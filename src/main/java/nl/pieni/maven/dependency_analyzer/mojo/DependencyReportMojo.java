@@ -57,6 +57,10 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
         for (String reportArtifact : reportArtifacts) {
             getLog().info("Report for artifact: " + reportArtifact);
             StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
+            if (strTok.countTokens() != 2) {
+                getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");
+                continue;
+            }
             String groupId = strTok.nextToken();
             String artifactId = strTok.nextToken();
             Dependency dependency = new Dependency();
@@ -64,6 +68,9 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
             dependency.setArtifactId(artifactId);
 
             Node artifactNode = dependencyDatabase.getSearcher().findArtifactNode(dependency);
+            if (artifactNode == null) {
+                continue;
+            }
 
             reportVersions(artifactNode);
             reportIncomingRelations(artifactNode);
@@ -88,7 +95,7 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
     }
 
     /**
-     * Print Relations to the specified node. Only the relations defined in {@link nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations}
+     * Print Relations to the specified node. Only the relations defined in {@link DependencyScopeRelations}
      * are processed
      *
      * @param node the parent for the report.

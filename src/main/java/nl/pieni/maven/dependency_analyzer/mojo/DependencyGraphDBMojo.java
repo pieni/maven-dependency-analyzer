@@ -28,7 +28,12 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.*;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
@@ -108,7 +113,6 @@ public class DependencyGraphDBMojo
     protected List<ArtifactRepository> remoteRepositories;
 
 
-
     /**
      * List of groupId's to retrieve from the repository.
      * A star (*) is appended to the pattern specified
@@ -159,6 +163,9 @@ public class DependencyGraphDBMojo
      */
     private DependencyIncludeFilter includeFilter;
 
+    private int nodeCreateCount = 0;
+    private int relationCreateCount = 0;
+
 
     /**
      * Create a Neo4j database and fill it with the dependencies and the relations found.
@@ -173,8 +180,6 @@ public class DependencyGraphDBMojo
         setup();
 
         try {
-            int elementCount = 0;
-
             for (ArtifactRepository remoteRepository : remoteRepositories) {
                 Map<String, ArtifactInfoGroup> stringArtifactInfoGroupMap;
 
@@ -187,16 +192,17 @@ public class DependencyGraphDBMojo
                     sortedArtifactInfoTreeSet.addAll(artifactInfoGroup.getArtifactInfos());
                     if (useLatestOnly) {
                         ArtifactInfo source = sortedArtifactInfoTreeSet.last();
-                        elementCount += processArtifactInfo(source);
+                        processArtifactInfo(source);
                     } else {
                         for (ArtifactInfo artifactInfo : sortedArtifactInfoTreeSet) {
-                            elementCount += processArtifactInfo(artifactInfo);
+                            processArtifactInfo(artifactInfo);
                         }
                     }
                 }
             }
 
-            getLog().info("Inserted " + elementCount + " elements into the Database");
+            getLog().info("Inserted " + nodeCreateCount + " elements in the Database");
+            getLog().info("Created " + relationCreateCount + " relations in the Database");
 
         } catch (IOException e) {
             throw new MojoExecutionException("Error communicating", e);
@@ -227,9 +233,8 @@ public class DependencyGraphDBMojo
      * @return Number of elements added to the Database
      * @throws SettingsBuildingException Unable to parse the settings file
      */
-    private int processArtifactInfo(@NotNull final ArtifactInfo source) throws SettingsBuildingException {
+    private void processArtifactInfo(@NotNull final ArtifactInfo source) throws SettingsBuildingException {
 
-        int count = 0;
         try {
             MavenProject mavenProject = artifactInfo2MavenProject(source);
             Dependency project = artifactInfo2Dependency(source);
@@ -238,19 +243,20 @@ public class DependencyGraphDBMojo
             List<Dependency> dependencyList = mavenProject.getDependencies();
             List<Dependency> filtered = includeFilter.filter(dependencyList);
             if (filtered.size() > 0) {
-                count += nodeProcessor.addArtifact(project);
-
+                nodeCreateCount += nodeProcessor.addArtifact(project);
+            } else {
+                getLog().info("No dependencies for inclusion selected");
             }
+
             for (Dependency dependency : filtered) {
                 getLog().info("Adding dependency: " + dependency);
-                count += nodeProcessor.addArtifact(dependency);
-                nodeProcessor.addRelation(project, dependency);
+                nodeCreateCount += nodeProcessor.addArtifact(dependency);
+                relationCreateCount += nodeProcessor.addRelation(project, dependency);
 
             }
         } catch (ProjectBuildingException e) {
             getLog().info("Error building project " + source);
         }
-        return count;
     }
 
     /**
@@ -299,8 +305,10 @@ public class DependencyGraphDBMojo
      *
      * @param artifactInfo The artifact
      * @return A {@link org.apache.maven.project.MavenProject}
-     * @throws org.apache.maven.project.ProjectBuildingException  Error parsing the POM file.
-     * @throws org.apache.maven.settings.building.SettingsBuildingException Unable to parse the settings file
+     * @throws org.apache.maven.project.ProjectBuildingException
+     *          Error parsing the POM file.
+     * @throws org.apache.maven.settings.building.SettingsBuildingException
+     *          Unable to parse the settings file
      */
     MavenProject artifactInfo2MavenProject(@NotNull ArtifactInfo artifactInfo) throws ProjectBuildingException, SettingsBuildingException {
         VersionRange versionRange = VersionRange.createFromVersion(artifactInfo.version);

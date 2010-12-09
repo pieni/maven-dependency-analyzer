@@ -62,6 +62,10 @@ public class SearcherImpl implements Searcher {
     @Override
     public Node findArtifactNode(@NotNull final Dependency dependency) {
         Node groupNode = findGroupNode(dependency);
+        if (groupNode == null) {
+            LOGGER.error("Unable to find groupNode for " + dependency);
+            return null;
+        }
         Traverser traverser = groupNode.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL_BUT_START_NODE, ArtifactRelations.has, Direction.OUTGOING);
         for (Node node : traverser) {
             if (node.getProperty(NodeProperties.ARTIFACT_ID).equals(dependency.getArtifactId())) {

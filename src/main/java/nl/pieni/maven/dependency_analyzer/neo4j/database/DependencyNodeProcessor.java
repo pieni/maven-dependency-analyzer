@@ -25,5 +25,5 @@ public interface DependencyNodeProcessor {
 
     int addArtifact(Dependency dependency);
 
-    void addRelation(Dependency sourceDependency, Dependency targetDependency);
+    int addRelation(Dependency sourceDependency, Dependency targetDependency);
 }

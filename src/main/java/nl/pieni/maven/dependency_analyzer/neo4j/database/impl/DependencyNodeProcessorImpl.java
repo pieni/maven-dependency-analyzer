@@ -63,7 +63,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     }
 
     @Override
-    public void addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
+    public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
+        int count = 0;
         Node sourceArtifactNode = database.getSearcher().findArtifactNode(sourceDependency);
         Node targetArtifactNode = database.getSearcher().findArtifactNode(targetDependency);
 
@@ -74,6 +75,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         if (!hasDependencyRelation(sourceArtifactNode, targetArtifactNode, relationType)) {
             database.startTransaction();
             sourceArtifactNode.createRelationshipTo(targetArtifactNode, relationType);
+            count++;
             getLog().info("Added " + relationType + " between " + sourceDependency + " and " + targetDependency);
             database.stopTransaction();
         }
@@ -83,9 +85,11 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
             database.startTransaction();
             sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
+            count++;
             getLog().info("Added " + ArtifactRelations.VersionsDependency + " between " + sourceDependency + " and " + targetDependency);
             database.stopTransaction();
         }
+        return count;
     }
 
     private boolean hasDependencyRelation(Node sourceArtifactNode, Node targetArtifactNode, RelationshipType type) {
