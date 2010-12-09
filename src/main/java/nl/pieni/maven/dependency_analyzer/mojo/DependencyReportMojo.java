@@ -55,7 +55,7 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         dependencyDatabase = new DependencyDatabaseImpl(getLog(), databaseDirectory);
         for (String reportArtifact : reportArtifacts) {
-            getLog().info("Report for artifact: " + reportArtifact);
+            getLog().info("\nReport for artifact: " + reportArtifact);
             StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
             if (strTok.countTokens() != 2) {
                 getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");
