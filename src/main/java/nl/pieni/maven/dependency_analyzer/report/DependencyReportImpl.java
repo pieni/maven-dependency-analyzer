@@ -84,7 +84,7 @@ public class DependencyReportImpl implements DependencyReport {
         writer.write("Report for Artifact: \"" + reportingArtifact + "\"" + lineSeperator);
         writer.write("Available versions" + lineSeperator);
         for (String version : versions) {
-            writer.write("\t" + version + "\n" + lineSeperator);
+            writer.write("\t" + version + lineSeperator);
         }
 
         writer.write("Incoming relations" + lineSeperator);
