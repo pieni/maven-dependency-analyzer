@@ -15,6 +15,7 @@
  */
 package nl.pieni.maven.dependency_analyzer.report;
 
+import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
 

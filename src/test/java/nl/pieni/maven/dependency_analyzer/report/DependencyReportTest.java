@@ -21,6 +21,7 @@ import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
+import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.junit.Test;
 

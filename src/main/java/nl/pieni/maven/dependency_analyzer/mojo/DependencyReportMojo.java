@@ -21,6 +21,7 @@ import nl.pieni.maven.dependency_analyzer.neo4j.database.impl.DependencyDatabase
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
+import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
