@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.database;
+package nl.pieni.maven.dependency_analyzer.database;
 
 import org.apache.maven.plugin.logging.Log;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.index.IndexService;
-
 
 
 /**
@@ -31,20 +26,27 @@ import org.neo4j.index.IndexService;
  * Time: 11:34
  * To change this template use File | Settings | File Templates.
  */
-public interface DependencyDatabase {
-    GraphDatabaseService getGraphDb();
+public interface DependencyDatabase<DB, N> extends DependencyDatabaseSearcher {
 
-    IndexService getIndexService();
+    DB getDatabase();
 
-    Searcher getSearcher();
+    Log getLOGGER();
 
-    Log getLog();
+    N createNode();
 
-    Node createNode();
+    /**
+     * Add index entry for the specified property
+     *
+     * @param node the node
+     * @param key  the key
+     */
+    void indexOnProperty(final N node, final String key);
 
-    Transaction startTransaction();
+    void shutdownDatabase();
+
+    void startTransaction();
 
     void stopTransaction();
 
-    void shutdown();
+
 }

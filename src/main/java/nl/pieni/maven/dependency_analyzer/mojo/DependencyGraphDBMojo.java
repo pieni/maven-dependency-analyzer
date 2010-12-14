@@ -16,8 +16,8 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo;
 
+import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.filter.DependencyIncludeFilter;
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.impl.DependencyNodeProcessorImpl;
 import nl.pieni.maven.dependency_analyzer.repository.remote.RemoteRepositorySearcher;
 import nl.pieni.maven.dependency_analyzer.util.VersionComparator;

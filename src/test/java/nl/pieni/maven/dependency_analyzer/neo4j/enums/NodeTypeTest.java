@@ -5,14 +5,13 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 9-12-10
- * Time: 22:56
- * To change this template use File | Settings | File Templates.
+ * Node type test
  */
 public class NodeTypeTest {
 
+    /**
+     * Test enum values
+     */
     @Test
     public void versionsDependencyTest() {
         NodeType[] values = NodeType.values();
@@ -22,6 +21,9 @@ public class NodeTypeTest {
         }
     }
 
+    /**
+     * Test from string conversions
+     */
     @Test
     public void fromStringTest() {
         NodeType[] values = NodeType.values();

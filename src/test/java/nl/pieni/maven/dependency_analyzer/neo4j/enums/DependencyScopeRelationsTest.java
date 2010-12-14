@@ -1,17 +1,18 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
+import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 9-12-10
- * Time: 22:47
- * To change this template use File | Settings | File Templates.
+ * Dependency scope tests
  */
 public class DependencyScopeRelationsTest {
+
+    /**
+     * Test all enum values
+     */
     @Test
     public void versionsDependencyTest() {
         DependencyScopeRelations[] values = DependencyScopeRelations.values();
@@ -21,6 +22,9 @@ public class DependencyScopeRelationsTest {
         }
     }
 
+    /**
+     * Test the from string conversion
+     */
     @Test
     public void fromStringTest() {
         DependencyScopeRelations[] values = DependencyScopeRelations.values();

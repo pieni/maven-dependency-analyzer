@@ -16,20 +16,19 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.impl.DependencyDatabaseImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
+import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
+import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
+import nl.pieni.maven.dependency_analyzer.report.LogWriter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.jetbrains.annotations.NotNull;
-import org.neo4j.graphdb.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.*;
 
 /**
  * Depenency grahpDB reporting Mojo.
@@ -48,12 +47,13 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
      */
     private List<String> reportArtifacts;
 
-    DependencyDatabase dependencyDatabase;
-
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        dependencyDatabase = new DependencyDatabaseImpl(getLog(), databaseDirectory);
+        DependencyDatabaseSearcher searcher = new DependencyDatabaseImpl(getLog(), databaseDirectory);
+        DependencyReport reporter = new DependencyReportImpl(searcher);
+        LogWriter logWriter = new LogWriter(getLog());
+
         for (String reportArtifact : reportArtifacts) {
             getLog().info("\nReport for artifact: " + reportArtifact);
             StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
@@ -67,115 +67,16 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
             dependency.setGroupId(groupId);
             dependency.setArtifactId(artifactId);
 
-            Node artifactNode = dependencyDatabase.getSearcher().findArtifactNode(dependency);
+            ArtifactNode artifactNode = searcher.findArtifactNode(dependency);
             if (artifactNode == null) {
                 continue;
             }
 
-            reportVersions(artifactNode);
-            reportIncomingRelations(artifactNode);
-            reportVersionDependencies(artifactNode);
-
-        }
-    }
-
-    private void reportVersionDependencies(Node node) {
-        getLog().info("Version specific relations: ");
-        Iterable<Relationship> availableVersionRelations = node.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
-
-        for (Relationship relationship : availableVersionRelations) {
-            Node versionNode = relationship.getOtherNode(node);
-            getLog().info("\tVersion: " + getProperty(versionNode, VERSION));
-            Iterable<Relationship> versionRelations = versionNode.getRelationships(ArtifactRelations.VersionsDependency, Direction.INCOMING);
-            for (Relationship versionRelation : versionRelations) {
-                Node relationNode = versionRelation.getOtherNode(versionNode);
-                getLog().info("\t\t" + versionNodeComplete(relationNode));
+            try {
+                reporter.createReport(artifactNode, logWriter);
+            } catch (IOException e) {
+                throw  new MojoExecutionException("Error creating output for reporting", e);
             }
         }
     }
-
-    /**
-     * Print Relations to the specified node. Only the relations defined in {@link DependencyScopeRelations}
-     * are processed
-     *
-     * @param node the parent for the report.
-     */
-    private void reportIncomingRelations(Node node) {
-        getLog().info("Incoming relations artifacts: ");
-        DependencyScopeRelations[] relations = DependencyScopeRelations.values();
-        for (DependencyScopeRelations relation : relations) {
-            getLog().info("\tScope: " + relation);
-            Iterable<Relationship> scopeRelations = node.getRelationships(relation, Direction.INCOMING);
-            for (Relationship scopeRelation : scopeRelations) {
-                Node scopeNode = scopeRelation.getOtherNode(node);
-                String id = getArtifactInformation(scopeNode);
-                getLog().info("\t\t" + id);
-            }
-        }
-    }
-
-    /**
-     * Retrieve a property from the node.
-     *
-     * @param node the node
-     * @param key  the key
-     * @return it value ("NotFound" if not present)
-     */
-    private String getProperty(@NotNull Node node, String key) {
-        try {
-            return node.getProperty(key).toString();
-        } catch (NotFoundException e) {
-            return "NotFound";
-        }
-    }
-
-    /**
-     * Print all available versions of the Node
-     *
-     * @param node the node
-     */
-    private void reportVersions(Node node) {
-        getLog().info("Available versions: ");
-        Iterable<Relationship> versions = node.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
-        for (Relationship relationship : versions) {
-            Node versionNode = relationship.getOtherNode(node);
-            getLog().info("\t" + getProperty(versionNode, VERSION));
-        }
-    }
-
-
-
-    /**
-     * Create a string that holds the groupId:ArtifactId:type
-     *
-     * @param artifactNode the node
-     * @return groupId:ArtifactId:type
-     */
-    private String getArtifactInformation(Node artifactNode) {
-        Iterable<Relationship> hasRelations = artifactNode.getRelationships(ArtifactRelations.has, Direction.INCOMING);
-
-        for (Relationship relationship : hasRelations) {
-            Node relationNode = relationship.getOtherNode(artifactNode);
-            return getProperty(relationNode, GROUP_ID) + ":" + getProperty(artifactNode, ARTIFACT_ID) + ":" + getProperty(artifactNode, TYPE);
-        }
-
-        return "unable to determine";
-    }
-
-    /**
-     * * Create a string that holds the groupId:ArtifactId:type
-     * @param node a versionNode
-     * @return groupId:ArtifactId:type:version
-     */
-    private String versionNodeComplete(Node node) {
-        Iterable<Relationship> parentRelations = node.getRelationships(ArtifactRelations.version, Direction.INCOMING);
-        for (Relationship parentRelation : parentRelations) {
-            Node parent = parentRelation.getOtherNode(node);
-            return getArtifactInformation(parent) + ":" + getProperty(node, VERSION);
-        }
-
-        return "unknown";
-    }
-
-
 }

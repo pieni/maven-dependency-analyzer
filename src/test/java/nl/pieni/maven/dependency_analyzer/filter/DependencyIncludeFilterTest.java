@@ -26,18 +26,13 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 1-12-10
- * Time: 22:42
- * To change this template use File | Settings | File Templates.
+ * Include filter tests
  */
 public class DependencyIncludeFilterTest {
 
     private Dependency junit;
     private Dependency orgPieniMaven;
-    private List<Dependency> dependencies = new ArrayList<Dependency>();
-    private Dependency junitXx;
+    private final List<Dependency> dependencies = new ArrayList<Dependency>();
 
 
     @Test
@@ -156,9 +151,9 @@ public class DependencyIncludeFilterTest {
     @Before
     public void setUp() throws Exception {
         this.junit = getJunitJunit();
-        this.junitXx = getJunitXx45();
+        Dependency junitXx=getJunitXx45();
         this.orgPieniMaven = getOrgPieniMaven10();
-        dependencies.add(this.junitXx);
+        dependencies.add(junitXx);
         dependencies.add(junit);
         dependencies.add(orgPieniMaven);
     }

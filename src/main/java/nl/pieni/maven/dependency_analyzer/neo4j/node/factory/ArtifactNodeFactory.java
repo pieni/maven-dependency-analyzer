@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.node;
+package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.ARTIFACT_ID;
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.TYPE;
 
 
 /**
  * An artifact Node
  */
-public class ArtifactNodeFactory extends AbstractNodeFactory {
+public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
 
     /**
      * {@inheritDoc}
      */
-    public ArtifactNodeFactory(DependencyDatabase database, final Log logger) {
+    public ArtifactNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, final Log logger) {
         super(database, logger);
     }
 
@@ -44,15 +46,14 @@ public class ArtifactNodeFactory extends AbstractNodeFactory {
      * {@inheritDoc}
      */
     @Override
-    protected Node create(@NotNull final Dependency dependency) {
+    protected ArtifactNode create(@NotNull final Dependency dependency) {
         getDatabase().startTransaction();
-        Node node = createNode(NodeType.ArtifactNode);
-        node.setProperty(ARTIFACT_ID, dependency.getArtifactId());
-        indexOnProperty(node, ARTIFACT_ID);
-        node.setProperty(TYPE, dependency.getType());
-        LOGGER.info("Create ArtifactNode: " + node2String(node));
+        Node node = getDatabase().createNode();
+        ArtifactNode artifactNode = new ArtifactNodeDecorator(node, dependency);
+        getDatabase().indexOnProperty(node, ARTIFACT_ID);
+        LOGGER.info("Create ArtifactNode: " + artifactNode);
         getDatabase().stopTransaction();
-        return node;
+        return artifactNode;
     }
 
     /**
@@ -61,14 +62,14 @@ public class ArtifactNodeFactory extends AbstractNodeFactory {
     @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        Node groupNode = getDatabase().getSearcher().findGroupNode(dependency);
-        Node artifactNode = getDatabase().getSearcher().findArtifactNode(dependency);
+        GroupNodeDecorator groupNode = (GroupNodeDecorator)getDatabase().findGroupNode(dependency);
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getDatabase().findArtifactNode(dependency);
         if (artifactNode == null) {
-            artifactNode = create(dependency);
+            artifactNode = (ArtifactNodeDecorator)create(dependency);
             nodeCount++;
             getDatabase().startTransaction();
             groupNode.createRelationshipTo(artifactNode, ArtifactRelations.has);
-            LOGGER.info("Created relation " + ArtifactRelations.has + "between " + node2String(groupNode) + " and " + node2String(artifactNode));
+            LOGGER.info("Created relation " + ArtifactRelations.has + "between " + groupNode + " and " + artifactNode);
             getDatabase().stopTransaction();
         }
         return nodeCount;

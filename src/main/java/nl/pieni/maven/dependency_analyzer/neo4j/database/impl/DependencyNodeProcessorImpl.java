@@ -16,13 +16,15 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.database.impl;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessor;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeFactory;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeFactory;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeFactory;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
+import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.ArtifactNodeFactory;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.GroupNodeFactory;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.VersionNodeFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.jetbrains.annotations.NotNull;
@@ -65,8 +67,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     @Override
     public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
         int count = 0;
-        Node sourceArtifactNode = database.getSearcher().findArtifactNode(sourceDependency);
-        Node targetArtifactNode = database.getSearcher().findArtifactNode(targetDependency);
+        ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator)database.findArtifactNode(sourceDependency);
+        ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator)database.findArtifactNode(targetDependency);
 
 
         RelationshipType relationType = determineRelationType(targetDependency);
@@ -80,8 +82,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
             database.stopTransaction();
         }
 
-        Node targetVersionNode = database.getSearcher().findVersionNode(targetDependency);
-        Node sourceVersionNode = database.getSearcher().findVersionNode(sourceDependency);
+        VersionNodeDecorator targetVersionNode = (VersionNodeDecorator)database.findVersionNode(targetDependency);
+        VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator)database.findVersionNode(sourceDependency);
         if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
             database.startTransaction();
             sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);

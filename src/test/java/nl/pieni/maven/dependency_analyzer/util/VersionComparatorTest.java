@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class VersionComparatorTest {
 
-    private VersionComparator comparator = new VersionComparator();
+    private final VersionComparator comparator = new VersionComparator();
 
     @Test
     public void equal() {

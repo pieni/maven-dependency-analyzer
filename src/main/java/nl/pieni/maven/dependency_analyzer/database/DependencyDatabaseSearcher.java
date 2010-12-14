@@ -14,37 +14,52 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.database;
+package nl.pieni.maven.dependency_analyzer.database;
 
+import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
+import nl.pieni.maven.dependency_analyzer.node.GroupNode;
+import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.neo4j.graphdb.Node;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface to the database searcher
  */
-public interface Searcher {
+public interface DependencyDatabaseSearcher {
     /**
      * Find the version node for specified {@link org.apache.maven.model.Dependency}
+     *
      * @param dependency The dependency
      * @return the Found node, null if not found
      */
-    @NotNull
-    Node findVersionNode(Dependency dependency);
+    VersionNode findVersionNode(Dependency dependency);
 
     /**
      * Find the artifact node for specified {@link org.apache.maven.model.Dependency}
+     *
      * @param dependency The dependency
      * @return the Found node, null if not found
      */
-    @Nullable
-    Node findArtifactNode(Dependency dependency);
+    ArtifactNode findArtifactNode(Dependency dependency);
 
     /**
      * Find the group node for specified {@link org.apache.maven.model.Dependency}
+     *
      * @param dependency The dependency
      * @return the Found node, null if not found
      */
-    Node findGroupNode(Dependency dependency);
+    GroupNode findGroupNode(Dependency dependency);
+
+    List<VersionNode> getVersionNodes(ArtifactNode node);
+
+    Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(ArtifactNode node);
+
+    Map<VersionNode, List<VersionNode>> getVersionDependencies(ArtifactNode node);
+
+    void shutdownSearcher();
+
+
 }

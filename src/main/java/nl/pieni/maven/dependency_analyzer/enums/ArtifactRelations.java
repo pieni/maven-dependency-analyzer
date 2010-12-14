@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.enums;
+package nl.pieni.maven.dependency_analyzer.enums;
 
 import org.neo4j.graphdb.RelationshipType;
 

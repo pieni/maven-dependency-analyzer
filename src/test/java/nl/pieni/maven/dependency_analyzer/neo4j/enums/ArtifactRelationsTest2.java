@@ -1,18 +1,18 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
+import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 9-12-10
- * Time: 22:57
- * To change this template use File | Settings | File Templates.
+ * Artifact Relations tests
  */
 public class ArtifactRelationsTest2 {
 
+    /**
+     * Verify all defined relations
+     */
     @Test
     public void versionsDependencyTest() {
         ArtifactRelations[] values = ArtifactRelations.values();

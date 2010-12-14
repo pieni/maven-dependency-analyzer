@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.node;
+package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERS
 /**
  * version Node
  */
-public class VersionNodeFactory extends AbstractNodeFactory {
+public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
 
 
     /**
@@ -43,13 +45,12 @@ public class VersionNodeFactory extends AbstractNodeFactory {
      * {@inheritDoc}
      */
     @Override
-    protected Node create(@NotNull final Dependency dependency) {
+    protected VersionNode create(@NotNull final Dependency dependency) {
         getDatabase().startTransaction();
-        Node node = createNode(NodeType.VersionNode);
-        node.setProperty(VERSION, dependency.getVersion());
-        LOGGER.info("Create versionNode: " + node2String(node));
+        VersionNode versionNode = new VersionNodeDecorator(getDatabase().createNode(), dependency);
+        LOGGER.info("Create versionNode: " + versionNode);
         getDatabase().stopTransaction();
-        return node;
+        return versionNode;
     }
 
     /**
@@ -57,7 +58,7 @@ public class VersionNodeFactory extends AbstractNodeFactory {
      */
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        Node artifactNode = getDatabase().getSearcher().findArtifactNode(dependency);
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getDatabase().findArtifactNode(dependency);
         Iterable<Relationship> versionsIterable = artifactNode.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
         Node versionNode = null;
 
@@ -66,18 +67,18 @@ public class VersionNodeFactory extends AbstractNodeFactory {
             if (dependency.getVersion().equals(verNode.getProperty(VERSION))) {
                 versionNode = verNode;
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found versionNode " + node2String(verNode));
+                    LOGGER.debug("Found versionNode " + verNode);
                 }
                 break;
             }
         }
 
         if (versionNode == null) {
-            versionNode = create(dependency);
+            versionNode = (VersionNodeDecorator)create(dependency);
             nodeCount++;
             getDatabase().startTransaction();
             artifactNode.createRelationshipTo(versionNode, ArtifactRelations.version);
-            LOGGER.info("Created relation " + ArtifactRelations.version + "between " + node2String(artifactNode) + " and " + node2String(versionNode));
+            LOGGER.info("Created relation " + ArtifactRelations.version + "between " + artifactNode + " and " + versionNode);
             getDatabase().stopTransaction();
         }
         return nodeCount;

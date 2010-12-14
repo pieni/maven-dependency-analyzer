@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.node;
+package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.GROU
 /**
  * GroupNodeFactory
  */
-public class GroupNodeFactory extends AbstractNodeFactory {
+public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
 
 
     /**
@@ -43,14 +44,14 @@ public class GroupNodeFactory extends AbstractNodeFactory {
      * {@inheritDoc}
      */
     @Override
-    protected Node create(@NotNull final Dependency dependency) {
+    protected GroupNode create(@NotNull final Dependency dependency) {
         getDatabase().startTransaction();
-        Node node = createNode(NodeType.GroupNode);
-        node.setProperty(GROUP_ID, dependency.getGroupId());
-        indexOnProperty(node, GROUP_ID);
-        LOGGER.info("Create GroupNode: " + node2String(node));
+        Node node = getDatabase().createNode();
+        GroupNode groupNode = new GroupNodeDecorator(node, dependency);
+        getDatabase().indexOnProperty(node, GROUP_ID);
+        LOGGER.info("Create GroupNode: " + node);
         getDatabase().stopTransaction();
-        return node;
+        return groupNode;
     }
 
     /**
@@ -59,14 +60,14 @@ public class GroupNodeFactory extends AbstractNodeFactory {
     @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        Node groupNode = getDatabase().getSearcher().findGroupNode(dependency);
+        GroupNodeDecorator groupNode = (GroupNodeDecorator)getDatabase().findGroupNode(dependency);
         if (groupNode == null) {
-            groupNode = create(dependency);
+            groupNode = (GroupNodeDecorator)create(dependency);
             nodeCount++;
             getDatabase().startTransaction();
-            getDatabase().getGraphDb().getReferenceNode().createRelationshipTo(groupNode, ArtifactRelations.has);
+            getDatabase().getDatabase().getReferenceNode().createRelationshipTo(groupNode, ArtifactRelations.has);
 
-            LOGGER.info("Created relation " + ArtifactRelations.has + "between referenceNode and " + node2String(groupNode));
+            LOGGER.info("Created relation " + ArtifactRelations.has + "between referenceNode and " + groupNode);
 
             getDatabase().stopTransaction();
         }
