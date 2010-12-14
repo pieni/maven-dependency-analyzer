@@ -1,5 +1,5 @@
 /*
- * Copyright  2010 Pieter van der Meer (pieter@pieni.nl)
+ * Copyright (c) 2010 Pieter van der Meer (pieter@pieni.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
  * Wrapper arround the {@link Log} implementation of the plugin logger and allow usage as a
  * writer for the {@link DependencyReportImpl}
  */
-public class LogWriter extends Writer {
+public class logWriter extends Writer {
     private static final String LINESEPERATOR = System.getProperty("line.separator");
     private final Log LOGGER;
 
@@ -34,7 +34,7 @@ public class LogWriter extends Writer {
      *
      * @param logger the Plugin logger
      */
-    public LogWriter(Log logger) {
+    public logWriter(Log logger) {
         this.LOGGER = logger;
     }
 

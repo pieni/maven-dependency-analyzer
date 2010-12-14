@@ -22,7 +22,6 @@ import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
 import org.apache.maven.plugin.logging.SystemStreamLog;
-import org.apache.xmlcommons.Version;
 import org.junit.Test;
 
 import java.io.IOException;
