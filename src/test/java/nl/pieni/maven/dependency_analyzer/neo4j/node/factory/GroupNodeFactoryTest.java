@@ -21,27 +21,19 @@ import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.node.VersionNode;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERSION;
-import static org.mockito.Matchers.any;
+import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.GROUP_ID;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -51,14 +43,12 @@ import static org.mockito.Mockito.when;
 /**
  * VersionNode decorator testing
  */
-public class VersionNodeFactoryTest {
+public class GroupNodeFactoryTest {
 
     Node createMockNode() {
         Node node = mock(Node.class);
-        Map<String, String> keyValueMap = new HashMap<String, String>() {
+        final Map<String, String> keyValueMap = new HashMap<String, String>() {
             {
-                put("key1", "value1");
-                put("key2", "value2");
             }
         };
         when(node.getPropertyKeys()).thenReturn(keyValueMap.keySet());
@@ -78,29 +68,13 @@ public class VersionNodeFactoryTest {
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        GroupNodeFactory factory = new GroupNodeFactory(database, log);
         factory.create(dependency);
 
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log).info(startsWith("Create versionNode: Node{ Id = 1"));
-    }
-
-    @Test
-    public void insertExistingTest() {
-        Dependency dependency = mock(Dependency.class);
-        when(dependency.getVersion()).thenReturn("1.0");
-        @SuppressWarnings("unchecked")
-        DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
-        ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
-        VersionNodeDecorator versionNode = mock(VersionNodeDecorator.class);
-        when(database.findVersionNode(dependency)).thenReturn(versionNode);
-        Log log = mock(Log.class);
-        when(log.isDebugEnabled()).thenReturn(true);
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
-        assertEquals(0, factory.insert(dependency));
+        verify(log).info(startsWith("Create GroupNode:"));
     }
 
     @Test
@@ -109,21 +83,39 @@ public class VersionNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
-        ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
-        when(database.findVersionNode(dependency)).thenReturn(null);
+        when(database.findGroupNode(dependency)).thenReturn(null);
+
+        Node groupNode = createMockNode();
+        when(database.createNode()).thenReturn(groupNode);
+
+        Node referenceNode = mock(Node.class);
+        GraphDatabaseService graphDatabaseService = mock(GraphDatabaseService.class);
+        when(database.getDatabase()).thenReturn(graphDatabaseService);
+        when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        Node versionNode = createMockNode();
-        when(database.createNode()).thenReturn(versionNode);
-
-
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        GroupNodeFactory factory = new GroupNodeFactory(database, log);
         assertEquals(1, factory.insert(dependency));
-
-        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
+        verify(database).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
         verify(database, times(2)).startTransaction();
         verify(database, times(2)).stopTransaction();
-        verify(log).info(startsWith("Create versionNode: "));
+        verify(log).info(startsWith("Create GroupNode: "));
+    }
+
+    @Test
+    public void insertExistingTest() {
+        Dependency dependency = mock(Dependency.class);
+        when(dependency.getVersion()).thenReturn("1.0");
+        @SuppressWarnings("unchecked")
+        DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
+        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+
+        Log log = mock(Log.class);
+        GroupNodeFactory factory = new GroupNodeFactory(database, log);
+        when(log.isDebugEnabled()).thenReturn(true);
+        assertEquals(0, factory.insert(dependency));
     }
 }

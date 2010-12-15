@@ -17,7 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.mojo;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.neo4j.database.impl.DependencyDatabaseImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
 import nl.pieni.maven.dependency_analyzer.repository.RepositorySearcher;
 import org.apache.maven.plugin.AbstractMojo;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.database.impl;
+package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;

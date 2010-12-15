@@ -58,23 +58,10 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
      */
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getDatabase().findArtifactNode(dependency);
-        Iterable<Relationship> versionsIterable = artifactNode.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
-        Node versionNode = null;
-
-        for (Relationship relationship : versionsIterable) {
-            Node verNode = relationship.getOtherNode(artifactNode);
-            if (dependency.getVersion().equals(verNode.getProperty(VERSION))) {
-                versionNode = verNode;
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found versionNode " + verNode);
-                }
-                break;
-            }
-        }
-
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getDatabase().findArtifactNode(dependency);
+        VersionNodeDecorator versionNode = (VersionNodeDecorator) getDatabase().findVersionNode(dependency);
         if (versionNode == null) {
-            versionNode = (VersionNodeDecorator)create(dependency);
+            versionNode = (VersionNodeDecorator) create(dependency);
             nodeCount++;
             getDatabase().startTransaction();
             artifactNode.createRelationshipTo(versionNode, ArtifactRelations.version);

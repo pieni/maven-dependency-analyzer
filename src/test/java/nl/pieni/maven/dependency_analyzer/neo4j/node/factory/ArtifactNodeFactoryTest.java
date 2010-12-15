@@ -17,31 +17,20 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.node.VersionNode;
+import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERSION;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -51,14 +40,12 @@ import static org.mockito.Mockito.when;
 /**
  * VersionNode decorator testing
  */
-public class VersionNodeFactoryTest {
+public class ArtifactNodeFactoryTest {
 
     Node createMockNode() {
         Node node = mock(Node.class);
-        Map<String, String> keyValueMap = new HashMap<String, String>() {
+        final Map<String, String> keyValueMap = new HashMap<String, String>() {
             {
-                put("key1", "value1");
-                put("key2", "value2");
             }
         };
         when(node.getPropertyKeys()).thenReturn(keyValueMap.keySet());
@@ -78,13 +65,13 @@ public class VersionNodeFactoryTest {
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
         factory.create(dependency);
 
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log).info(startsWith("Create versionNode: Node{ Id = 1"));
+        verify(log).info(startsWith("Create ArtifactNode: Node{ Id = 1"));
     }
 
     @Test
@@ -93,13 +80,15 @@ public class VersionNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
+        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+
         ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
         when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
-        VersionNodeDecorator versionNode = mock(VersionNodeDecorator.class);
-        when(database.findVersionNode(dependency)).thenReturn(versionNode);
+
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
         assertEquals(0, factory.insert(dependency));
     }
 
@@ -109,21 +98,23 @@ public class VersionNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
-        ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
-        when(database.findVersionNode(dependency)).thenReturn(null);
+        GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
+        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+
+        when(database.findArtifactNode(dependency)).thenReturn(null);
+
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        Node versionNode = createMockNode();
-        when(database.createNode()).thenReturn(versionNode);
+        Node artifactNode = createMockNode();
+        when(database.createNode()).thenReturn(artifactNode);
 
-
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
         assertEquals(1, factory.insert(dependency));
 
-        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
+        verify(database).indexOnProperty(artifactNode, NodeProperties.ARTIFACT_ID);
         verify(database, times(2)).startTransaction();
         verify(database, times(2)).stopTransaction();
-        verify(log).info(startsWith("Create versionNode: "));
+        verify(log).info(startsWith("Create ArtifactNode: "));
     }
 }
