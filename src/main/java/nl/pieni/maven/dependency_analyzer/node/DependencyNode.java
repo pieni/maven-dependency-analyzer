@@ -16,28 +16,16 @@
 
 package nl.pieni.maven.dependency_analyzer.node;
 
+import org.apache.maven.model.Dependency;
+
 /**
- * Interface for the an ArtifactNode
+ * Base interface for all nodes
  */
-public interface ArtifactNode extends DependencyNode {
+public interface DependencyNode {
     /**
-     * Retrieve the artifact ID
+     * Set the {@link Dependency} instance
      *
-     * @return artifactId
+     * @param dependency the dependency
      */
-    String getArtifactId();
-
-    /**
-     * Return the type of the artifact
-     *
-     * @return
-     */
-    String getType();
-
-    /**
-     * Retrieve the parent of the Artifact (i.e. the groupId)
-     *
-     * @return {@link GroupNode}
-     */
-    GroupNode getParent();
+    void setDependency(Dependency dependency);
 }

@@ -41,7 +41,7 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
 
     /**
      * The type of artifacts to search. remember, the search is performed against the packaging that is defined in the
-     * pom file used to create the artifact.
+     * pom file used to create the artifact. Format: "groupId:artifactId"
      *
      * @parameter property="reportArtifacts"
      */
@@ -56,17 +56,12 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
 
         for (String reportArtifact : reportArtifacts) {
             getLog().info("\nReport for artifact: " + reportArtifact);
-            StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
-            if (strTok.countTokens() != 2) {
-                getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");
-                continue;
+            Dependency dependency = stringToGaDependency(reportArtifact);
+            if (dependency == null){
+                return;
             }
-            String groupId = strTok.nextToken();
-            String artifactId = strTok.nextToken();
-            Dependency dependency = new Dependency();
-            dependency.setGroupId(groupId);
-            dependency.setArtifactId(artifactId);
 
+            //Find the Node
             ArtifactNode artifactNode = searcher.findArtifactNode(dependency);
             if (artifactNode == null) {
                 continue;
@@ -78,5 +73,24 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
                 throw  new MojoExecutionException("Error creating output for reporting", e);
             }
         }
+    }
+
+    /**
+     * Convert the string (groupId:artifactId) to a {@link Dependency} object.
+     * @param reportArtifact The G:A string
+     * @return a dependency object
+     */
+    private Dependency stringToGaDependency(String reportArtifact) {
+        StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
+        if (strTok.countTokens() != 2) {
+            getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");
+            return null;
+        }
+        String groupId = strTok.nextToken();
+        String artifactId = strTok.nextToken();
+        Dependency dependency = new Dependency();
+        dependency.setGroupId(groupId);
+        dependency.setArtifactId(artifactId);
+        return dependency;
     }
 }

@@ -20,6 +20,7 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
 import nl.pieni.maven.dependency_analyzer.repository.RepositorySearcher;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * base class for the Mojo's
@@ -44,7 +45,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
     protected DependencyDatabase database;
 
 
-    protected void setup() {
+    protected void setup() throws MojoExecutionException {
         database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
     }
 

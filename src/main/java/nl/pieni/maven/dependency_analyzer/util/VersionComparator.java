@@ -27,6 +27,10 @@ import java.util.Comparator;
  */
 public class VersionComparator implements Comparator<ArtifactInfo> {
 
+    /**
+     * @inheritDoc
+     */
+    @Override
     public int compare(@NotNull final ArtifactInfo f1, @NotNull final ArtifactInfo f2) {
 
         ComparableVersion cv1 = new ComparableVersion(f1.version);

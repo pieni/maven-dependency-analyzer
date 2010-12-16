@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 public class LogWriter extends Writer {
     private static final String LINESEPERATOR = System.getProperty("line.separator");
     private final Log LOGGER;
+
     /**
      * Default constructor
      *
@@ -51,8 +52,8 @@ public class LogWriter extends Writer {
 
     }
 
-    /*
-     *  @inheritDoc
+    /**
+     * @inheritDoc
      */
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
@@ -62,16 +63,16 @@ public class LogWriter extends Writer {
         }
     }
 
-    /*
-     *  @inheritDoc
+    /**
+     * @inheritDoc
      */
     @Override
     public void flush() throws IOException {
         //Intentionally left blank
     }
 
-    /*
-     *  @inheritDoc
+    /**
+     * @inheritDoc
      */
     @Override
     public void close() throws IOException {

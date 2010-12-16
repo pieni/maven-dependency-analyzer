@@ -101,7 +101,7 @@ public class DependencyGraphDBMojo
     private ProjectBuilder projectBuilder;
 
     /**
-     * Node database
+     * Node Processor
      */
     protected DependencyNodeProcessor nodeProcessor;
 
@@ -131,7 +131,7 @@ public class DependencyGraphDBMojo
 
     /**
      * The type of artifacts to search. remember, the search is performed against the packaging that is defined in the
-     * pom file used to create the artifact.
+     * pom file used to create the artifact. Usable values: jar, war and ear
      *
      * @parameter property="packaging"
      */
@@ -152,7 +152,7 @@ public class DependencyGraphDBMojo
     private Boolean useLatestOnly;
 
     /**
-     * Target folder
+     * Folder to store the DB in
      *
      * @parameter property="indexDirectory" default-value="${project.build.directory}"
      */
@@ -163,8 +163,20 @@ public class DependencyGraphDBMojo
      */
     private DependencyIncludeFilter includeFilter;
 
+    /*
+     * Counter for the node count
+     */
     private int nodeCreateCount = 0;
+
+    /*
+     * Counter for the relation count
+     */
     private int relationCreateCount = 0;
+
+    /*
+     * Required to process the pom file
+     */
+    private ProjectBuildingRequest buildRequest;
 
 
     /**
@@ -175,7 +187,10 @@ public class DependencyGraphDBMojo
     public void execute()
             throws MojoExecutionException {
 
-        getLog().info("Starting " + this.getClass().getName());
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Starting " + this.getClass().getName());
+        }
+
 
         setup();
 
@@ -218,11 +233,12 @@ public class DependencyGraphDBMojo
     /**
      * Initialize the environment required for processing.
      */
-    protected void setup() {
+    protected void setup() throws MojoExecutionException {
         super.setup();
-        includeFilter = new DependencyIncludeFilter(includeFilterPatterns);
-        nodeProcessor = new DependencyNodeProcessorImpl(database, getLog());
-        repositorySearcher = new RemoteRepositorySearcher(indexer, indexUpdater, getLog(), indexDirectory, allowSnapshots);
+        this.includeFilter = new DependencyIncludeFilter(includeFilterPatterns);
+        this.nodeProcessor = new DependencyNodeProcessorImpl(database, getLog());
+        this.repositorySearcher = new RemoteRepositorySearcher(indexer, indexUpdater, getLog(), indexDirectory, allowSnapshots);
+        this.buildRequest = makeBuildingRequest();
     }
 
     /**
@@ -286,18 +302,25 @@ public class DependencyGraphDBMojo
      * @throws SettingsBuildingException Unable to parse the settings file.
      */
     @NotNull
-    private ProjectBuildingRequest makeBuildingRequest() throws SettingsBuildingException {
-        ProjectBuildingRequest buildRequest = new DefaultProjectBuildingRequest();
+    private ProjectBuildingRequest makeBuildingRequest() throws MojoExecutionException {
 
-        SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(new DefaultSettingsBuildingRequest());
-        Settings settings = settingsBuildingResult.getEffectiveSettings();
-        buildRequest.setActiveProfileIds(settings.getActiveProfiles());
-        buildRequest.setLocalRepository(localRepository);
-        MavenRepositorySystemSession mrs = new MavenRepositorySystemSession();
-        mrs.setLocalRepositoryManager(new SimpleLocalRepositoryManager(localRepository.getBasedir()));
-        buildRequest.setRepositorySession(mrs);
-        buildRequest.setRemoteRepositories(remoteRepositories);
-        return buildRequest;
+        try {
+            if (buildRequest == null) {
+                buildRequest = new DefaultProjectBuildingRequest();
+
+                SettingsBuildingResult settingsBuildingResult = settingsBuilder.build(new DefaultSettingsBuildingRequest());
+                Settings settings = settingsBuildingResult.getEffectiveSettings();
+                buildRequest.setActiveProfileIds(settings.getActiveProfiles());
+                buildRequest.setLocalRepository(localRepository);
+                MavenRepositorySystemSession mrs = new MavenRepositorySystemSession();
+                mrs.setLocalRepositoryManager(new SimpleLocalRepositoryManager(localRepository.getBasedir()));
+                buildRequest.setRepositorySession(mrs);
+                buildRequest.setRemoteRepositories(remoteRepositories);
+            }
+            return buildRequest;
+        } catch (SettingsBuildingException e) {
+            throw new MojoExecutionException("Unable to create building request", e);
+        }
     }
 
     /**
@@ -313,7 +336,7 @@ public class DependencyGraphDBMojo
     MavenProject artifactInfo2MavenProject(@NotNull ArtifactInfo artifactInfo) throws ProjectBuildingException, SettingsBuildingException {
         VersionRange versionRange = VersionRange.createFromVersion(artifactInfo.version);
         Artifact parentArtifact = new DefaultArtifact(artifactInfo.groupId, artifactInfo.artifactId, versionRange, "compile", "pom", null, new DefaultArtifactHandler());
-        ProjectBuildingResult buildingResult = projectBuilder.build(parentArtifact, makeBuildingRequest());
+        ProjectBuildingResult buildingResult = projectBuilder.build(parentArtifact, this.buildRequest);
         return buildingResult.getProject();
     }
 

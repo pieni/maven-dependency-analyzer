@@ -80,6 +80,7 @@ public class GroupNodeDecoratorTest {
     public void constructor2Arguments() {
         new GroupNodeDecorator(groupNode, dependency);
         verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
+        verify(groupNode).setProperty(NodeProperties.GROUP_ID, dependency.getGroupId());
     }
 
     @Test
@@ -92,6 +93,14 @@ public class GroupNodeDecoratorTest {
     public void constructor1ArgumentIllegalArgument() {
         when(groupNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
         new GroupNodeDecorator(groupNode);
+    }
+    @Test
+    public void setDependencyTest() {
+       GroupNodeDecorator decorator = new GroupNodeDecorator(groupNode);
+        decorator.setDependency(dependency);
+        verify(dependency).getGroupId();
+        verify(groupNode).getProperty(NodeProperties.NODE_TYPE);
+        verify(groupNode).setProperty(NodeProperties.GROUP_ID, dependency.getGroupId());
     }
 
 

@@ -1,7 +1,23 @@
+/*
+ * Copyright (c) 2010 Pieter van der Meer (pieter@pieni.nl)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package nl.pieni.maven.dependency_analyzer.repository.remote;
 
-import nl.pieni.maven.dependency_analyzer.repository.listener.DebugTransferListener;
 import nl.pieni.maven.dependency_analyzer.repository.RepositorySearcher;
+import nl.pieni.maven.dependency_analyzer.repository.listener.DebugTransferListener;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -38,6 +54,15 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
     private final File outputDirectory;
     private final boolean allowSnapshots;
 
+    /**
+     * Default constructor
+     *
+     * @param indexer         the Indexer
+     * @param indexUpdater    updater
+     * @param log             logger
+     * @param outputDirectory index storage base directory
+     * @param allowSnapshots  snaphots allowed
+     */
     public RemoteRepositorySearcher(final NexusIndexer indexer, final IndexUpdater indexUpdater, final Log log, final File outputDirectory, final boolean allowSnapshots) {
         this.indexer = indexer;
         this.indexUpdater = indexUpdater;
@@ -47,6 +72,9 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
     }
 
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public Map<String, ArtifactInfoGroup> searchIndexGrouped(@NotNull final List<String> groupPatterns, @NotNull final ArtifactRepository repository, @NotNull final List<String> packaging) throws IOException, UnsupportedExistingLuceneIndexException {
 
@@ -65,7 +93,13 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
         return response.getResults();
     }
 
-    @NotNull
+
+    /**
+     * Create the query to perform
+     * @param groupPatterns list of patters to search for
+     * @param packaging the packinging of the artifact searched for
+     * @return {@link BooleanQuery}
+     */
     private BooleanQuery createQuery(@NotNull final List<String> groupPatterns, @NotNull final List<String> packaging) {
         BooleanQuery bq = new BooleanQuery();
 
@@ -100,6 +134,12 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
         return bq;
     }
 
+    /**
+     * Get an indexing context
+     * @param repository the repository
+     * @throws IOException Error connecting
+     * @throws UnsupportedExistingLuceneIndexException Not a Nexus index
+     */
     private void getIndexingContext(@NotNull final ArtifactRepository repository) throws IOException, UnsupportedExistingLuceneIndexException {
         if (getLog().isDebugEnabled()) {
             getLog().debug("Retrieving indexing contexts");
@@ -121,15 +161,29 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
         }
     }
 
+    /**
+     * Can this repo be used
+     * @param repository the repo
+     * @param allowSnapshots snapshots allowed
+     * @return true when valid
+     */
     private boolean useableRepository(@NotNull final ArtifactRepository repository, final boolean allowSnapshots) {
         boolean snapshots = repository.getSnapshots().isEnabled() || allowSnapshots;
         return repository.getReleases().isEnabled() && snapshots;
     }
 
+    /**
+     * The logger
+     * @return {@link Log}
+     */
     private Log getLog() {
         return this.log;
     }
 
+    /**
+     * Retrieve the index file from a remote repo
+     * @throws IOException error connecting
+     */
     private void updateRemoteIndex()
             throws IOException {
         Map<String, IndexingContext> contexts = indexer.getIndexingContexts();

@@ -28,7 +28,6 @@ import org.neo4j.graphdb.Node;
  */
 public abstract class AbstractNodeFactory<T> {
     protected final Log LOGGER;
-
     private final DependencyDatabase<GraphDatabaseService, Node> database;
 
     /**

@@ -1,13 +1,12 @@
 package nl.pieni.maven.dependency_analyzer.enums;
 
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.RelationshipType;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The scope of a dependency
+ * The scope of a dependency, Enumeration of the Maven dependency scope identifier
  * Implements the J Bloch implementation for String to enum value casting
  */
 public enum DependencyScopeRelations implements RelationshipType {
@@ -20,7 +19,6 @@ public enum DependencyScopeRelations implements RelationshipType {
     tag;        // <optional />
 
 
-    @NotNull
     private static final Map<String, DependencyScopeRelations> STRING2ENUM = new HashMap<String, DependencyScopeRelations>();
 
     static {

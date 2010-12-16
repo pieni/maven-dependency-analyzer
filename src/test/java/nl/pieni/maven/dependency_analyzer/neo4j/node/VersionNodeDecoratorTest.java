@@ -81,6 +81,7 @@ public class VersionNodeDecoratorTest {
     public void constructor2Arguments() {
         new VersionNodeDecorator(versionNode, dependency);
         verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(versionNode).setProperty(NodeProperties.VERSION, "1.0");
     }
 
     @Test
@@ -96,12 +97,11 @@ public class VersionNodeDecoratorTest {
         new VersionNodeDecorator(versionNode);
     }
 
-
     @Test
-    public void setDependency() {
+    public void setDependencyTest() {
         VersionNodeDecorator decorator = new VersionNodeDecorator(versionNode);
         decorator.setDependency(dependency);
-        verify(dependency).getVersion();
+        verify(versionNode).getProperty(NodeProperties.NODE_TYPE);
         verify(versionNode).setProperty(NodeProperties.VERSION, "1.0");
     }
 

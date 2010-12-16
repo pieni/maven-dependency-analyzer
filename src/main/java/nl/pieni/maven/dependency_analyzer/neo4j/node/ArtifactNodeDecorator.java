@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 Pieter van der Meer (pieter@pieni.nl)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
@@ -11,20 +27,21 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 11-12-10
- * Time: 19:44
- * To change this template use File | Settings | File Templates.
+ * ArtifactNode decorator
  */
 public class ArtifactNodeDecorator extends AbstractNodeDecorator implements ArtifactNode {
 
+    /**
+     * {@inheritDoc}
+     */
     public ArtifactNodeDecorator(Node node, Dependency dependency) {
-        super(node);
+        super(node, dependency);
         setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
-        setDependency(dependency);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ArtifactNodeDecorator(Node node) {
         super(node);
         if (node.getProperty(NodeProperties.NODE_TYPE) != NodeType.ArtifactNode) {
@@ -32,22 +49,34 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setDependency(Dependency dependency) {
         setProperty(NodeProperties.ARTIFACT_ID, dependency.getArtifactId());
-        setProperty(NodeProperties.TYPE, dependency.getType());
+        setProperty(NodeProperties.ARTIFACT_TYPE, dependency.getType());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getArtifactId() {
         return (String) getProperty(NodeProperties.ARTIFACT_ID);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getType() {
-        return (String) getProperty(NodeProperties.TYPE);
+        return (String) getProperty(NodeProperties.ARTIFACT_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GroupNode getParent() {
         Iterable<Relationship> hasRelations = getRelationships(ArtifactRelations.has, Direction.INCOMING);
@@ -58,6 +87,4 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
 
         throw new IllegalArgumentException("Database inconsistent" + this.toString() + " has no parent");
     }
-
-
 }

@@ -20,33 +20,50 @@ import org.apache.maven.plugin.logging.Log;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 2-12-10
- * Time: 11:34
- * To change this template use File | Settings | File Templates.
+ * Interface to the Dependency database.
+ * @param <DB> the Database implementation
+ * @param <N> The node type of the implementation
  */
 public interface DependencyDatabase<DB, N> extends DependencyDatabaseSearcher {
 
+    /**
+     * Retrieve the Database instance
+     * @return the database
+     */
     DB getDatabase();
 
+    /**
+     * get the Logger instance
+     * @return the Logger
+     */
     Log getLOGGER();
 
+    /**
+     * Create a node in the database, see {@link #getDatabase()}.
+     * @return the new node
+     */
     N createNode();
 
     /**
      * Add index entry for the specified property
-     *
      * @param node the node
      * @param key  the key
      */
     void indexOnProperty(final N node, final String key);
 
+    /**
+     * Shutdown the database, i.e. close the connection
+     */
     void shutdownDatabase();
 
+    /**
+     * Support for transactions, start a transaction
+     *
+     */
     void startTransaction();
 
+    /**
+     * Support for transactions, stop the transaction
+     */
     void stopTransaction();
-
-
 }

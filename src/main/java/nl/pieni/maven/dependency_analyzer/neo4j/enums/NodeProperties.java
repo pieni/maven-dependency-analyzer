@@ -16,20 +16,19 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Properties stored in the various nodes
+ * (Actually want this to be an enum but that leads to multiple casts in Neo4j specific code
  */
 public interface NodeProperties {
-    @NotNull
+    /** Version property **/
     static final String VERSION = "version";
-    @NotNull
+    /** Artifact ID property **/
     static final String ARTIFACT_ID = "artifact";
-    @NotNull
+    /** Group ID property **/
     static final String GROUP_ID = "group";
-    @NotNull
-    static final String TYPE = "type";
-    @NotNull
+    /** Artifact type property **/
+    static final String ARTIFACT_TYPE = "type";
+    /** Node type property see {@link NodeType} **/
     static final String NODE_TYPE = "NodeType";
 }

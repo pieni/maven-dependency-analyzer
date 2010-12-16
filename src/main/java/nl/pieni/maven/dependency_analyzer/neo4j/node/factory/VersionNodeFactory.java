@@ -56,6 +56,7 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getDatabase().findArtifactNode(dependency);

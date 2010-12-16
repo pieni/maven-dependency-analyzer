@@ -23,7 +23,20 @@ import org.apache.maven.model.Dependency;
  */
 public interface DependencyNodeProcessor {
 
+    /**
+     * Add a {@link Dependency} to the database
+     *
+     * @param dependency the {@link Dependency}
+     * @return number of elements create in the DB
+     */
     int addArtifact(Dependency dependency);
 
+    /**
+     * Add a relation between the source and target dependency. Both the artifact to artifact relation and the version to version relation is added.
+     *
+     * @param sourceDependency the source
+     * @param targetDependency the target
+     * @return the amount of relations created
+     */
     int addRelation(Dependency sourceDependency, Dependency targetDependency);
 }

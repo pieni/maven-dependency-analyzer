@@ -23,7 +23,7 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public enum ArtifactRelations implements RelationshipType {
     version, //version relation
-    has,
+    has,  //Has or contains relation
     VersionsDependency //Group artifact relation
 
 }

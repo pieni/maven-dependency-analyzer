@@ -40,6 +40,11 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     private final DependencyDatabase database;
     private final Log logger;
 
+    /**
+     * Default constructor
+     * @param database the database instance
+     * @param logger the Logger
+     */
     public DependencyNodeProcessorImpl(DependencyDatabase database, final Log logger) {
         this.database = database;
         this.logger = logger;
@@ -48,6 +53,9 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         versionNodeFactory = new VersionNodeFactory(database, logger);
     }
 
+            /**
+     * {@inheritDoc}
+     */
     @Override
     public int addArtifact(@NotNull final Dependency dependency) {
         int nodeCount = 0;
@@ -64,6 +72,9 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         return nodeCount;
     }
 
+            /**
+     * {@inheritDoc}
+     */
     @Override
     public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
         int count = 0;
@@ -94,6 +105,13 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         return count;
     }
 
+    /**
+     * See of the source node and artifact node have a specific relation
+     * @param sourceArtifactNode the source
+     * @param targetArtifactNode the target
+     * @param type the relation
+     * @return true when the relation is present
+     */
     private boolean hasDependencyRelation(Node sourceArtifactNode, Node targetArtifactNode, RelationshipType type) {
         Iterable<Relationship> relations = sourceArtifactNode.getRelationships(type, Direction.OUTGOING);
 
@@ -106,11 +124,21 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         return false;  //To change body of created methods use File | Settings | File Templates.
     }
 
+    /**
+     * Convert the {@link Dependency} scope attribute to a {@link RelationshipType}
+     * @param dependency
+     * @return
+     */
     private RelationshipType determineRelationType(@NotNull final Dependency dependency) {
         return DependencyScopeRelations.fromString(dependency.getScope());
     }
 
-    public Log getLog() {
+
+    /**
+     * Get the logger.
+     * @return the logger
+     */
+    private Log getLog() {
         return logger;
     }
 }

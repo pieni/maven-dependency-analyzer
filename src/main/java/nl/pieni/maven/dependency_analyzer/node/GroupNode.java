@@ -1,15 +1,13 @@
 package nl.pieni.maven.dependency_analyzer.node;
 
-import org.apache.maven.model.Dependency;
-
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 11-12-10
- * Time: 19:48
- * To change this template use File | Settings | File Templates.
+ * Interface for a GroupNode
  */
-public interface GroupNode {
-    void setDependency(Dependency dependency);
+public interface GroupNode extends DependencyNode {
+    /**
+     * Get the GroupId
+     *
+     * @return groupId
+     */
     String getGroupId();
 }

@@ -31,9 +31,7 @@ import java.util.Map;
  * Place holder for the data collected for the report.
  */
 public class DependencyReportImpl implements DependencyReport {
-    private final String lineSeperator;
-
-
+    private final String lineSeperator = System.getProperty("line.separator");
     private final DependencyDatabaseSearcher searcher;
 
     /**
@@ -42,10 +40,12 @@ public class DependencyReportImpl implements DependencyReport {
      * @param dependencyDatabaseSearcher the Searcher
      */
     public DependencyReportImpl(DependencyDatabaseSearcher dependencyDatabaseSearcher) {
-        this.lineSeperator = System.getProperty("line.separator");
         this.searcher = dependencyDatabaseSearcher;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void createReport(ArtifactNode artifactNode, Writer writer) throws IOException {
         List<VersionNode> versions = searcher.getVersionNodes(artifactNode);

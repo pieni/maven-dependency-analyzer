@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
 import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import org.apache.maven.model.Dependency;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
@@ -50,6 +51,11 @@ public class AbstractNodeDecoratorTest {
 
         public AbstractNodeDecoratorImpl(Node node) {
             super(node);
+        }
+
+        @Override
+        public void setDependency(Dependency dependency) {
+            //Left blank
         }
     }
 

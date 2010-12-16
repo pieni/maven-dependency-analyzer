@@ -58,6 +58,12 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
     private int transactionCount = 0;
     private IndexService index;
 
+    /**
+     * Default constructor
+     *
+     * @param logger      the logger
+     * @param dbDirectory the directory in which the DB is created
+     */
     public DependencyDatabaseImpl(final Log logger, String dbDirectory) {
         this.LOGGER = logger;
         this.graphDb = new EmbeddedGraphDatabase(dbDirectory);
@@ -65,21 +71,33 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GraphDatabaseService getDatabase() {
         return graphDb;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Log getLOGGER() {
         return LOGGER;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Node createNode() {
         return graphDb.createNode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startTransaction() {
         getLOGGER().debug("Starting Transaction");
@@ -88,6 +106,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         return;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stopTransaction() {
         this.transaction.success();
@@ -96,6 +117,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         getLOGGER().debug("Finish Transaction");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void shutdownDatabase() {
         if (transactionCount != 0) {
@@ -106,7 +130,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         shutdownSearcher();
     }
 
-    @NotNull
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public VersionNode findVersionNode(@NotNull final Dependency dependency) {
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) findArtifactNode(dependency);
@@ -122,7 +148,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         throw new IllegalArgumentException("version Node not found" + dependency);
     }
 
-    @Nullable
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ArtifactNode findArtifactNode(@NotNull final Dependency dependency) {
         GroupNodeDecorator groupNode = (GroupNodeDecorator) findGroupNode(dependency);
@@ -142,6 +170,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GroupNode findGroupNode(@NotNull final Dependency dependency) {
         String key = NodeProperties.GROUP_ID;
@@ -149,6 +180,9 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         return new GroupNodeDecorator(node, dependency);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<VersionNode> getVersionNodes(ArtifactNode artifactNode) {
         List<VersionNode> versionNodes = new ArrayList<VersionNode>();
@@ -164,13 +198,11 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
 
 
     /**
-     * Print Relations to the specified node. Only the relations defined in {@link nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations}
-     * are processed
-     *
-     * @param node the parent for the report.
+     * {@inheritDoc}
      */
+    @Override
     public Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(ArtifactNode node) {
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)node;
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) node;
         Map<DependencyScopeRelations, List<ArtifactNode>> artifactNodeMap = new HashMap<DependencyScopeRelations, List<ArtifactNode>>();
         DependencyScopeRelations[] relations = DependencyScopeRelations.values();
         for (DependencyScopeRelations relation : relations) {
@@ -186,36 +218,15 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         return artifactNodeMap;
     }
 
-
-    /**
-     * Create a string that holds the groupId:ArtifactId:type
-     *
-     * @param node the node
-     * @return groupId:ArtifactId:type
-     */
-    public GroupNode getGroupNode(ArtifactNode node) {
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)node;
-
-        Iterable<Relationship> hasRelations = artifactNode.getRelationships(ArtifactRelations.has, Direction.INCOMING);
-
-        for (Relationship relationship : hasRelations) {
-            Node relationNode = relationship.getOtherNode(artifactNode);
-            return new GroupNodeDecorator(relationNode);
-        }
-
-        throw new IllegalArgumentException("Database inconsistent" + this.toString() + " has no parent");
-    }
-
-
     public Map<VersionNode, List<VersionNode>> getVersionDependencies(ArtifactNode node) {
         Map<VersionNode, List<VersionNode>> versionNodeListMap = new HashMap<VersionNode, List<VersionNode>>();
 
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)node;
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) node;
         Iterable<Relationship> availableVersionRelations = artifactNode.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
 
         for (Relationship relationship : availableVersionRelations) {
             VersionNodeDecorator versionNode = new VersionNodeDecorator(relationship.getOtherNode(artifactNode));
-            List<VersionNode> versionNodes  = new ArrayList<VersionNode>();
+            List<VersionNode> versionNodes = new ArrayList<VersionNode>();
             versionNodeListMap.put(versionNode, versionNodes);
 
 
@@ -228,18 +239,18 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         return versionNodeListMap;
     }
 
-
+             /**
+     * {@inheritDoc}
+     */
     @Override
     public void shutdownSearcher() {
         index.shutdown();
     }
 
-    /**
-     * Add index entry for the specified property
-     *
-     * @param node the node
-     * @param key  the key
+          /**
+     * {@inheritDoc}
      */
+          @Override
     public void indexOnProperty(@NotNull final Node node, final String key) {
         index.index(node, key, node.getProperty(key));
     }

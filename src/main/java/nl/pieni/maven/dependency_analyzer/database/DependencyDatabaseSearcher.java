@@ -53,13 +53,30 @@ public interface DependencyDatabaseSearcher {
      */
     GroupNode findGroupNode(Dependency dependency);
 
+    /**
+     * Retrieve all version nodes
+     * @param node the artifact
+     * @return the list of version node for the artifact
+     */
     List<VersionNode> getVersionNodes(ArtifactNode node);
 
+    /**
+     * Retrieve the list of artifacts that have a dependency on this {@link ArtifactNode}
+     *
+     * @param node the Artifact node
+     * @return A separate list for each ({@link Dependency}) scope
+     */
     Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(ArtifactNode node);
 
+    /**
+     * Retrieve the list of {@link VersionNode} elements that are dependent on the {@link ArtifactNode}.
+     * @param node the source node
+     * @return List for each version available of the {@link ArtifactNode}
+     */
     Map<VersionNode, List<VersionNode>> getVersionDependencies(ArtifactNode node);
 
+    /**
+     * Shutdown the searcher, ie. disconnect
+     */
     void shutdownSearcher();
-
-
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * The Node types used
+ * Implements the J Bloch implementation for String to enum value casting
  */
 public enum NodeType {
     GroupNode,

@@ -52,7 +52,7 @@ public class ArtifactNodeDecoratorTest {
         artifactNode = mock(Node.class);
         when(artifactNode.getId()).thenReturn(1L);
         when(artifactNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
-        when(artifactNode.getProperty(NodeProperties.TYPE)).thenReturn("jar");
+        when(artifactNode.getProperty(NodeProperties.ARTIFACT_TYPE)).thenReturn("jar");
         //To avoid a null pointer in the toString method.
         when(artifactNode.getPropertyKeys()).thenReturn(new Iterable<String>() {
             @Override
@@ -82,6 +82,9 @@ public class ArtifactNodeDecoratorTest {
     public void constructor2Arguments() {
         new ArtifactNodeDecorator(artifactNode, dependency);
         verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
+        verify(dependency).getArtifactId();
+        verify(artifactNode).setProperty(NodeProperties.ARTIFACT_ID, "artifactID");
+        verify(artifactNode).setProperty(NodeProperties.ARTIFACT_TYPE, "jar");
     }
 
     @Test
@@ -96,15 +99,13 @@ public class ArtifactNodeDecoratorTest {
         new ArtifactNodeDecorator(artifactNode);
     }
 
-
     @Test
-    public void setDependency() {
+    public void setDependencyTest() {
         ArtifactNodeDecorator decorator = new ArtifactNodeDecorator(artifactNode);
-        verify(artifactNode).getProperty(NodeProperties.NODE_TYPE);
         decorator.setDependency(dependency);
-        verify(dependency).getArtifactId();
+        verify(artifactNode).getProperty(NodeProperties.NODE_TYPE);
         verify(artifactNode).setProperty(NodeProperties.ARTIFACT_ID, "artifactID");
-        verify(artifactNode).setProperty(NodeProperties.TYPE, "jar");
+        verify(artifactNode).setProperty(NodeProperties.ARTIFACT_TYPE, "jar");
     }
 
 
@@ -121,7 +122,7 @@ public class ArtifactNodeDecoratorTest {
         ArtifactNodeDecorator decorator = new ArtifactNodeDecorator(artifactNode);
         verify(artifactNode).getProperty(NodeProperties.NODE_TYPE);
         assertEquals("jar", decorator.getType());
-        verify(artifactNode).getProperty(NodeProperties.TYPE);
+        verify(artifactNode).getProperty(NodeProperties.ARTIFACT_TYPE);
 
     }
 
