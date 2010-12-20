@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Interface to the database searcher
  */
-public interface DependencyDatabaseSearcher {
+public interface DependencyDatabaseSearcher<N> {
     /**
      * Find the version node for specified {@link org.apache.maven.model.Dependency}
      *
@@ -58,7 +58,7 @@ public interface DependencyDatabaseSearcher {
      * @param node the artifact
      * @return the list of version node for the artifact
      */
-    List<VersionNode> getVersionNodes(ArtifactNode node);
+    List<VersionNode> getVersionNodes(Dependency dependency);
 
     /**
      * Retrieve the list of artifacts that have a dependency on this {@link ArtifactNode}
@@ -66,17 +66,24 @@ public interface DependencyDatabaseSearcher {
      * @param node the Artifact node
      * @return A separate list for each ({@link Dependency}) scope
      */
-    Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(ArtifactNode node);
+    Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(Dependency dependency);
 
     /**
      * Retrieve the list of {@link VersionNode} elements that are dependent on the {@link ArtifactNode}.
      * @param node the source node
      * @return List for each version available of the {@link ArtifactNode}
      */
-    Map<VersionNode, List<VersionNode>> getVersionDependencies(ArtifactNode node);
+    Map<VersionNode, List<VersionNode>> getVersionDependencies(Dependency dependency);
 
     /**
      * Shutdown the searcher, ie. disconnect
      */
     void shutdownSearcher();
+
+    /**
+     * Add index entry for the specified property
+     * @param node the node
+     * @param key  the key
+     */
+    void indexOnProperty(final N node, final String key);
 }

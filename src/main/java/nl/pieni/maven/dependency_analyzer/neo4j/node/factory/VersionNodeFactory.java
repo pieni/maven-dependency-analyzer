@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -37,8 +38,8 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
     /**
      * {@inheritDoc}
      */
-    public VersionNodeFactory(DependencyDatabase database, final Log logger) {
-        super(database, logger);
+    public VersionNodeFactory(DependencyDatabase database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
+        super(database, searcher, logger);
     }
 
     /**
@@ -59,8 +60,8 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
     @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getDatabase().findArtifactNode(dependency);
-        VersionNodeDecorator versionNode = (VersionNodeDecorator) getDatabase().findVersionNode(dependency);
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getSearcher().findArtifactNode(dependency);
+        VersionNodeDecorator versionNode = (VersionNodeDecorator) getSearcher().findVersionNode(dependency);
         if (versionNode == null) {
             versionNode = (VersionNodeDecorator) create(dependency);
             nodeCount++;

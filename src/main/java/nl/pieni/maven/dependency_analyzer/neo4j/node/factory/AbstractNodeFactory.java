@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -29,6 +30,7 @@ import org.neo4j.graphdb.Node;
 public abstract class AbstractNodeFactory<T> {
     protected final Log LOGGER;
     private final DependencyDatabase<GraphDatabaseService, Node> database;
+    private final DependencyDatabaseSearcher<Node> searcher;
 
     /**
      * Default constructor
@@ -36,8 +38,9 @@ public abstract class AbstractNodeFactory<T> {
      * @param database The database
      * @param logger   the logger
      */
-    public AbstractNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, final Log logger) {
+    public AbstractNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
         this.database = database;
+        this.searcher = searcher;
         this.LOGGER = logger;
     }
 
@@ -50,6 +53,9 @@ public abstract class AbstractNodeFactory<T> {
         return this.database;
     }
 
+    public DependencyDatabaseSearcher<Node> getSearcher() {
+        return searcher;
+    }
 
     /**
      * Create a specific node for insertion into the DB

@@ -16,8 +16,10 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo;
 
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearcherImpl;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
@@ -50,7 +52,8 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        DependencyDatabaseSearcher searcher = new DependencyDatabaseImpl(getLog(), databaseDirectory);
+        DependencyDatabase database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
+        DependencyDatabaseSearcher searcher = new DependencyDatabaseSearcherImpl(getLog(), database);
         DependencyReport reporter = new DependencyReportImpl(searcher);
         LogWriter logWriter = new LogWriter(getLog());
 
@@ -68,7 +71,7 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
             }
 
             try {
-                reporter.createReport(artifactNode, logWriter);
+                reporter.createReport(dependency, logWriter);
             } catch (IOException e) {
                 throw  new MojoExecutionException("Error creating output for reporting", e);
             }

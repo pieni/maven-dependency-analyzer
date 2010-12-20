@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
@@ -36,8 +37,8 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
     /**
      * {@inheritDoc}
      */
-    public GroupNodeFactory(DependencyDatabase database, final Log logger) {
-        super(database, logger);
+    public GroupNodeFactory(DependencyDatabase database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
+        super(database, searcher, logger);
     }
 
     /**
@@ -48,7 +49,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
         getDatabase().startTransaction();
         Node node = getDatabase().createNode();
         GroupNode groupNode = new GroupNodeDecorator(node, dependency);
-        getDatabase().indexOnProperty(node, GROUP_ID);
+        getSearcher().indexOnProperty(node, GROUP_ID);
         LOGGER.info("Create GroupNode: " + node);
         getDatabase().stopTransaction();
         return groupNode;
@@ -60,7 +61,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
     @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        GroupNodeDecorator groupNode = (GroupNodeDecorator)getDatabase().findGroupNode(dependency);
+        GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
         if (groupNode == null) {
             groupNode = (GroupNodeDecorator)create(dependency);
             nodeCount++;

@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
@@ -74,14 +75,15 @@ public class VersionNodeFactoryTest {
         Dependency dependency = mock(Dependency.class);
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         Log log = mock(Log.class);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        VersionNodeFactory factory = new VersionNodeFactory(database, searcher, log);
         factory.create(dependency);
 
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
         verify(log).info(startsWith("Create versionNode: Node{ Id = 1"));
@@ -93,13 +95,14 @@ public class VersionNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
+        when(searcher.findArtifactNode(dependency)).thenReturn(artifactNode);
         VersionNodeDecorator versionNode = mock(VersionNodeDecorator.class);
-        when(database.findVersionNode(dependency)).thenReturn(versionNode);
+        when(searcher.findVersionNode(dependency)).thenReturn(versionNode);
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        VersionNodeFactory factory = new VersionNodeFactory(database, searcher, log);
         assertEquals(0, factory.insert(dependency));
     }
 
@@ -109,19 +112,20 @@ public class VersionNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
-        when(database.findVersionNode(dependency)).thenReturn(null);
+        when(searcher.findArtifactNode(dependency)).thenReturn(artifactNode);
+        when(searcher.findVersionNode(dependency)).thenReturn(null);
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
         Node versionNode = createMockNode();
         when(database.createNode()).thenReturn(versionNode);
 
 
-        VersionNodeFactory factory = new VersionNodeFactory(database, log);
+        VersionNodeFactory factory = new VersionNodeFactory(database, searcher, log);
         assertEquals(1, factory.insert(dependency));
 
-        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
         verify(database, times(2)).startTransaction();
         verify(database, times(2)).stopTransaction();
         verify(log).info(startsWith("Create versionNode: "));

@@ -22,7 +22,9 @@ import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
 import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -64,8 +66,19 @@ public class DependencyReportTest {
     private ArtifactNode otherArtifactNode;
     private VersionNode otherVersionNode;
     private DependencyDatabaseSearcher searcher;
+    private Dependency reportDependency1;
 
-    private void setup() {
+
+    @Before
+    public void setup() {
+        //Setup the dependency objects
+        reportDependency1 = new Dependency();
+        reportDependency1.setGroupId("reportGroupNode");
+        reportDependency1.setArtifactId("reportArtifactNode");
+        reportDependency1.setVersion("1.0");
+
+
+        /* Setup the node interactions */
         reportArtifactNode = mock(ArtifactNode.class);
         when(reportArtifactNode.getArtifactId()).thenReturn("reportAID");
         when(reportArtifactNode.getType()).thenReturn("jar");
@@ -91,19 +104,24 @@ public class DependencyReportTest {
         when(otherVersionNode.getParent()).thenReturn(otherArtifactNode);
         when(otherArtifactNode.getParent()).thenReturn(otherGroupNode);
 
-        searcher = mock(DependencyDatabaseSearcher.class);
 
+        /* Searcher mocking*/
+        searcher = mock(DependencyDatabaseSearcher.class);
+        //The version nodes of the reporting dependency
         List<VersionNode> versionNodes = new ArrayList<VersionNode>();
         versionNodes.add(reportVersion1);
         versionNodes.add(reportVersion2);
-        when(searcher.getVersionNodes(reportArtifactNode)).thenReturn(versionNodes);
+        when(searcher.getVersionNodes(reportDependency1)).thenReturn(versionNodes);
+        //The artifact node of the report
+        when(searcher.findArtifactNode(reportDependency1)).thenReturn(reportArtifactNode);
+        //The group of the report
+        when(searcher.findGroupNode(reportDependency1)).thenReturn(reportGroupNode);
 
         Map<DependencyScopeRelations, List<ArtifactNode>> dependingArtifacts = new HashMap<DependencyScopeRelations, List<ArtifactNode>>();
         List<ArtifactNode> artifacts = new ArrayList<ArtifactNode>();
         artifacts.add(otherArtifactNode);
         dependingArtifacts.put(DependencyScopeRelations.compile, artifacts);
-        when(searcher.getDependingArtifacts(reportArtifactNode)).thenReturn(dependingArtifacts);
-
+        when(searcher.getDependingArtifacts(reportDependency1)).thenReturn(dependingArtifacts);
 
         Map<VersionNode, List<VersionNode>> versionDependencyMap = new HashMap<VersionNode, List<VersionNode>>();
         List<VersionNode> version1DependencyList = new ArrayList<VersionNode>();
@@ -111,7 +129,7 @@ public class DependencyReportTest {
         versionDependencyMap.put(reportVersion1, version1DependencyList);
         versionDependencyMap.put(reportVersion2, version1DependencyList);
 
-        when(searcher.getVersionDependencies(reportArtifactNode)).thenReturn(versionDependencyMap);
+        when(searcher.getVersionDependencies(reportDependency1)).thenReturn(versionDependencyMap);
     }
 
     /**
@@ -122,10 +140,9 @@ public class DependencyReportTest {
     @Test
     public void stringWriterTest() throws IOException {
 
-        setup();
         DependencyReport report = new DependencyReportImpl(searcher);
         StringWriter writer = mock(StringWriter.class);
-        report.createReport(reportArtifactNode, writer);
+        report.createReport(reportDependency1, writer);
 
         verify(writer).write("Report for Artifact: \"reportGID:reportAID\"" + LINESEPERATOR);
         verify(writer).write("Available versions" + LINESEPERATOR);
@@ -148,18 +165,17 @@ public class DependencyReportTest {
     @Test
     public void logWriterTest() throws IOException {
 
-        setup();
         DependencyReport report = new DependencyReportImpl(searcher);
 
         SystemStreamLog systemStreamLog = mock(SystemStreamLog.class);
         LogWriter writer = new LogWriter(systemStreamLog);
-        report.createReport(reportArtifactNode, writer);
+        report.createReport(reportDependency1, writer);
 
         verify(systemStreamLog).info("Report for Artifact: \"reportGID:reportAID\"");
-        verify(systemStreamLog).info("Available versions" );
-        verify(systemStreamLog, times(2)).info("\t1.0" );
-        verify(systemStreamLog, times(2)).info("\t2.0" );
-        verify(systemStreamLog).info("Incoming relations" );
+        verify(systemStreamLog).info("Available versions");
+        verify(systemStreamLog, times(2)).info("\t1.0");
+        verify(systemStreamLog, times(2)).info("\t2.0");
+        verify(systemStreamLog).info("Incoming relations");
         verify(systemStreamLog).info("\tScope: compile");
         verify(systemStreamLog, times(2)).info("\t\totherGID:otherAID:jar:1.0");
         verify(systemStreamLog).info("\t\totherGID:otherAID:jar");

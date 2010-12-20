@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
@@ -38,8 +39,8 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
     /**
      * {@inheritDoc}
      */
-    public ArtifactNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, final Log logger) {
-        super(database, logger);
+    public ArtifactNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
+        super(database, searcher, logger);
     }
 
     /**
@@ -50,7 +51,7 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
         getDatabase().startTransaction();
         Node node = getDatabase().createNode();
         ArtifactNode artifactNode = new ArtifactNodeDecorator(node, dependency);
-        getDatabase().indexOnProperty(node, ARTIFACT_ID);
+        getSearcher().indexOnProperty(node, ARTIFACT_ID);
         LOGGER.info("Create ArtifactNode: " + artifactNode);
         getDatabase().stopTransaction();
         return artifactNode;
@@ -62,8 +63,8 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
     @Override
     public int insert(@NotNull final Dependency dependency) {
         int nodeCount = 0;
-        GroupNodeDecorator groupNode = (GroupNodeDecorator)getDatabase().findGroupNode(dependency);
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getDatabase().findArtifactNode(dependency);
+        GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getSearcher().findArtifactNode(dependency);
         if (artifactNode == null) {
             artifactNode = (ArtifactNodeDecorator)create(dependency);
             nodeCount++;

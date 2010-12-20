@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.report;
 
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
+import org.apache.maven.model.Dependency;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -32,6 +33,6 @@ public interface DependencyReport {
      * @param writer the Writer
      * @throws IOException In case of error
      */
-    void createReport(ArtifactNode artifactNode, Writer writer) throws IOException;
+    void createReport(Dependency dependency, Writer writer) throws IOException;
 
 }

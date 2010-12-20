@@ -24,7 +24,7 @@ import org.apache.maven.plugin.logging.Log;
  * @param <DB> the Database implementation
  * @param <N> The node type of the implementation
  */
-public interface DependencyDatabase<DB, N> extends DependencyDatabaseSearcher {
+public interface DependencyDatabase<DB, N>  {
 
     /**
      * Retrieve the Database instance
@@ -43,13 +43,6 @@ public interface DependencyDatabase<DB, N> extends DependencyDatabaseSearcher {
      * @return the new node
      */
     N createNode();
-
-    /**
-     * Add index entry for the specified property
-     * @param node the node
-     * @param key  the key
-     */
-    void indexOnProperty(final N node, final String key);
 
     /**
      * Shutdown the database, i.e. close the connection

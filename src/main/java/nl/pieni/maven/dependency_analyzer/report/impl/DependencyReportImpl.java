@@ -21,6 +21,7 @@ import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
+import org.apache.maven.model.Dependency;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -47,9 +48,14 @@ public class DependencyReportImpl implements DependencyReport {
      * @inheritDoc
      */
     @Override
-    public void createReport(ArtifactNode artifactNode, Writer writer) throws IOException {
-        List<VersionNode> versions = searcher.getVersionNodes(artifactNode);
+    public void createReport(Dependency dependency, Writer writer) throws IOException {
 
+        ArtifactNode artifactNode = searcher.findArtifactNode(dependency);
+        if (artifactNode == null) {
+            return;
+        }
+
+        List<VersionNode> versions = searcher.getVersionNodes(dependency);
         GroupNode groupNode = artifactNode.getParent();
         writer.write("Report for Artifact: \"" + groupNode.getGroupId() + ":" + artifactNode.getArtifactId() + "\"" + lineSeperator);
         writer.write("Available versions" + lineSeperator);
@@ -57,7 +63,7 @@ public class DependencyReportImpl implements DependencyReport {
             writer.write("\t" + version.getVersion() + lineSeperator);
         }
 
-        Map<DependencyScopeRelations, List<ArtifactNode>> scopedRelations = searcher.getDependingArtifacts(artifactNode);
+        Map<DependencyScopeRelations, List<ArtifactNode>> scopedRelations = searcher.getDependingArtifacts(dependency);
         writer.write("Incoming relations" + lineSeperator);
         for (DependencyScopeRelations dependencyScope : scopedRelations.keySet()) {
             writer.write("\tScope: " + dependencyScope + lineSeperator);
@@ -69,7 +75,7 @@ public class DependencyReportImpl implements DependencyReport {
             }
         }
 
-        Map<VersionNode, List<VersionNode>> versionDependencies = searcher.getVersionDependencies(artifactNode);
+        Map<VersionNode, List<VersionNode>> versionDependencies = searcher.getVersionDependencies(dependency);
         writer.write("Version specific relations" + lineSeperator);
         for (VersionNode parentVersion : versionDependencies.keySet()) {
             writer.write("\t" + parentVersion.getVersion() + lineSeperator);

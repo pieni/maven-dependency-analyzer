@@ -16,8 +16,10 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo;
 
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.filter.DependencyIncludeFilter;
+import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearcherImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessorImpl;
 import nl.pieni.maven.dependency_analyzer.repository.remote.RemoteRepositorySearcher;
 import nl.pieni.maven.dependency_analyzer.util.VersionComparator;
@@ -236,7 +238,8 @@ public class DependencyGraphDBMojo
     protected void setup() throws MojoExecutionException {
         super.setup();
         this.includeFilter = new DependencyIncludeFilter(includeFilterPatterns);
-        this.nodeProcessor = new DependencyNodeProcessorImpl(database, getLog());
+        DependencyDatabaseSearcher searcher = new DependencyDatabaseSearcherImpl(getLog(), database);
+        this.nodeProcessor = new DependencyNodeProcessorImpl(database, searcher, getLog());
         this.repositorySearcher = new RemoteRepositorySearcher(indexer, indexUpdater, getLog(), indexDirectory, allowSnapshots);
         this.buildRequest = makeBuildingRequest();
     }

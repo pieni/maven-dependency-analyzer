@@ -37,7 +37,10 @@ public class VersionNodeDecorator extends AbstractNodeDecorator implements Versi
      */
     public VersionNodeDecorator(Node node, Dependency dependency) {
         super(node, dependency);
-        setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        if (hasProperty(NodeProperties.NODE_TYPE)) {
+            return;
+        }
+        setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
     }
 
 
@@ -46,7 +49,7 @@ public class VersionNodeDecorator extends AbstractNodeDecorator implements Versi
      */
     public VersionNodeDecorator(Node node) {
         super(node);
-        if (node.getProperty(NodeProperties.NODE_TYPE) != NodeType.VersionNode) {
+        if (!getProperty(NodeProperties.NODE_TYPE).equals(NodeType.VersionNode.name())) {
             throw new IllegalArgumentException("node " + node.getId() + " is not a " + NodeType.VersionNode);
         }
     }
@@ -56,6 +59,9 @@ public class VersionNodeDecorator extends AbstractNodeDecorator implements Versi
      */
     @Override
     public void setDependency(Dependency dependency) {
+        if (hasProperty(NodeProperties.VERSION)) {
+            return;
+        }
         setProperty(NodeProperties.VERSION, dependency.getVersion());
     }
 

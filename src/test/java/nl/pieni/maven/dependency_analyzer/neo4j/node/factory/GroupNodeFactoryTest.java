@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
@@ -64,14 +65,16 @@ public class GroupNodeFactoryTest {
         Dependency dependency = mock(Dependency.class);
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
+
         Log log = mock(Log.class);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
-        GroupNodeFactory factory = new GroupNodeFactory(database, log);
+        GroupNodeFactory factory = new GroupNodeFactory(database, searcher, log);
         factory.create(dependency);
 
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
+        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
         verify(log).info(startsWith("Create GroupNode:"));
@@ -83,7 +86,8 @@ public class GroupNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
-        when(database.findGroupNode(dependency)).thenReturn(null);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
+        when(searcher.findGroupNode(dependency)).thenReturn(null);
 
         Node groupNode = createMockNode();
         when(database.createNode()).thenReturn(groupNode);
@@ -95,10 +99,10 @@ public class GroupNodeFactoryTest {
 
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        GroupNodeFactory factory = new GroupNodeFactory(database, log);
+        GroupNodeFactory factory = new GroupNodeFactory(database, searcher, log);
         assertEquals(1, factory.insert(dependency));
-        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
-        verify(database).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
+        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
+        verify(searcher).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
         verify(database, times(2)).startTransaction();
         verify(database, times(2)).stopTransaction();
         verify(log).info(startsWith("Create GroupNode: "));
@@ -110,11 +114,12 @@ public class GroupNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
-        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+        when(searcher.findGroupNode(dependency)).thenReturn(groupNode);
 
         Log log = mock(Log.class);
-        GroupNodeFactory factory = new GroupNodeFactory(database, log);
+        GroupNodeFactory factory = new GroupNodeFactory(database, searcher, log);
         when(log.isDebugEnabled()).thenReturn(true);
         assertEquals(0, factory.insert(dependency));
     }

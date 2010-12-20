@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
@@ -38,6 +39,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     private GroupNodeFactory groupNodeFactory;
     private VersionNodeFactory versionNodeFactory;
     private final DependencyDatabase database;
+    private final DependencyDatabaseSearcher searcher;
     private final Log logger;
 
     /**
@@ -45,12 +47,13 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @param database the database instance
      * @param logger the Logger
      */
-    public DependencyNodeProcessorImpl(DependencyDatabase database, final Log logger) {
+    public DependencyNodeProcessorImpl(DependencyDatabase database, DependencyDatabaseSearcher searcher, final Log logger) {
         this.database = database;
+        this.searcher = searcher;
         this.logger = logger;
-        artifactNodeFactory = new ArtifactNodeFactory(database, logger);
-        groupNodeFactory = new GroupNodeFactory(database, logger);
-        versionNodeFactory = new VersionNodeFactory(database, logger);
+        artifactNodeFactory = new ArtifactNodeFactory(database, searcher,  logger);
+        groupNodeFactory = new GroupNodeFactory(database, searcher, logger);
+        versionNodeFactory = new VersionNodeFactory(database, searcher, logger);
     }
 
             /**
@@ -78,8 +81,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     @Override
     public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
         int count = 0;
-        ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator)database.findArtifactNode(sourceDependency);
-        ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator)database.findArtifactNode(targetDependency);
+        ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator)searcher.findArtifactNode(sourceDependency);
+        ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator)searcher.findArtifactNode(targetDependency);
 
 
         RelationshipType relationType = determineRelationType(targetDependency);
@@ -93,8 +96,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
             database.stopTransaction();
         }
 
-        VersionNodeDecorator targetVersionNode = (VersionNodeDecorator)database.findVersionNode(targetDependency);
-        VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator)database.findVersionNode(sourceDependency);
+        VersionNodeDecorator targetVersionNode = (VersionNodeDecorator)searcher.findVersionNode(targetDependency);
+        VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator)searcher.findVersionNode(sourceDependency);
         if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
             database.startTransaction();
             sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
@@ -130,7 +133,11 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @return
      */
     private RelationshipType determineRelationType(@NotNull final Dependency dependency) {
-        return DependencyScopeRelations.fromString(dependency.getScope());
+        RelationshipType result = DependencyScopeRelations.fromString(dependency.getScope());
+        if (result == null) {
+            throw new IllegalArgumentException("Unable to determine scope for dependency: " +  dependency);
+        }
+        return result;
     }
 
 

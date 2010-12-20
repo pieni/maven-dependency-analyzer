@@ -32,7 +32,10 @@ public class GroupNodeDecorator extends AbstractNodeDecorator implements GroupNo
      */
     public GroupNodeDecorator(Node node, Dependency dependency) {
         super(node, dependency);
-        setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
+        if (hasProperty(NodeProperties.NODE_TYPE)) {
+            return;
+        }
+        setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
     }
 
     /**
@@ -40,7 +43,7 @@ public class GroupNodeDecorator extends AbstractNodeDecorator implements GroupNo
      */
     public GroupNodeDecorator(Node node) {
         super(node);
-        if (node.getProperty(NodeProperties.NODE_TYPE) != NodeType.GroupNode) {
+        if (!getProperty(NodeProperties.NODE_TYPE).equals(NodeType.GroupNode.name())) {
             throw new IllegalArgumentException("node " + node.getId() + " is not a " + NodeType.GroupNode);
         }
     }
@@ -51,6 +54,9 @@ public class GroupNodeDecorator extends AbstractNodeDecorator implements GroupNo
      */
     @Override
     public void setDependency(Dependency dependency) {
+        if (hasProperty(NodeProperties.GROUP_ID)) {
+            return;
+        }
         setProperty(NodeProperties.GROUP_ID, dependency.getGroupId());
     }
 
@@ -59,6 +65,6 @@ public class GroupNodeDecorator extends AbstractNodeDecorator implements GroupNo
      */
     @Override
     public String getGroupId() {
-        return (String)super.getProperty(NodeProperties.GROUP_ID);
+        return (String)getProperty(NodeProperties.GROUP_ID);
     }
 }

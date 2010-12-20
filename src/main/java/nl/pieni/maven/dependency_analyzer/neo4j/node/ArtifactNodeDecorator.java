@@ -36,7 +36,10 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
      */
     public ArtifactNodeDecorator(Node node, Dependency dependency) {
         super(node, dependency);
-        setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
+        if (hasProperty(NodeProperties.NODE_TYPE)) {
+            return;
+        }
+        setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
     }
 
     /**
@@ -44,7 +47,7 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
      */
     public ArtifactNodeDecorator(Node node) {
         super(node);
-        if (node.getProperty(NodeProperties.NODE_TYPE) != NodeType.ArtifactNode) {
+        if (!getProperty(NodeProperties.NODE_TYPE).equals(NodeType.ArtifactNode.name())) {
             throw new IllegalArgumentException("node " + node.getId() + " is not a " + NodeType.ArtifactNode);
         }
     }
@@ -54,6 +57,9 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
      */
     @Override
     public void setDependency(Dependency dependency) {
+        if (hasProperty(NodeProperties.ARTIFACT_ID) && hasProperty(NodeProperties.ARTIFACT_TYPE)) {
+            return;
+        }
         setProperty(NodeProperties.ARTIFACT_ID, dependency.getArtifactId());
         setProperty(NodeProperties.ARTIFACT_TYPE, dependency.getType());
     }

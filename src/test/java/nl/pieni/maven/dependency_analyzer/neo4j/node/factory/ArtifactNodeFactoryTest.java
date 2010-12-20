@@ -17,6 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
@@ -61,14 +62,15 @@ public class ArtifactNodeFactoryTest {
         Dependency dependency = mock(Dependency.class);
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         Log log = mock(Log.class);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
-        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, searcher, log);
         factory.create(dependency);
 
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
+        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
         verify(log).info(startsWith("Create ArtifactNode: Node{ Id = 1"));
@@ -80,15 +82,16 @@ public class ArtifactNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
-        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+        when(searcher.findGroupNode(dependency)).thenReturn(groupNode);
 
         ArtifactNodeDecorator artifactNode = mock(ArtifactNodeDecorator.class);
-        when(database.findArtifactNode(dependency)).thenReturn(artifactNode);
+        when(searcher.findArtifactNode(dependency)).thenReturn(artifactNode);
 
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
-        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, searcher, log);
         assertEquals(0, factory.insert(dependency));
     }
 
@@ -98,21 +101,22 @@ public class ArtifactNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
-        when(database.findGroupNode(dependency)).thenReturn(groupNode);
+        when(searcher.findGroupNode(dependency)).thenReturn(groupNode);
 
-        when(database.findArtifactNode(dependency)).thenReturn(null);
+        when(searcher.findArtifactNode(dependency)).thenReturn(null);
 
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
         Node artifactNode = createMockNode();
         when(database.createNode()).thenReturn(artifactNode);
 
-        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, log);
+        ArtifactNodeFactory factory = new ArtifactNodeFactory(database, searcher, log);
         assertEquals(1, factory.insert(dependency));
 
-        verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
-        verify(database).indexOnProperty(artifactNode, NodeProperties.ARTIFACT_ID);
+        verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
+        verify(searcher).indexOnProperty(artifactNode, NodeProperties.ARTIFACT_ID);
         verify(database, times(2)).startTransaction();
         verify(database, times(2)).stopTransaction();
         verify(log).info(startsWith("Create ArtifactNode: "));

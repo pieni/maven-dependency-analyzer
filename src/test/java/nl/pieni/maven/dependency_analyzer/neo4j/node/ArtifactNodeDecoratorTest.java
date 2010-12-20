@@ -51,7 +51,7 @@ public class ArtifactNodeDecoratorTest {
 
         artifactNode = mock(Node.class);
         when(artifactNode.getId()).thenReturn(1L);
-        when(artifactNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
+        when(artifactNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode.name());
         when(artifactNode.getProperty(NodeProperties.ARTIFACT_TYPE)).thenReturn("jar");
         //To avoid a null pointer in the toString method.
         when(artifactNode.getPropertyKeys()).thenReturn(new Iterable<String>() {
@@ -81,7 +81,7 @@ public class ArtifactNodeDecoratorTest {
     @Test
     public void constructor2Arguments() {
         new ArtifactNodeDecorator(artifactNode, dependency);
-        verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode);
+        verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
         verify(dependency).getArtifactId();
         verify(artifactNode).setProperty(NodeProperties.ARTIFACT_ID, "artifactID");
         verify(artifactNode).setProperty(NodeProperties.ARTIFACT_TYPE, "jar");
@@ -131,7 +131,7 @@ public class ArtifactNodeDecoratorTest {
         ArtifactNodeDecorator decorator = new ArtifactNodeDecorator(artifactNode);
 
         Node parentNode = mock(Node.class);
-        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
+        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode.name());
         when(parentNode.getId()).thenReturn(99L);
         Iterable<Relationship> parentRelations = mock(Iterable.class);
         when(artifactNode.getRelationships(ArtifactRelations.has, Direction.INCOMING)).thenReturn(parentRelations);

@@ -51,7 +51,7 @@ public class VersionNodeDecoratorTest {
 
         versionNode = mock(Node.class);
         when(versionNode.getId()).thenReturn(1L);
-        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
+        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode.name());
         //To avoid a null pointer in the toString method.
         when(versionNode.getPropertyKeys()).thenReturn(new Iterable<String>() {
             @Override
@@ -80,20 +80,20 @@ public class VersionNodeDecoratorTest {
     @Test
     public void constructor2Arguments() {
         new VersionNodeDecorator(versionNode, dependency);
-        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
         verify(versionNode).setProperty(NodeProperties.VERSION, "1.0");
     }
 
     @Test
     public void constructor1Argument() {
-        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
+        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode.name());
         new VersionNodeDecorator(versionNode, dependency);
-        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode);
+        verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructor1ArgumentIllegalArgument() {
-        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
+        when(versionNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode.name());
         new VersionNodeDecorator(versionNode);
     }
 
@@ -117,7 +117,7 @@ public class VersionNodeDecoratorTest {
         VersionNodeDecorator decorator = new VersionNodeDecorator(versionNode);
 
         Node parentNode = mock(Node.class);
-        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
+        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode.name());
         when(parentNode.getId()).thenReturn(99L);
         Iterable<Relationship> parentRelations = mock(Iterable.class);
         when(versionNode.getRelationships(ArtifactRelations.version, Direction.INCOMING)).thenReturn(parentRelations);
@@ -138,7 +138,7 @@ public class VersionNodeDecoratorTest {
         VersionNodeDecorator decorator = new VersionNodeDecorator(versionNode);
 
         Node parentNode = mock(Node.class);
-        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
+        when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode.name());
         when(parentNode.getId()).thenReturn(99L);
         Iterable<Relationship> parentRelations = mock(Iterable.class);
         when(versionNode.getRelationships(ArtifactRelations.version, Direction.INCOMING)).thenReturn(parentRelations);

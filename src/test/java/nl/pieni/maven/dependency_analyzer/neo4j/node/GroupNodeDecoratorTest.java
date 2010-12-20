@@ -48,9 +48,9 @@ public class GroupNodeDecoratorTest {
         when(dependency.getArtifactId()).thenReturn("artifactID");
         when(dependency.getType()).thenReturn("jar");
 
-        groupNode= mock(Node.class);
+        groupNode = mock(Node.class);
         when(groupNode.getId()).thenReturn(1L);
-        when(groupNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
+        when(groupNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode.name());
         //To avoid a null pointer in the toString method.
         when(groupNode.getPropertyKeys()).thenReturn(new Iterable<String>() {
             @Override
@@ -79,7 +79,7 @@ public class GroupNodeDecoratorTest {
     @Test
     public void constructor2Arguments() {
         new GroupNodeDecorator(groupNode, dependency);
-        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode);
+        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
         verify(groupNode).setProperty(NodeProperties.GROUP_ID, dependency.getGroupId());
     }
 
@@ -91,12 +91,13 @@ public class GroupNodeDecoratorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void constructor1ArgumentIllegalArgument() {
-        when(groupNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
+        when(groupNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode.name());
         new GroupNodeDecorator(groupNode);
     }
+
     @Test
     public void setDependencyTest() {
-       GroupNodeDecorator decorator = new GroupNodeDecorator(groupNode);
+        GroupNodeDecorator decorator = new GroupNodeDecorator(groupNode);
         decorator.setDependency(dependency);
         verify(dependency).getGroupId();
         verify(groupNode).getProperty(NodeProperties.NODE_TYPE);

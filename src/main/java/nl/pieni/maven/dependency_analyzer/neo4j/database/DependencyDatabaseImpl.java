@@ -51,12 +51,12 @@ import java.util.Map;
 /**
  * Abstract base class for accessing the GRaph Database
  */
-public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseService, Node>, DependencyDatabaseSearcher {
+public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseService, Node> {
     private final Log LOGGER;
     private GraphDatabaseService graphDb;
     private Transaction transaction;
     private int transactionCount = 0;
-    private IndexService index;
+
 
     /**
      * Default constructor
@@ -67,7 +67,7 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
     public DependencyDatabaseImpl(final Log logger, String dbDirectory) {
         this.LOGGER = logger;
         this.graphDb = new EmbeddedGraphDatabase(dbDirectory);
-        this.index = new LuceneIndexService(graphDb);
+
 
     }
 
@@ -127,131 +127,5 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         }
 
         getDatabase().shutdown();
-        shutdownSearcher();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public VersionNode findVersionNode(@NotNull final Dependency dependency) {
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) findArtifactNode(dependency);
-        Traverser traverser = artifactNode.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL_BUT_START_NODE, ArtifactRelations.version, Direction.OUTGOING);
-        for (Node node : traverser) {
-            if (node.getProperty(NodeProperties.VERSION).equals(dependency.getVersion())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found versionNode for dependency: " + dependency);
-                }
-                return new VersionNodeDecorator(node, dependency);
-            }
-        }
-        throw new IllegalArgumentException("version Node not found" + dependency);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ArtifactNode findArtifactNode(@NotNull final Dependency dependency) {
-        GroupNodeDecorator groupNode = (GroupNodeDecorator) findGroupNode(dependency);
-        if (groupNode == null) {
-            LOGGER.error("Unable to find groupNode for " + dependency);
-            return null;
-        }
-        Traverser traverser = groupNode.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL_BUT_START_NODE, ArtifactRelations.has, Direction.OUTGOING);
-        for (Node node : traverser) {
-            if (node.getProperty(NodeProperties.ARTIFACT_ID).equals(dependency.getArtifactId())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found artifactNode for artifact: " + dependency);
-                }
-                return new ArtifactNodeDecorator(node, dependency);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GroupNode findGroupNode(@NotNull final Dependency dependency) {
-        String key = NodeProperties.GROUP_ID;
-        Node node = index.getSingleNode(key, dependency.getGroupId());
-        return new GroupNodeDecorator(node, dependency);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<VersionNode> getVersionNodes(ArtifactNode artifactNode) {
-        List<VersionNode> versionNodes = new ArrayList<VersionNode>();
-        ArtifactNodeDecorator node = (ArtifactNodeDecorator) artifactNode;
-        Iterable<Relationship> versions = node.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
-        for (Relationship relationship : versions) {
-            Node versionNode = relationship.getOtherNode(node);
-            versionNodes.add(new VersionNodeDecorator(versionNode));
-        }
-
-        return versionNodes;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(ArtifactNode node) {
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) node;
-        Map<DependencyScopeRelations, List<ArtifactNode>> artifactNodeMap = new HashMap<DependencyScopeRelations, List<ArtifactNode>>();
-        DependencyScopeRelations[] relations = DependencyScopeRelations.values();
-        for (DependencyScopeRelations relation : relations) {
-            List<ArtifactNode> artifactNodes = new ArrayList<ArtifactNode>();
-            artifactNodeMap.put(relation, artifactNodes);
-            Iterable<Relationship> scopeRelations = artifactNode.getRelationships(relation, Direction.INCOMING);
-            for (Relationship scopeRelation : scopeRelations) {
-                Node scopeNode = scopeRelation.getOtherNode(artifactNode);
-                artifactNodes.add(new ArtifactNodeDecorator(scopeNode));
-            }
-        }
-
-        return artifactNodeMap;
-    }
-
-    public Map<VersionNode, List<VersionNode>> getVersionDependencies(ArtifactNode node) {
-        Map<VersionNode, List<VersionNode>> versionNodeListMap = new HashMap<VersionNode, List<VersionNode>>();
-
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) node;
-        Iterable<Relationship> availableVersionRelations = artifactNode.getRelationships(ArtifactRelations.version, Direction.OUTGOING);
-
-        for (Relationship relationship : availableVersionRelations) {
-            VersionNodeDecorator versionNode = new VersionNodeDecorator(relationship.getOtherNode(artifactNode));
-            List<VersionNode> versionNodes = new ArrayList<VersionNode>();
-            versionNodeListMap.put(versionNode, versionNodes);
-
-
-            Iterable<Relationship> versionRelations = versionNode.getRelationships(ArtifactRelations.VersionsDependency, Direction.INCOMING);
-            for (Relationship versionRelation : versionRelations) {
-                Node relationNode = versionRelation.getOtherNode(versionNode);
-                versionNodes.add(new VersionNodeDecorator(relationNode));
-            }
-        }
-        return versionNodeListMap;
-    }
-
-             /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdownSearcher() {
-        index.shutdown();
-    }
-
-          /**
-     * {@inheritDoc}
-     */
-          @Override
-    public void indexOnProperty(@NotNull final Node node, final String key) {
-        index.index(node, key, node.getProperty(key));
     }
 }
