@@ -157,6 +157,19 @@ public class DependencyReportTest {
     }
 
 
+    @Test
+    public void stringWriterEmptyTest() throws IOException {
+        Dependency dependency = new Dependency();
+        dependency.setGroupId("a");
+        dependency.setArtifactId("b");
+        dependency.setVersion("1.0");
+
+        DependencyReport report = new DependencyReportImpl(searcher);
+        StringWriter writer = mock(StringWriter.class);
+        report.createReport(dependency, writer);
+    }
+
+
     /**
      * The the writer with a {@link org.apache.maven.plugin.logging.Log} as writer
      *
