@@ -239,7 +239,6 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
     public void getDependingArtifactsNotFoundDependency() {
         Map<DependencyScopeRelations, List<ArtifactNode>> result;
         result = searcher.getDependingArtifacts(dependencyA);
-        assertTrue(result.containsKey(DependencyScopeRelations.compile));
         for (DependencyScopeRelations dependencyScopeRelations : result.keySet()) {
             assertTrue(result.get(dependencyScopeRelations).size() == 0);
         }
