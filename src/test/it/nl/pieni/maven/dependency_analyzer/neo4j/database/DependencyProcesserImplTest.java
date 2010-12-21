@@ -40,13 +40,12 @@ import static junit.framework.Assert.assertEquals;
 public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
     private static DependencyDatabase<GraphDatabaseService, Node> database;
     private static DependencyNodeProcessor processor;
-    private static DependencyDatabaseSearcher<Node> searcher;
 
     @BeforeClass
     public static void beforeClass() throws IOException {
         beforeBase();
         database = new DependencyDatabaseImpl(log, getDBDirectory());
-        searcher = new DependencyDatabaseSearcherImpl(log, database);
+        DependencyDatabaseSearcher<Node> searcher=new DependencyDatabaseSearcherImpl(log, database);
         processor = new DependencyNodeProcessorImpl(database, searcher, log);
     }
 
@@ -97,7 +96,7 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
         assertEquals(3, count);
         count = processor.addArtifact(dependencyB);
         assertEquals(3, count);
-        count = processor.addRelation(dependencyA, dependencyB);
+        processor.addRelation(dependencyA, dependencyB);
     }
 
     @Test

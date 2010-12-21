@@ -103,8 +103,7 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
         getLOGGER().debug("Starting Transaction");
         transactionCount++;
         this.transaction = getDatabase().beginTx();
-        return;
-    }
+        }
 
     /**
      * {@inheritDoc}

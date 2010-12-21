@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 
 /**
  * Wrapper arround the {@link Log} implementation of the plugin logger and allow usage as a
- * writer for the {@link DependencyReportImpl}
+ * writer for the {@link nl.pieni.maven.dependency_analyzer.report.DependencyReport}
  */
 public class LogWriter extends Writer {
     private static final String LINESEPERATOR = System.getProperty("line.separator");
@@ -59,7 +59,7 @@ public class LogWriter extends Writer {
     public void write(char[] cbuf, int off, int len) throws IOException {
         StringTokenizer strTok = new StringTokenizer(bufferToString(cbuf, off, len), LINESEPERATOR);
         while (strTok.hasMoreElements()) {
-            LOGGER.info(strTok.nextToken().toString());
+            LOGGER.info(strTok.nextToken());
         }
     }
 

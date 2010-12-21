@@ -55,7 +55,7 @@ public interface DependencyDatabaseSearcher<N> {
 
     /**
      * Retrieve all version nodes
-     * @param node the artifact
+     * @param dependency the artifact
      * @return the list of version node for the artifact
      */
     List<VersionNode> getVersionNodes(Dependency dependency);
@@ -63,14 +63,14 @@ public interface DependencyDatabaseSearcher<N> {
     /**
      * Retrieve the list of artifacts that have a dependency on this {@link ArtifactNode}
      *
-     * @param node the Artifact node
+     * @param dependency the Artifact
      * @return A separate list for each ({@link Dependency}) scope
      */
     Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(Dependency dependency);
 
     /**
      * Retrieve the list of {@link VersionNode} elements that are dependent on the {@link ArtifactNode}.
-     * @param node the source node
+     * @param dependency the source
      * @return List for each version available of the {@link ArtifactNode}
      */
     Map<VersionNode, List<VersionNode>> getVersionDependencies(Dependency dependency);

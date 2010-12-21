@@ -35,9 +35,9 @@ import org.neo4j.graphdb.*;
  * Processing of Dependency elements
  */
 public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
-    private ArtifactNodeFactory artifactNodeFactory;
-    private GroupNodeFactory groupNodeFactory;
-    private VersionNodeFactory versionNodeFactory;
+    private final ArtifactNodeFactory artifactNodeFactory;
+    private final GroupNodeFactory groupNodeFactory;
+    private final VersionNodeFactory versionNodeFactory;
     private final DependencyDatabase database;
     private final DependencyDatabaseSearcher searcher;
     private final Log logger;

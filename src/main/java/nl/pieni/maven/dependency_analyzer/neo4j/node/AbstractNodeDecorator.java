@@ -33,7 +33,7 @@ import org.neo4j.graphdb.Traverser;
  * Mainly code to proxy to the {@link Node} object
  */
 public abstract class AbstractNodeDecorator implements Node, DependencyNode {
-    private Node node;
+    private final Node node;
 
     /**
      * Default constructor
@@ -50,7 +50,7 @@ public abstract class AbstractNodeDecorator implements Node, DependencyNode {
      * @param node       The node
      * @param dependency the dependency
      */
-    public AbstractNodeDecorator(Node node, Dependency dependency) {
+    AbstractNodeDecorator(Node node, Dependency dependency) {
         this.node = node;
         setDependency(dependency);
     }

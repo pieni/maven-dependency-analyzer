@@ -35,24 +35,24 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractDatabaseImplTest {
 
     private final static String TEST_DB_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
-    protected static Log log;
+    static Log log;
     private static int dependencyCnt = 0;
 
-    static public boolean deleteDirectory(File path) {
+    private static boolean deleteDirectory(File path) {
         if (path.exists()) {
             File[] files = path.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteDirectory(files[i]);
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
                 } else {
-                    files[i].delete();
+                    file.delete();
                 }
             }
         }
         return (path.delete());
     }
 
-    public static void beforeBase() throws IOException {
+    static void beforeBase() throws IOException {
         //Test and remove any old DB's
         File file = new File(TEST_DB_LOCATION);
         System.out.println("Using directory " + file.getAbsolutePath() + " for test database");
@@ -69,7 +69,7 @@ public abstract class AbstractDatabaseImplTest {
         when(log.isDebugEnabled()).thenReturn(true);
     }
 
-    public static void afterBase() {
+    static void afterBase() {
         File file = new File(TEST_DB_LOCATION);
         System.out.println("Removing directory " + file.getAbsolutePath() + " (Used for test DB)");
         if (file.exists()) {
@@ -79,23 +79,15 @@ public abstract class AbstractDatabaseImplTest {
         }
     }
 
-    public static String getDBDirectory() {
+    static String getDBDirectory() {
         return TEST_DB_LOCATION;
     }
 
-    protected Dependency getDependency() {
-        return getDependency(null);
-    }
-
-    protected Dependency getDependency(String version) {
+    Dependency getDependency() {
         Dependency dependency = new Dependency();
         dependency.setArtifactId("artifactId_" + dependencyCnt);
         dependency.setGroupId("groupId_" + dependencyCnt);
-        if (version == null) {
-            dependency.setVersion("1.0");
-        } else {
-            dependency.setVersion(version);
-        }
+        dependency.setVersion("1.0");
         dependency.setType("jar");
         dependencyCnt++;
         return dependency;

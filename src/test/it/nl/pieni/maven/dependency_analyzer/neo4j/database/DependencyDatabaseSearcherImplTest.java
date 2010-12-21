@@ -52,9 +52,6 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
 
     private DependencyDatabase<GraphDatabaseService, Node> database;
     private DependencyDatabaseSearcher<Node> searcher;
-    private Dependency dependencyA;
-    private Dependency dependencyA2;
-    private Dependency dependencyB;
 
 
     @Before
@@ -64,21 +61,21 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
         searcher = new DependencyDatabaseSearcherImpl(log, database);
 
         //Create the dependencies used
-        dependencyA = new Dependency();
+        Dependency dependencyA=new Dependency();
         dependencyA.setArtifactId("artifactId_A");
         dependencyA.setGroupId("groupId_A");
         dependencyA.setVersion("1.0");
         dependencyA.setType("jar");
 
 
-        dependencyA2 = new Dependency();
+        Dependency dependencyA2=new Dependency();
         dependencyA2.setArtifactId("artifactId_A");
         dependencyA2.setGroupId("groupId_A");
         dependencyA2.setVersion("2.0");
         dependencyA2.setType("jar");
 
 
-        dependencyB = new Dependency();
+        Dependency dependencyB=new Dependency();
         dependencyB.setArtifactId("artifactId_B");
         dependencyB.setGroupId("groupId_B");
         dependencyB.setVersion("1.0");

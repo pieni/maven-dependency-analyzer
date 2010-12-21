@@ -47,24 +47,6 @@ public class DependencyReportTest {
 
     private static final String LINESEPERATOR = System.getProperty("line.separator");
 
-    /*
-     Create a set of artifact nodes and parent, mock the searcher and return these
-
-                reportGroupNode                     otherGroupNode
-                        |                               |
-                reportArtifactNode -> compile ->    otherArtifactNode
-                   |       |                            |
-        reportVersion1(1.0)  reportVersion2(2.0)              otherVersionNode(1.0)
-                |          |                            |
-                ------<-------------------------<-------
-    */
-    private GroupNode reportGroupNode;
-    private ArtifactNode reportArtifactNode;
-    private VersionNode reportVersion1;
-    private VersionNode reportVersion2;
-    private GroupNode otherGroupNode;
-    private ArtifactNode otherArtifactNode;
-    private VersionNode otherVersionNode;
     private DependencyDatabaseSearcher searcher;
     private Dependency reportDependency1;
 
@@ -79,14 +61,14 @@ public class DependencyReportTest {
 
 
         /* Setup the node interactions */
-        reportArtifactNode = mock(ArtifactNode.class);
+        ArtifactNode reportArtifactNode=mock(ArtifactNode.class);
         when(reportArtifactNode.getArtifactId()).thenReturn("reportAID");
         when(reportArtifactNode.getType()).thenReturn("jar");
-        reportGroupNode = mock(GroupNode.class);
+        GroupNode reportGroupNode=mock(GroupNode.class);
         when(reportGroupNode.getGroupId()).thenReturn("reportGID");
-        reportVersion1 = mock(VersionNode.class);
+        VersionNode reportVersion1=mock(VersionNode.class);
         when(reportVersion1.getVersion()).thenReturn("1.0");
-        reportVersion2 = mock(VersionNode.class);
+        VersionNode reportVersion2=mock(VersionNode.class);
         when(reportVersion2.getVersion()).thenReturn("2.0");
 
         //The parent child relations
@@ -94,12 +76,12 @@ public class DependencyReportTest {
         when(reportVersion1.getParent()).thenReturn(reportArtifactNode);
         when(reportVersion2.getParent()).thenReturn(reportArtifactNode);
 
-        otherGroupNode = mock(GroupNode.class);
+        GroupNode otherGroupNode=mock(GroupNode.class);
         when(otherGroupNode.getGroupId()).thenReturn("otherGID");
-        otherArtifactNode = mock(ArtifactNode.class);
+        ArtifactNode otherArtifactNode=mock(ArtifactNode.class);
         when(otherArtifactNode.getArtifactId()).thenReturn("otherAID");
         when(otherArtifactNode.getType()).thenReturn("jar");
-        otherVersionNode = mock(VersionNode.class);
+        VersionNode otherVersionNode=mock(VersionNode.class);
         when(otherVersionNode.getVersion()).thenReturn("1.0");
         when(otherVersionNode.getParent()).thenReturn(otherArtifactNode);
         when(otherArtifactNode.getParent()).thenReturn(otherGroupNode);

@@ -22,7 +22,7 @@
     <packaging>maven-plugin</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>dependency-analyzer Maven Mojo</name>
-    <url></url>
+    <url/>
     <properties>
         <nexus-indexer.version>3.0.3</nexus-indexer.version>
     </properties>

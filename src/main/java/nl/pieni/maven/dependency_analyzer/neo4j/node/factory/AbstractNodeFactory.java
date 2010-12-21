@@ -28,7 +28,7 @@ import org.neo4j.graphdb.Node;
  * Abstract Base class for all Nodes
  */
 public abstract class AbstractNodeFactory<T> {
-    protected final Log LOGGER;
+    final Log LOGGER;
     private final DependencyDatabase<GraphDatabaseService, Node> database;
     private final DependencyDatabaseSearcher<Node> searcher;
 
@@ -38,7 +38,7 @@ public abstract class AbstractNodeFactory<T> {
      * @param database The database
      * @param logger   the logger
      */
-    public AbstractNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
+    AbstractNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
         this.database = database;
         this.searcher = searcher;
         this.LOGGER = logger;
@@ -49,11 +49,11 @@ public abstract class AbstractNodeFactory<T> {
      *
      * @return the Database
      */
-    public DependencyDatabase<GraphDatabaseService, Node> getDatabase() {
+    DependencyDatabase<GraphDatabaseService, Node> getDatabase() {
         return this.database;
     }
 
-    public DependencyDatabaseSearcher<Node> getSearcher() {
+    DependencyDatabaseSearcher<Node> getSearcher() {
         return searcher;
     }
 
