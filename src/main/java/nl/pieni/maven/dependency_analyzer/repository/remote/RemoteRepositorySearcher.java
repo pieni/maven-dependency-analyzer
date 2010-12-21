@@ -17,7 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.repository.remote;
 
 import nl.pieni.maven.dependency_analyzer.repository.RepositorySearcher;
-import nl.pieni.maven.dependency_analyzer.repository.listener.DebugTransferListener;
+import nl.pieni.maven.dependency_analyzer.repository.listener.RepositoryTransferListener;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -191,7 +191,7 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
             IndexingContext context = contexts.get(key);
             getLog().info("Updating from index from: " + context.getRepositoryUrl());
             IndexUpdateRequest updRequest = new IndexUpdateRequest(context);
-            updRequest.setTransferListener(new DebugTransferListener(getLog()));
+            updRequest.setTransferListener(new RepositoryTransferListener(getLog()));
             updRequest.setForceFullUpdate(false);
             indexUpdater.fetchAndUpdateIndex(updRequest);
         }

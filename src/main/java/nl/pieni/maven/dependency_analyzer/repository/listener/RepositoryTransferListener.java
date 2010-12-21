@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * Listener for the Nexus updater
  * Report progress of the index download
  */
-public class DebugTransferListener implements TransferListener {
+public class RepositoryTransferListener implements TransferListener {
     private long timestamp;
     private long transfer;
     private long progress_block;
@@ -40,7 +40,7 @@ public class DebugTransferListener implements TransferListener {
      *
      * @param logger stream to write output to
      */
-    public DebugTransferListener(final Log logger) {
+    public RepositoryTransferListener(final Log logger) {
         this.LOG = logger;
     }
 
@@ -107,7 +107,7 @@ public class DebugTransferListener implements TransferListener {
      */
     @Override
     public void transferError(@NotNull TransferEvent transferEvent) {
-        LOG.info(" Transfer error: " + transferEvent.getException());
+        LOG.info("Transfer error: " + transferEvent.getException());
     }
 
     /**
@@ -115,6 +115,6 @@ public class DebugTransferListener implements TransferListener {
      */
     @Override
     public void debug(String message) {
-        LOG.debug("message = " + message);
+        LOG.debug("Message = " + message);
     }
 }
