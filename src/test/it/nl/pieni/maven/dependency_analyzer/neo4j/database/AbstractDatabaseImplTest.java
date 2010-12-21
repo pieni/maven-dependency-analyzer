@@ -33,8 +33,8 @@ import static org.mockito.Mockito.when;
  */
 public abstract class AbstractDatabaseImplTest {
 
-    private final String TEST_DB_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
-    protected Log log;
+    private final static String TEST_DB_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
+    protected static Log log;
 
     static public boolean deleteDirectory(File path) {
         if (path.exists()) {
@@ -50,7 +50,7 @@ public abstract class AbstractDatabaseImplTest {
         return (path.delete());
     }
 
-    public void beforeBase() throws IOException {
+    public static void beforeBase() throws IOException {
         //Test and remove any old DB's
         File file = new File(TEST_DB_LOCATION);
         System.out.println("Using directory " + file.getAbsolutePath() + " for test database");
@@ -67,7 +67,7 @@ public abstract class AbstractDatabaseImplTest {
         when(log.isDebugEnabled()).thenReturn(true);
     }
 
-    public void afterBase() {
+    public static void afterBase() {
         File file = new File(TEST_DB_LOCATION);
         System.out.println("Removing directory " + file.getAbsolutePath() + " (Used for test DB)");
         if (file.exists()) {
@@ -77,7 +77,7 @@ public abstract class AbstractDatabaseImplTest {
         }
     }
 
-    public String getDBDirectory() {
+    public static String getDBDirectory() {
         return TEST_DB_LOCATION;
     }
 }

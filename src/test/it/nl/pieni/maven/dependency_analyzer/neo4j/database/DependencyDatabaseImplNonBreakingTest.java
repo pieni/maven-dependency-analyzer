@@ -17,45 +17,38 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
-import org.apache.maven.plugin.logging.Log;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotInTransactionException;
-import org.neo4j.graphdb.TransactionFailureException;
 
 import java.io.IOException;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 15-12-10
- * Time: 20:50
+ * Date: 21-12-10
+ * Time: 19:52
  * To change this template use File | Settings | File Templates.
  */
-
-public class DependencyDatabaseImplTest extends AbstractDatabaseImplTest {
-
+public class DependencyDatabaseImplNonBreakingTest extends AbstractDatabaseImplTest {
     private static DependencyDatabase<GraphDatabaseService, Node> database;
 
 
-    @Before
-    public void beforeClass() throws IOException {
+    @BeforeClass
+    public static void beforeClass() throws IOException {
         beforeBase();
         database = new DependencyDatabaseImpl(log, getDBDirectory());
     }
 
-    @After
-    public void afterClass() {
+    @AfterClass
+    public static void afterClass() {
         try {
             database.shutdownDatabase();
             afterBase();
@@ -64,30 +57,22 @@ public class DependencyDatabaseImplTest extends AbstractDatabaseImplTest {
         }
     }
 
-
-    @Test(expected = NotInTransactionException.class)
-    public void createNodeNotInTransactionTest() {
-        Node node = database.createNode();
-        assertNull(node);
+    @Test
+    public void getDatabaseTest() {
+        assertNotNull(database.getDatabase());
     }
 
+    @Test
+    public void getLOGGERTest() {
+        assertNotNull(database.getLOGGER());
+    }
 
-    @Test(expected = IllegalStateException.class)
-    public void shutdownDatabaseAndCreateNode() {
-        database.shutdownDatabase();
+    @Test
+    public void createNodeTest() {
         database.startTransaction();
-        database.createNode();
+        Node node = database.createNode();
         database.stopTransaction();
-    }
-
-    @Test(expected = TransactionFailureException.class)
-    public void shutdownDatabaseAndPendingTransaction() {
-        try {
-            database.startTransaction();
-            database.createNode();
-            database.shutdownDatabase();
-        } finally {
-            database.stopTransaction();
-        }
+        assertNotNull(node);
+        assertTrue(node.getId() != 0);
     }
 }

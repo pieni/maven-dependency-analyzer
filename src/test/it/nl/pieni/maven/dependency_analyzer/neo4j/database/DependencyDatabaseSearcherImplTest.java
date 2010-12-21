@@ -147,127 +147,30 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
         searcher.indexOnProperty(node, "Key");
     }
 
-    @Test
-    public void findGroupNodeEmptyDBTest() {
-        GroupNodeDecorator node = (GroupNodeDecorator) searcher.findGroupNode(dependencyA);
-        assertNull(node);
-    }
-
-    @Test
-    public void findGroupNodeTest() {
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        GroupNodeDecorator node = (GroupNodeDecorator) searcher.findGroupNode(dependencyA);
-        assertNotNull(node);
-        assertTrue(node.getGroupId().equals(dependencyA.getGroupId()));
-    }
-
-    @Test
-    public void findArtifactNodeTest() {
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        ArtifactNodeDecorator node = (ArtifactNodeDecorator) searcher.findArtifactNode(dependencyA);
-        assertNotNull(node);
-        assertTrue(node.getArtifactId().equals(dependencyA.getArtifactId()));
-    }
-
-    @Test
-    public void findVersionNodeTest() {
-
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        VersionNodeDecorator node = (VersionNodeDecorator) searcher.findVersionNode(dependencyA);
-        assertNotNull(node);
-        assertTrue(node.getVersion().equals(dependencyA.getVersion()));
-
-    }
-
-    @Test
-    public void getVersionNodesSingleResultTest() {
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        List<VersionNode> versionNodes = searcher.getVersionNodes(dependencyA);
-        assertNotNull(versionNodes);
-        assertEquals(1, versionNodes.size());
-        assertTrue(versionNodes.get(0).getVersion().equals(dependencyA.getVersion()));
-    }
-
-    @Test
-    public void getVersionNodesMultiResultTest() {
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        processor.addArtifact(dependencyA2);
-        List<VersionNode> versionNodes = searcher.getVersionNodes(dependencyA);
-        assertNotNull(versionNodes);
-        assertEquals(2, versionNodes.size());
-        assertTrue(versionNodes.get(0).getVersion().equals(dependencyA.getVersion()));
-        assertTrue(versionNodes.get(1).getVersion().equals(dependencyA2.getVersion()));
-    }
-
-    @Test
-    public void getVersionNodesNonProcessedDependency() {
-        List<VersionNode> versionNodes = searcher.getVersionNodes(dependencyA);
-        assertNotNull(versionNodes);
-        assertEquals(0, versionNodes.size());
-    }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getDependingArtifactsBadScope() {
-        Map<DependencyScopeRelations, List<ArtifactNode>> result;
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        processor.addArtifact(dependencyA);
-        processor.addArtifact(dependencyB);
-        processor.addRelation(dependencyB, dependencyA);
-    }
-
-    @Test
-    public void getDependingArtifacts() {
-        Map<DependencyScopeRelations, List<ArtifactNode>> result;
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        dependencyA.setScope("compile");
-        processor.addArtifact(dependencyA);
-        processor.addArtifact(dependencyB);
-        processor.addRelation(dependencyB, dependencyA);
-        result = searcher.getDependingArtifacts(dependencyA);
-        assertTrue(result.containsKey(DependencyScopeRelations.compile));
-        assertTrue(result.get(DependencyScopeRelations.compile).size() == 1);
-        assertTrue(result.get(DependencyScopeRelations.compile).get(0).getArtifactId().equals(dependencyB.getArtifactId()));
-    }
-
-    @Test
-    public void getDependingArtifactsNotFoundDependency() {
-        Map<DependencyScopeRelations, List<ArtifactNode>> result;
-        result = searcher.getDependingArtifacts(dependencyA);
-        for (DependencyScopeRelations dependencyScopeRelations : result.keySet()) {
-            assertTrue(result.get(dependencyScopeRelations).size() == 0);
-        }
-    }
 
 
-    @Test
-    public void getVersionDependenciesTest() {
-        Map<VersionNode, List<VersionNode>> result;
-        DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
-        dependencyA.setScope("compile");
-        processor.addArtifact(dependencyA);
-        processor.addArtifact(dependencyB);
-        processor.addRelation(dependencyB, dependencyA);
-        result = searcher.getVersionDependencies(dependencyA);
-        assertEquals(1, result.keySet().size());
-        for (VersionNode versionNode : result.keySet()) {
-            assertTrue(versionNode.getVersion().equals("1.0"));
-            VersionNode otherVersionNode = result.get(versionNode).get(0);
-            assertTrue(otherVersionNode.getVersion().equals("1.0"));
-        }
-    }
 
-    @Test
-    public void getVersionDependenciesEmptyTest() {
-        Map<VersionNode, List<VersionNode>> result;
-        result = searcher.getVersionDependencies(dependencyA);
-        assertEquals(0, result.keySet().size());
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
