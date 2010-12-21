@@ -124,7 +124,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
                 return true;
             }
         }
-        return false;  //To change body of created methods use File | Settings | File Templates.
+        return false;
     }
 
     /**

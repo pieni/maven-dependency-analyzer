@@ -54,7 +54,7 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
 
     private static DependencyDatabase<GraphDatabaseService, Node> database;
     private static DependencyDatabaseSearcher<Node> searcher;
-    private static int dependencyCnt = 0;
+
 
 
     @BeforeClass
@@ -62,27 +62,6 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         beforeBase();
         database = new DependencyDatabaseImpl(log, getDBDirectory());
         searcher = new DependencyDatabaseSearcherImpl(log, database);
-
-//        //Create the dependencies used
-//        dependencyA = new Dependency();
-//        dependencyA.setArtifactId("artifactId_A");
-//        dependencyA.setGroupId("groupId_A");
-//        dependencyA.setVersion("1.0");
-//        dependencyA.setType("jar");
-//
-//
-//        dependencyA2 = new Dependency();
-//        dependencyA2.setArtifactId("artifactId_A");
-//        dependencyA2.setGroupId("groupId_A");
-//        dependencyA2.setVersion("2.0");
-//        dependencyA2.setType("jar");
-//
-//
-//        dependencyB = new Dependency();
-//        dependencyB.setArtifactId("artifactId_B");
-//        dependencyB.setGroupId("groupId_B");
-//        dependencyB.setVersion("1.0");
-//        dependencyB.setType("jar");
     }
 
     @AfterClass
@@ -94,24 +73,6 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         } finally {
             System.out.println("Done.");
         }
-    }
-
-    private Dependency getDependency() {
-        return getDependency(null);
-    }
-
-    private Dependency getDependency(String version) {
-        Dependency dependency = new Dependency();
-        dependency.setArtifactId("artifactId_" + dependencyCnt);
-        dependency.setGroupId("groupId_" + dependencyCnt);
-        if (version == null) {
-            dependency.setVersion("1.0");
-        } else {
-            dependency.setVersion(version);
-        }
-        dependency.setType("jar");
-        dependencyCnt++;
-        return dependency;
     }
 
     @Test

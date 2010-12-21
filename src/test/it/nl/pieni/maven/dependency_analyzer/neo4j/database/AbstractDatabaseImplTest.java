@@ -16,6 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
@@ -35,6 +36,7 @@ public abstract class AbstractDatabaseImplTest {
 
     private final static String TEST_DB_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
     protected static Log log;
+    private static int dependencyCnt = 0;
 
     static public boolean deleteDirectory(File path) {
         if (path.exists()) {
@@ -79,5 +81,23 @@ public abstract class AbstractDatabaseImplTest {
 
     public static String getDBDirectory() {
         return TEST_DB_LOCATION;
+    }
+
+    protected Dependency getDependency() {
+        return getDependency(null);
+    }
+
+    protected Dependency getDependency(String version) {
+        Dependency dependency = new Dependency();
+        dependency.setArtifactId("artifactId_" + dependencyCnt);
+        dependency.setGroupId("groupId_" + dependencyCnt);
+        if (version == null) {
+            dependency.setVersion("1.0");
+        } else {
+            dependency.setVersion(version);
+        }
+        dependency.setType("jar");
+        dependencyCnt++;
+        return dependency;
     }
 }
