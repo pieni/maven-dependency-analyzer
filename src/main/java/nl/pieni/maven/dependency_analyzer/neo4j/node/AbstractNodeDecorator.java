@@ -82,7 +82,7 @@ public abstract class AbstractNodeDecorator implements Node, DependencyNode {
     }
 
     /**
-     * @InheritDoc
+     * @inheritDoc
      */
     @Override
     public long getId() {

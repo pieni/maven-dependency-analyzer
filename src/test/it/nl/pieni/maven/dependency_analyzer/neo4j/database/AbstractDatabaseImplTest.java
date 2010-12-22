@@ -26,11 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 20-12-10
- * Time: 18:33
- * To change this template use File | Settings | File Templates.
+ * Base class for database unit testing
  */
 public abstract class AbstractDatabaseImplTest {
 
@@ -45,7 +41,10 @@ public abstract class AbstractDatabaseImplTest {
                 if (file.isDirectory()) {
                     deleteDirectory(file);
                 } else {
-                    file.delete();
+                    boolean result = file.delete();
+                    if (!result) {
+                        System.out.println("Unable to delete file = " + file);
+                    }
                 }
             }
         }

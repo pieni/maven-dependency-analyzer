@@ -37,19 +37,19 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
      *
      * @parameter property="databaseDirectory" default-value="target/neo4j"
      */
-    protected String databaseDirectory;
+    String databaseDirectory;
 
     /**
      * The Dependency database
      */
-    protected DependencyDatabase database;
+    DependencyDatabase database;
 
 
-    protected void setup() throws MojoExecutionException {
+    void setup() throws MojoExecutionException {
         database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
     }
 
-    protected void tearDown() {
+    void tearDown() {
         database.shutdownDatabase();
     }
 }

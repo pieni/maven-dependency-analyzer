@@ -31,11 +31,7 @@ import java.io.IOException;
 import static junit.framework.Assert.assertEquals;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 21-12-10
- * Time: 20:18
- * To change this template use File | Settings | File Templates.
+ * Database tests (each test breaks the consistency of the DB)
  */
 public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
     private static DependencyDatabase<GraphDatabaseService, Node> database;

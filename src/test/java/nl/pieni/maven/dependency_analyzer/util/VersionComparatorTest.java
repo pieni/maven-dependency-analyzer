@@ -22,11 +22,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 1-12-10
- * Time: 23:33
- * To change this template use File | Settings | File Templates.
+ * Version comparison test
  */
 public class VersionComparatorTest {
 

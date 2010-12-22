@@ -30,7 +30,7 @@ public interface ArtifactNode extends DependencyNode {
     /**
      * Return the type of the artifact
      *
-     * @return
+     * @return the Type
      */
     String getType();
 

@@ -44,11 +44,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 21-12-10
- * Time: 19:55
- * To change this template use File | Settings | File Templates.
+ * Non consistency based database tests
  */
 public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatabaseImplTest {
 
@@ -56,7 +52,10 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
     private static DependencyDatabaseSearcher<Node> searcher;
 
 
-
+    /**
+     * Setup for the tests
+     * @throws IOException
+     */
     @BeforeClass
     public static void beforeClass() throws IOException {
         beforeBase();
@@ -64,6 +63,9 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         searcher = new DependencyDatabaseSearcherImpl(log, database);
     }
 
+    /**
+     * Cleanup of database after test
+     */
     @AfterClass
     public static void afterClass() {
         try {

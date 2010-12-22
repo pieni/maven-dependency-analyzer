@@ -30,7 +30,8 @@ public interface DependencyReport {
     /**
      * Print the report using the provided writer
      *
-     * @param writer the Writer
+     * @param dependency  dependency
+     * @param writer     the Writer
      * @throws IOException In case of error
      */
     void createReport(Dependency dependency, Writer writer) throws IOException;

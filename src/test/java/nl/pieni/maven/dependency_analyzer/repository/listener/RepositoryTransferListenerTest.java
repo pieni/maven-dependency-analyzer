@@ -31,11 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 21-12-10
- * Time: 21:55
- * To change this template use File | Settings | File Templates.
+ * Unit testing of the transfer listener
  */
 public class RepositoryTransferListenerTest {
     private Log log;

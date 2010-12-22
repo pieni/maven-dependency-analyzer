@@ -86,9 +86,7 @@ public class LogWriterTest {
         String tmp = "String";
         char[] tmpBuf = tmp.toCharArray();
         for (int y = 0; y < 3; y++) {
-            for (int i = 0; i < tmpBuf.length; i++) {
-                cbuf[i] = tmpBuf[i];
-            }
+            System.arraycopy(tmpBuf, 0, cbuf, 0, tmpBuf.length);
         }
         Log log = mock(Log.class);
         LogWriter writer = new LogWriter(log);

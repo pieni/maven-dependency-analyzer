@@ -36,6 +36,7 @@ public abstract class AbstractNodeFactory<T> {
      * Default constructor
      *
      * @param database The database
+     * @param searcher The searcher
      * @param logger   the logger
      */
     AbstractNodeFactory(DependencyDatabase<GraphDatabaseService, Node> database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
@@ -59,6 +60,7 @@ public abstract class AbstractNodeFactory<T> {
 
     /**
      * Create a specific node for insertion into the DB
+     *
      * @param dependency The {@link Dependency}
      * @return {@link Node} created
      */
@@ -66,7 +68,8 @@ public abstract class AbstractNodeFactory<T> {
 
     /**
      * Insert a {@link Dependency} into the DB
-     * @param dependency
+     *
+     * @param dependency dependency
      * @return Number of {@link Node}'s inserted into the DB
      */
     abstract public int insert(final Dependency dependency);

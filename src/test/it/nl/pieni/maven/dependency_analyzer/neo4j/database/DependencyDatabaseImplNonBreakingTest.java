@@ -31,11 +31,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 21-12-10
- * Time: 19:52
- * To change this template use File | Settings | File Templates.
+ * Non database consistency breaking unit tests
  */
 public class DependencyDatabaseImplNonBreakingTest extends AbstractDatabaseImplTest {
     private static DependencyDatabase<GraphDatabaseService, Node> database;

@@ -249,7 +249,6 @@ public class DependencyGraphDBMojo
      * the project and its found dependencies are added to the database
      *
      * @param source the found artifact
-     * @return Number of elements added to the Database
      * @throws SettingsBuildingException Unable to parse the settings file
      */
     private void processArtifactInfo(@NotNull final ArtifactInfo source) throws SettingsBuildingException {
@@ -302,9 +301,10 @@ public class DependencyGraphDBMojo
      * Setup the context for the creation of a {@link org.apache.maven.project.MavenProject}.
      *
      * @return Building context
-     * @throws SettingsBuildingException Unable to parse the settings file.
+     * @throws MojoExecutionException Unable to parse the settings file.
+     * @throws org.apache.maven.plugin.MojoExecutionException in case of error
+     *
      */
-    @NotNull
     private ProjectBuildingRequest makeBuildingRequest() throws MojoExecutionException {
 
         try {

@@ -44,19 +44,21 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
 
     /**
      * Default constructor
+     *
      * @param database the database instance
-     * @param logger the Logger
+     * @param searcher The searcher
+     * @param logger   the Logger
      */
     public DependencyNodeProcessorImpl(DependencyDatabase database, DependencyDatabaseSearcher searcher, final Log logger) {
         this.database = database;
         this.searcher = searcher;
         this.logger = logger;
-        artifactNodeFactory = new ArtifactNodeFactory(database, searcher,  logger);
+        artifactNodeFactory = new ArtifactNodeFactory(database, searcher, logger);
         groupNodeFactory = new GroupNodeFactory(database, searcher, logger);
         versionNodeFactory = new VersionNodeFactory(database, searcher, logger);
     }
 
-            /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -75,14 +77,14 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         return nodeCount;
     }
 
-            /**
+    /**
      * {@inheritDoc}
      */
     @Override
     public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
         int count = 0;
-        ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator)searcher.findArtifactNode(sourceDependency);
-        ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator)searcher.findArtifactNode(targetDependency);
+        ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(sourceDependency);
+        ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(targetDependency);
 
 
         RelationshipType relationType = determineRelationType(targetDependency);
@@ -96,8 +98,8 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
             database.stopTransaction();
         }
 
-        VersionNodeDecorator targetVersionNode = (VersionNodeDecorator)searcher.findVersionNode(targetDependency);
-        VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator)searcher.findVersionNode(sourceDependency);
+        VersionNodeDecorator targetVersionNode = (VersionNodeDecorator) searcher.findVersionNode(targetDependency);
+        VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator) searcher.findVersionNode(sourceDependency);
         if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
             database.startTransaction();
             sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
@@ -110,9 +112,10 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
 
     /**
      * See of the source node and artifact node have a specific relation
+     *
      * @param sourceArtifactNode the source
      * @param targetArtifactNode the target
-     * @param type the relation
+     * @param type               the relation
      * @return true when the relation is present
      */
     private boolean hasDependencyRelation(Node sourceArtifactNode, Node targetArtifactNode, RelationshipType type) {
@@ -129,13 +132,14 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
 
     /**
      * Convert the {@link Dependency} scope attribute to a {@link RelationshipType}
+     *
      * @param dependency
-     * @return
+     * @return the {@link RelationshipType}
      */
     private RelationshipType determineRelationType(@NotNull final Dependency dependency) {
         RelationshipType result = DependencyScopeRelations.fromString(dependency.getScope());
         if (result == null) {
-            throw new IllegalArgumentException("Unable to determine scope for dependency: " +  dependency);
+            throw new IllegalArgumentException("Unable to determine scope for dependency: " + dependency);
         }
         return result;
     }
@@ -143,6 +147,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
 
     /**
      * Get the logger.
+     *
      * @return the logger
      */
     private Log getLog() {

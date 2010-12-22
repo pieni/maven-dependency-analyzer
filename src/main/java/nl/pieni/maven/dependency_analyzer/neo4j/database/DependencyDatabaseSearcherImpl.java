@@ -46,17 +46,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 19-12-10
- * Time: 20:59
- * To change this template use File | Settings | File Templates.
+ * Searcher for the database
  */
 public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearcher<Node> {
 
     private final Log LOGGER;
     private IndexService index;
 
+    /**
+     * Default constructor
+     *
+     * @param LOGGER   the logger
+     * @param database the database
+     */
     public DependencyDatabaseSearcherImpl(Log LOGGER, DependencyDatabase<GraphDatabaseService, Node> database) {
         this.LOGGER = LOGGER;
         this.index = new LuceneIndexService(database.getDatabase());
@@ -165,6 +167,9 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
         return artifactNodeMap;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<VersionNode, List<VersionNode>> getVersionDependencies(Dependency dependency) {
         Map<VersionNode, List<VersionNode>> versionNodeListMap = new HashMap<VersionNode, List<VersionNode>>();
