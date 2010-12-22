@@ -14,15 +14,14 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.pieni.maven.dependency-resolver</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6</version>
     <name>dependency-analyzer Maven Mojo</name>
-    <url/>
+    <url />
     <scm>
         <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</connection>
         <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git</url>
