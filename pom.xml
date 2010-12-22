@@ -24,7 +24,8 @@
     <name>dependency-analyzer Maven Mojo</name>
     <url/>
     <scm>
-        <connection>scm:git:https://pieni@github.com/pieni/maven-dependency-analyzer.git</connection>
+        <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</connection>
+        <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git</url>
     </scm>
     <properties>
         <nexus-indexer.version>3.0.3</nexus-indexer.version>
