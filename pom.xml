@@ -26,6 +26,12 @@
         <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</connection>
         <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git</url>
     </scm>
+    <developers>
+        <developer>
+            <name>Pieter van der Meer</name>
+            <email>pieter@pieni.nl</email>
+        </developer>
+    </developers>
     <properties>
         <nexus-indexer.version>3.0.3</nexus-indexer.version>
     </properties>
