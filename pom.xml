@@ -19,7 +19,7 @@
     <groupId>nl.pieni.maven.dependency-resolver</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>0.6</version>
+    <version>0.6-SNAPSHOT</version>
     <name>dependency-analyzer Maven Mojo</name>
     <url />
     <scm>
