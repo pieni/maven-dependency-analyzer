@@ -25,7 +25,7 @@
 
     <groupId>nl.pieni.maven.dependency-resolver</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>dependency-analyzer Maven Mojo</name>
@@ -42,9 +42,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git/tags/maven-dependency-analyzer-0.6</connection>
-        <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git/tags/maven-dependency-analyzer-0.6</url>
-      <developerConnection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git/tags/maven-dependency-analyzer-0.6</developerConnection>
+        <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</connection>
+        <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git</url>
+      <developerConnection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</developerConnection>
   </scm>
 
     <developers>
