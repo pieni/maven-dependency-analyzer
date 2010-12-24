@@ -23,7 +23,7 @@
         <version>5</version>
     </parent>
 
-    <groupId>nl.pieni.maven.dependency-resolver</groupId>
+    <groupId>nl.pieni.maven.dependency-analyzer</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
     <version>0.7-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
