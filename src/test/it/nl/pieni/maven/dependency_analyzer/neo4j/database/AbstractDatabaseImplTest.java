@@ -22,6 +22,7 @@ import org.apache.maven.plugin.logging.Log;
 import java.io.File;
 import java.io.IOException;
 
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,19 +31,22 @@ import static org.mockito.Mockito.when;
  */
 public abstract class AbstractDatabaseImplTest {
 
-    private final static String TEST_DB_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
+    private final static String BASE_TEST_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
+    private static File testDirectory;
     static Log log;
     private static int dependencyCnt = 0;
 
     private static boolean deleteDirectory(File path) {
+        if (path.equals(testDirectory)) {
+            System.out.println("Removing directory: " + path.getAbsolutePath());
+        }
         if (path.exists()) {
             File[] files = path.listFiles();
             for (File file : files) {
                 if (file.isDirectory()) {
                     deleteDirectory(file);
                 } else {
-                    boolean result = file.delete();
-                    if (!result) {
+                    if (file.delete()) {
                         System.out.println("Unable to delete file = " + file);
                     }
                 }
@@ -51,35 +55,42 @@ public abstract class AbstractDatabaseImplTest {
         return (path.delete());
     }
 
-    static void beforeBase() throws IOException {
-        //Test and remove any old DB's
-        File file = new File(TEST_DB_LOCATION);
-        System.out.println("Using directory " + file.getAbsolutePath() + " for test database");
-        if (file.exists()) {
-            deleteDirectory(file);
-        } else {
-            boolean result = file.mkdir();
-            if (!result) {
-                throw new IOException("Unable to create directory");
-            }
+    public static File createTempDirectory()
+            throws IOException {
+        final File temp;
+
+        File basedir = new File(BASE_TEST_LOCATION);
+        if (!basedir.exists()) {
+            basedir.mkdir();
         }
 
+        temp = File.createTempFile("test-db", "xx", basedir);
+        temp.deleteOnExit();
+
+        if (!(temp.delete())) {
+            throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+        }
+
+        if (!(temp.mkdir())) {
+            throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+        }
+
+        System.out.println("Creating directory: " + temp.getAbsolutePath());
+        return (temp);
+    }
+
+    static void beforeBase() throws IOException {
+        testDirectory = createTempDirectory();
         log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
     }
 
     static void afterBase() {
-        File file = new File(TEST_DB_LOCATION);
-        System.out.println("Removing directory " + file.getAbsolutePath() + " (Used for test DB)");
-        if (file.exists()) {
-            if (!deleteDirectory(file)) {
-                System.out.println("Error deleting directory");
-            }
-        }
+        deleteDirectory(testDirectory);
     }
 
     static String getDBDirectory() {
-        return TEST_DB_LOCATION;
+        return testDirectory.getAbsolutePath();
     }
 
     Dependency getDependency() {
