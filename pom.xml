@@ -14,26 +14,53 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>5</version>
+    </parent>
+
     <groupId>nl.pieni.maven.dependency-resolver</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
-    <packaging>maven-plugin</packaging>
     <version>0.6-SNAPSHOT</version>
+    <packaging>maven-plugin</packaging>
+
     <name>dependency-analyzer Maven Mojo</name>
-    <url />
+    <description>
+        Maven plugin to analyze the dependencies in a nexus based repository
+    </description>
+    <url>https://github.com/pieni/maven-dependency-analyzer</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:git:git@github.com:pieni/maven-dependency-analyzer.git</connection>
         <url>https://pieni@github.com/pieni/maven-dependency-analyzer.git</url>
     </scm>
+
     <developers>
         <developer>
+            <id>pieni</id>
             <name>Pieter van der Meer</name>
             <email>pieter@pieni.nl</email>
+            <roles>
+                <role>Owner</role>
+            </roles>
         </developer>
     </developers>
+
     <properties>
         <nexus-indexer.version>3.0.3</nexus-indexer.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
@@ -95,23 +122,10 @@
             <version>1.2</version>
         </dependency>
 
-        <!-- Neo4j -->
         <dependency>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-index</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-graph-algo</artifactId>
-            <version>0.6</version>
+            <artifactId>neo4j</artifactId>
+            <version>1.2.M06</version>
         </dependency>
 
         <dependency>
@@ -155,25 +169,46 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/it</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!--
+                For some reason the integration tests are unpredictable when running a cygwin
+                environment. Excluded for release purposes
+            -->
+            <id>development</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>add-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/test/it</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
