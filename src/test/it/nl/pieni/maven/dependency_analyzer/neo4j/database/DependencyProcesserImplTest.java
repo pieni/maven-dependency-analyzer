@@ -39,20 +39,20 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        beforeBase();
-        database = new DependencyDatabaseImpl(log, getDBDirectory());
-        DependencyDatabaseSearcher<Node> searcher=new DependencyDatabaseSearcherImpl(log, database);
-        processor = new DependencyNodeProcessorImpl(database, searcher, log);
+        try {
+            beforeBase();
+            database = new DependencyDatabaseImpl(log, getDBDirectory());
+            DependencyDatabaseSearcher<Node> searcher = new DependencyDatabaseSearcherImpl(log, database);
+            processor = new DependencyNodeProcessorImpl(database, searcher, log);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterClass
     public static void afterClass() {
-        try {
-            database.shutdownDatabase();
-            afterBase();
-        } finally {
-            System.out.println("Done.");
-        }
+        database.shutdownDatabase();
+        afterBase();
     }
 
     @Test
@@ -60,7 +60,7 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
         Dependency dependencyA = getDependency();
         Dependency dependencyB = getDependency();
         dependencyB.setScope("compile");
-        int count =processor.addArtifact(dependencyA);
+        int count = processor.addArtifact(dependencyA);
         assertEquals(3, count);
         count = processor.addArtifact(dependencyB);
         assertEquals(3, count);
@@ -73,7 +73,7 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
         Dependency dependencyA = getDependency();
         Dependency dependencyB = getDependency();
         dependencyB.setScope("compile");
-        int count =processor.addArtifact(dependencyA);
+        int count = processor.addArtifact(dependencyA);
         assertEquals(3, count);
         count = processor.addArtifact(dependencyB);
         assertEquals(3, count);
@@ -84,11 +84,11 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
 
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addRelationNoScopeTest() {
         Dependency dependencyA = getDependency();
         Dependency dependencyB = getDependency();
-        int count =processor.addArtifact(dependencyA);
+        int count = processor.addArtifact(dependencyA);
         assertEquals(3, count);
         count = processor.addArtifact(dependencyB);
         assertEquals(3, count);

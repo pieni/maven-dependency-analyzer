@@ -71,10 +71,10 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         try {
             database.shutdownDatabase();
             searcher.shutdownSearcher();
-            afterBase();
-        } finally {
-            System.out.println("Done.");
+        } catch (Exception e) {
+            //Ignored
         }
+            afterBase();
     }
 
     @Test

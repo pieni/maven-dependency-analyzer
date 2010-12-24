@@ -28,6 +28,8 @@ import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -59,37 +61,16 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
         beforeBase();
         database = new DependencyDatabaseImpl(log, getDBDirectory());
         searcher = new DependencyDatabaseSearcherImpl(log, database);
-
-        //Create the dependencies used
-        Dependency dependencyA=new Dependency();
-        dependencyA.setArtifactId("artifactId_A");
-        dependencyA.setGroupId("groupId_A");
-        dependencyA.setVersion("1.0");
-        dependencyA.setType("jar");
-
-
-        Dependency dependencyA2=new Dependency();
-        dependencyA2.setArtifactId("artifactId_A");
-        dependencyA2.setGroupId("groupId_A");
-        dependencyA2.setVersion("2.0");
-        dependencyA2.setType("jar");
-
-
-        Dependency dependencyB=new Dependency();
-        dependencyB.setArtifactId("artifactId_B");
-        dependencyB.setGroupId("groupId_B");
-        dependencyB.setVersion("1.0");
-        dependencyB.setType("jar");
     }
 
     @After
     public void afterClass() {
         try {
-            database.shutdownDatabase();
-            searcher.shutdownSearcher();
-            afterBase();
-        } finally {
-            System.out.println("Done.");
+        database.shutdownDatabase();
+        searcher.shutdownSearcher();
+        afterBase();
+        } catch (Exception e) {
+            //Exception is ignored
         }
     }
 
@@ -126,15 +107,13 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
      * Sort of BS Test cause i can't test the index here
      */
     @Test(expected = NotInTransactionException.class)
-    public void indexOnPropertyNotInTransactionTest
-    () {
+    public void indexOnPropertyNotInTransactionTest() {
         database.startTransaction();
         Node node = database.createNode();
         node.setProperty("Key", "Value");
         database.stopTransaction();
         searcher.indexOnProperty(node, "Key");
     }
-
 
     @Test(expected = NotFoundException.class)
     public void shutdownSearcher() {
@@ -143,31 +122,6 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
         Node node = database.createNode();
         searcher.indexOnProperty(node, "Key");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
