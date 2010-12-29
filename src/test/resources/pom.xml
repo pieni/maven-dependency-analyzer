@@ -11,9 +11,9 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>dependency-resolver</artifactId>
-                <groupId>nl.pieni.maven.dependency-resolver</groupId>
-                <version>1.0-SNAPSHOT</version>
+                <groupId>nl.pieni.maven.dependency-analyzer</groupId>
+                <artifactId>maven-dependency-analyzer</artifactId>
+                <version>0.6-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <goals>
