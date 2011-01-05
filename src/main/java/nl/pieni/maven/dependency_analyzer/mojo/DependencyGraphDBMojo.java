@@ -42,7 +42,6 @@ import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingResult;
-import org.jetbrains.annotations.NotNull;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoGroup;
@@ -251,7 +250,7 @@ public class DependencyGraphDBMojo
      * @param source the found artifact
      * @throws SettingsBuildingException Unable to parse the settings file
      */
-    private void processArtifactInfo(@NotNull final ArtifactInfo source) throws SettingsBuildingException {
+    private void processArtifactInfo( final ArtifactInfo source) throws SettingsBuildingException {
 
         try {
             MavenProject mavenProject = artifactInfo2MavenProject(source);
@@ -284,8 +283,8 @@ public class DependencyGraphDBMojo
      * @param project The project being parsed
      * @return {@link org.apache.maven.model.Dependency} object
      */
-    @NotNull
-    private Dependency artifactInfo2Dependency(@NotNull final ArtifactInfo project) {
+
+    private Dependency artifactInfo2Dependency( final ArtifactInfo project) {
         Dependency dependency = new Dependency();
         dependency.setArtifactId(project.artifactId);
         dependency.setGroupId(project.groupId);
@@ -336,7 +335,7 @@ public class DependencyGraphDBMojo
      * @throws org.apache.maven.settings.building.SettingsBuildingException
      *          Unable to parse the settings file
      */
-    MavenProject artifactInfo2MavenProject(@NotNull ArtifactInfo artifactInfo) throws ProjectBuildingException, SettingsBuildingException {
+    MavenProject artifactInfo2MavenProject( ArtifactInfo artifactInfo) throws ProjectBuildingException, SettingsBuildingException {
         VersionRange versionRange = VersionRange.createFromVersion(artifactInfo.version);
         Artifact parentArtifact = new DefaultArtifact(artifactInfo.groupId, artifactInfo.artifactId, versionRange, "compile", "pom", null, new DefaultArtifactHandler());
         ProjectBuildingResult buildingResult = projectBuilder.build(parentArtifact, this.buildRequest);

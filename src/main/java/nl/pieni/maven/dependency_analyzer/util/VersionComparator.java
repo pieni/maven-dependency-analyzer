@@ -17,7 +17,6 @@
 package nl.pieni.maven.dependency_analyzer.util;
 
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.jetbrains.annotations.NotNull;
 import org.sonatype.nexus.index.ArtifactInfo;
 
 import java.util.Comparator;
@@ -31,7 +30,7 @@ public class VersionComparator implements Comparator<ArtifactInfo> {
      * @inheritDoc
      */
     @Override
-    public int compare(@NotNull final ArtifactInfo f1, @NotNull final ArtifactInfo f2) {
+    public int compare( final ArtifactInfo f1,  final ArtifactInfo f2) {
 
         ComparableVersion cv1 = new ComparableVersion(f1.version);
         ComparableVersion cv2 = new ComparableVersion(f2.version);

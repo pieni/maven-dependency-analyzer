@@ -18,7 +18,6 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
 import nl.pieni.maven.dependency_analyzer.node.DependencyNode;
 import org.apache.maven.model.Dependency;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

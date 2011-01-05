@@ -29,8 +29,6 @@ import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

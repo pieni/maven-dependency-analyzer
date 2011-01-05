@@ -16,8 +16,6 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +28,7 @@ public enum NodeType {
     ArtifactNode,
     VersionNode;
 
-    @NotNull
+
     private static final Map<String, NodeType> STRING2ENUM = new HashMap<String, NodeType>();
 
     static {

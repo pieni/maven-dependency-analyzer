@@ -24,7 +24,6 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
@@ -47,7 +46,7 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
      * {@inheritDoc}
      */
     @Override
-    protected ArtifactNode create(@NotNull final Dependency dependency) {
+    protected ArtifactNode create( final Dependency dependency) {
         getDatabase().startTransaction();
         Node node = getDatabase().createNode();
         ArtifactNode artifactNode = new ArtifactNodeDecorator(node, dependency);
@@ -61,7 +60,7 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
      * {@inheritDoc}
      */
     @Override
-    public int insert(@NotNull final Dependency dependency) {
+    public int insert( final Dependency dependency) {
         int nodeCount = 0;
         GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getSearcher().findArtifactNode(dependency);

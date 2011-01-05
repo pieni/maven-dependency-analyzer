@@ -24,7 +24,6 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.*;
 
 import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERSION;
@@ -46,7 +45,7 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
      * {@inheritDoc}
      */
     @Override
-    protected VersionNode create(@NotNull final Dependency dependency) {
+    protected VersionNode create( final Dependency dependency) {
         getDatabase().startTransaction();
         VersionNode versionNode = new VersionNodeDecorator(getDatabase().createNode(), dependency);
         LOGGER.info("Create versionNode: " + versionNode);
@@ -58,7 +57,7 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
      * {@inheritDoc}
      */
     @Override
-    public int insert(@NotNull final Dependency dependency) {
+    public int insert( final Dependency dependency) {
         int nodeCount = 0;
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getSearcher().findArtifactNode(dependency);
         VersionNodeDecorator versionNode = (VersionNodeDecorator) getSearcher().findVersionNode(dependency);

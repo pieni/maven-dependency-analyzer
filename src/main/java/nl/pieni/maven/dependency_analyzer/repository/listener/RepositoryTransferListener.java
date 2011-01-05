@@ -19,8 +19,6 @@ package nl.pieni.maven.dependency_analyzer.repository.listener;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
-import org.jetbrains.annotations.NotNull;
-
 
 /**
  * Listener for the Nexus updater
@@ -56,7 +54,7 @@ public class RepositoryTransferListener implements TransferListener {
      * {@inheritDoc}
      */
     @Override
-    public void transferStarted(@NotNull TransferEvent transferEvent) {
+    public void transferStarted( TransferEvent transferEvent) {
         timestamp = transferEvent.getTimestamp();
         long totalSize;
         this.transfer = 0;
@@ -80,7 +78,7 @@ public class RepositoryTransferListener implements TransferListener {
      * {@inheritDoc}
      */
     @Override
-    public void transferProgress(TransferEvent transferEvent, @NotNull byte[] buffer, int length) {
+    public void transferProgress(TransferEvent transferEvent,  byte[] buffer, int length) {
         transfer += buffer.length;
         progress_block += buffer.length;
         //Report each Mb
@@ -94,7 +92,7 @@ public class RepositoryTransferListener implements TransferListener {
      * {@inheritDoc}
      */
     @Override
-    public void transferCompleted(@NotNull TransferEvent transferEvent) {
+    public void transferCompleted( TransferEvent transferEvent) {
         final double duration = (double) (transferEvent.getTimestamp() - timestamp) / 1000;
 
         final String message = "Transfer finished. " + transfer / SIZE_1M + "Mb (" + transfer + " bytes) copied in " + duration + " seconds";
@@ -106,7 +104,7 @@ public class RepositoryTransferListener implements TransferListener {
      * {@inheritDoc}
      */
     @Override
-    public void transferError(@NotNull TransferEvent transferEvent) {
+    public void transferError( TransferEvent transferEvent) {
         LOG.info("Transfer error: " + transferEvent.getException());
     }
 

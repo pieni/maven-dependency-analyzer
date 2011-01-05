@@ -28,7 +28,6 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.GroupNodeFactory;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.VersionNodeFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.*;
 
 /**
@@ -62,7 +61,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * {@inheritDoc}
      */
     @Override
-    public int addArtifact(@NotNull final Dependency dependency) {
+    public int addArtifact( final Dependency dependency) {
         int nodeCount = 0;
         if (getLog().isDebugEnabled()) {
             getLog().debug("Adding nodes for artifact: " + dependency);
@@ -81,7 +80,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * {@inheritDoc}
      */
     @Override
-    public int addRelation(@NotNull final Dependency sourceDependency, @NotNull final Dependency targetDependency) {
+    public int addRelation( final Dependency sourceDependency,  final Dependency targetDependency) {
         int count = 0;
         ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(sourceDependency);
         ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(targetDependency);
@@ -136,7 +135,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @param dependency
      * @return the {@link RelationshipType}
      */
-    private RelationshipType determineRelationType(@NotNull final Dependency dependency) {
+    private RelationshipType determineRelationType( final Dependency dependency) {
         RelationshipType result = DependencyScopeRelations.fromString(dependency.getScope());
         if (result == null) {
             throw new IllegalArgumentException("Unable to determine scope for dependency: " + dependency);

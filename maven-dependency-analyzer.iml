@@ -81,24 +81,23 @@
     <orderEntry type="library" name="Maven: org.apache.maven:maven-project:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-profile:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-registry:2.0.8" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j:1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-kernel:1.2-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-index:1.2-1.2.M06" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j:1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-kernel:1.2-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-index:1.2-1.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.servicemix.bundles:org.apache.servicemix.bundles.lucene:3.0.1_2" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-lucene-index:0.2-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-shell:1.2-1.2.M06" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-lucene-index:0.2-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-shell:1.2-1.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.servicemix.bundles:org.apache.servicemix.bundles.jline:0.9.94_1" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-remote-graphdb:0.8-1.2.M06" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-remote-graphdb:0.8-1.2" level="project" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-graph-algo:0.7-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-online-backup:0.7-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-udc:0.1-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-management:1.2-1.2.M06" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ha:0.5-1.2.M06" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-graph-algo:0.7-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-online-backup:0.7-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-udc:0.1-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-management:1.2-1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ha:0.5-1.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.zookeeper:zookeeper:3.3.2" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.netty:netty:3.2.1.Final" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
-    <orderEntry type="library" name="Maven: com.intellij:annotations:7.0.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.5" level="project" />
   </component>
 </module>

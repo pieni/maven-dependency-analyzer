@@ -273,17 +273,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/2.3.0/protobuf-java-2.3.0-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.intellij:annotations:7.0.3">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/intellij/annotations/7.0.3/annotations-7.0.3-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: commons-cli:commons-cli:1.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-cli/commons-cli/1.0/commons-cli-1.0.jar!/" />
@@ -834,125 +823,125 @@
         <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-graph-algo:0.7-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-graph-algo:0.7-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2.M06/neo4j-graph-algo-0.7-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2/neo4j-graph-algo-0.7-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2.M06/neo4j-graph-algo-0.7-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2/neo4j-graph-algo-0.7-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2.M06/neo4j-graph-algo-0.7-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-graph-algo/0.7-1.2/neo4j-graph-algo-0.7-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-ha:0.5-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-ha:0.5-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2.M06/neo4j-ha-0.5-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2/neo4j-ha-0.5-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2.M06/neo4j-ha-0.5-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2/neo4j-ha-0.5-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2.M06/neo4j-ha-0.5-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-ha/0.5-1.2/neo4j-ha-0.5-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-index:1.2-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-index:1.2-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2.M06/neo4j-index-1.2-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2/neo4j-index-1.2-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2.M06/neo4j-index-1.2-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2/neo4j-index-1.2-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2.M06/neo4j-index-1.2-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-index/1.2-1.2/neo4j-index-1.2-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-kernel:1.2-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-kernel:1.2-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2.M06/neo4j-kernel-1.2-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2/neo4j-kernel-1.2-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2.M06/neo4j-kernel-1.2-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2/neo4j-kernel-1.2-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2.M06/neo4j-kernel-1.2-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-kernel/1.2-1.2/neo4j-kernel-1.2-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-lucene-index:0.2-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-lucene-index:0.2-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2.M06/neo4j-lucene-index-0.2-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2/neo4j-lucene-index-0.2-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2.M06/neo4j-lucene-index-0.2-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2/neo4j-lucene-index-0.2-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2.M06/neo4j-lucene-index-0.2-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-lucene-index/0.2-1.2/neo4j-lucene-index-0.2-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-management:1.2-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-management:1.2-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2.M06/neo4j-management-1.2-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2/neo4j-management-1.2-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2.M06/neo4j-management-1.2-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2/neo4j-management-1.2-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2.M06/neo4j-management-1.2-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-management/1.2-1.2/neo4j-management-1.2-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-online-backup:0.7-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-online-backup:0.7-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2.M06/neo4j-online-backup-0.7-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2/neo4j-online-backup-0.7-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2.M06/neo4j-online-backup-0.7-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2/neo4j-online-backup-0.7-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2.M06/neo4j-online-backup-0.7-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-online-backup/0.7-1.2/neo4j-online-backup-0.7-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-remote-graphdb:0.8-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-remote-graphdb:0.8-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2.M06/neo4j-remote-graphdb-0.8-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2/neo4j-remote-graphdb-0.8-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2.M06/neo4j-remote-graphdb-0.8-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2/neo4j-remote-graphdb-0.8-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2.M06/neo4j-remote-graphdb-0.8-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-remote-graphdb/0.8-1.2/neo4j-remote-graphdb-0.8-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-shell:1.2-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-shell:1.2-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2.M06/neo4j-shell-1.2-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2/neo4j-shell-1.2-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2.M06/neo4j-shell-1.2-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2/neo4j-shell-1.2-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2.M06/neo4j-shell-1.2-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-shell/1.2-1.2/neo4j-shell-1.2-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j-udc:0.1-1.2.M06">
+    <library name="Maven: org.neo4j:neo4j-udc:0.1-1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2.M06/neo4j-udc-0.1-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2/neo4j-udc-0.1-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2.M06/neo4j-udc-0.1-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2/neo4j-udc-0.1-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2.M06/neo4j-udc-0.1-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j-udc/0.1-1.2/neo4j-udc-0.1-1.2-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.neo4j:neo4j:1.2.M06">
+    <library name="Maven: org.neo4j:neo4j:1.2">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2.M06/neo4j-1.2.M06.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2/neo4j-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2.M06/neo4j-1.2.M06-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2/neo4j-1.2-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2.M06/neo4j-1.2.M06-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/neo4j/neo4j/1.2/neo4j-1.2-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.sonatype.aether:aether-api:1.7">

@@ -23,7 +23,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.sonatype.nexus.index.ArtifactInfoGroup;
 import org.sonatype.nexus.index.Field;
 import org.sonatype.nexus.index.GroupedSearchRequest;
@@ -76,7 +75,7 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
      * @inheritDoc
      */
     @Override
-    public Map<String, ArtifactInfoGroup> searchIndexGrouped(@NotNull final List<String> groupPatterns, @NotNull final ArtifactRepository repository, @NotNull final List<String> packaging) throws IOException, UnsupportedExistingLuceneIndexException {
+    public Map<String, ArtifactInfoGroup> searchIndexGrouped( final List<String> groupPatterns,  final ArtifactRepository repository,  final List<String> packaging) throws IOException, UnsupportedExistingLuceneIndexException {
 
         getIndexingContext(repository);
         updateRemoteIndex();
@@ -100,7 +99,7 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
      * @param packaging the packinging of the artifact searched for
      * @return {@link BooleanQuery}
      */
-    private BooleanQuery createQuery(@NotNull final List<String> groupPatterns, @NotNull final List<String> packaging) {
+    private BooleanQuery createQuery( final List<String> groupPatterns,  final List<String> packaging) {
         BooleanQuery bq = new BooleanQuery();
 
         Query query;
@@ -140,7 +139,7 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
      * @throws IOException Error connecting
      * @throws UnsupportedExistingLuceneIndexException Not a Nexus index
      */
-    private void getIndexingContext(@NotNull final ArtifactRepository repository) throws IOException, UnsupportedExistingLuceneIndexException {
+    private void getIndexingContext( final ArtifactRepository repository) throws IOException, UnsupportedExistingLuceneIndexException {
         if (getLog().isDebugEnabled()) {
             getLog().debug("Retrieving indexing contexts");
         }
@@ -167,7 +166,7 @@ public class RemoteRepositorySearcher implements RepositorySearcher {
      * @param allowSnapshots snapshots allowed
      * @return true when valid
      */
-    private boolean useableRepository(@NotNull final ArtifactRepository repository, final boolean allowSnapshots) {
+    private boolean useableRepository( final ArtifactRepository repository, final boolean allowSnapshots) {
         boolean snapshots = repository.getSnapshots().isEnabled() || allowSnapshots;
         return repository.getReleases().isEnabled() && snapshots;
     }

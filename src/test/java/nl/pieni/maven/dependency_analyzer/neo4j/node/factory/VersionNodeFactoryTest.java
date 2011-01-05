@@ -27,7 +27,6 @@ import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.neo4j.graphdb.Direction;

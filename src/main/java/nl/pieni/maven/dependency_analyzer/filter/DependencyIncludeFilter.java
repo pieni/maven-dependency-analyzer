@@ -17,7 +17,6 @@
 package nl.pieni.maven.dependency_analyzer.filter;
 
 import org.apache.maven.model.Dependency;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +42,7 @@ public class DependencyIncludeFilter {
      * @param dependencies list of dependencies to filter
      * @return filtered list
      */
-    @NotNull
-    public List<Dependency> filter(@NotNull final List<Dependency> dependencies) {
+    public List<Dependency> filter(final List<Dependency> dependencies) {
         List<Dependency> result = new ArrayList<Dependency>();
         for (Dependency gav : dependencies) {
             boolean add = include(gav);
@@ -61,7 +59,7 @@ public class DependencyIncludeFilter {
      * @param dependency the dependency
      * @return true when inclusion required
      */
-    private boolean include(@NotNull final Dependency dependency) {
+    private boolean include(final Dependency dependency) {
         for (String pattern : patterns) {
             if (include(dependency, pattern)) {
                 return true;
@@ -76,7 +74,7 @@ public class DependencyIncludeFilter {
      * @param pattern the pattern
      * @return true when inclusion required
      */
-    private boolean include( @NotNull final Dependency dependency, @NotNull final String pattern )
+    private boolean include(  final Dependency dependency,  final String pattern )
     {
         String[] tokens = new String[] {
             dependency.getGroupId(),
@@ -105,7 +103,7 @@ public class DependencyIncludeFilter {
      *            the pattern segment to match, as defined above
      * @return <code>true</code> if the specified token is matched by the specified pattern segment
      */
-    private boolean matches( @NotNull final String token, @NotNull final String pattern )
+    private boolean matches(  final String token,  final String pattern )
     {
         boolean matches;
 

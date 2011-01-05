@@ -23,7 +23,6 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.graphdb.Node;
 
 import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.GROUP_ID;
@@ -45,7 +44,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
      * {@inheritDoc}
      */
     @Override
-    protected GroupNode create(@NotNull final Dependency dependency) {
+    protected GroupNode create( final Dependency dependency) {
         getDatabase().startTransaction();
         Node node = getDatabase().createNode();
         GroupNode groupNode = new GroupNodeDecorator(node, dependency);
@@ -59,7 +58,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
      * {@inheritDoc}
      */
     @Override
-    public int insert(@NotNull final Dependency dependency) {
+    public int insert( final Dependency dependency) {
         int nodeCount = 0;
         GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
         if (groupNode == null) {
