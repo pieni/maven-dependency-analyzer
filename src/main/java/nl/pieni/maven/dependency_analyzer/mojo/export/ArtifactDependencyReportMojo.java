@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.mojo;
+package nl.pieni.maven.dependency_analyzer.mojo.export;
 
-import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearcherImpl;
+import nl.pieni.maven.dependency_analyzer.mojo.AbstractAnalyzeMojo;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
 import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
@@ -39,7 +36,7 @@ import java.util.StringTokenizer;
  * @phase process-sources
  * @requiredProject false
  */
-public class DependencyReportMojo extends AbstractDependencyMojo {
+public class ArtifactDependencyReportMojo extends AbstractAnalyzeMojo {
 
     /**
      * The type of artifacts to search. remember, the search is performed against the packaging that is defined in the
@@ -52,9 +49,9 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        DependencyDatabase database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
-        DependencyDatabaseSearcher searcher = new DependencyDatabaseSearcherImpl(getLog(), database);
-        DependencyReport reporter = new DependencyReportImpl(searcher);
+        super.setup();
+
+        DependencyReport reporter = new DependencyReportImpl(getSearcher());
         LogWriter logWriter = new LogWriter(getLog());
 
         for (String reportArtifact : reportArtifacts) {
@@ -65,7 +62,7 @@ public class DependencyReportMojo extends AbstractDependencyMojo {
             }
 
             //Find the Node
-            ArtifactNode artifactNode = searcher.findArtifactNode(dependency);
+            ArtifactNode artifactNode = getSearcher().findArtifactNode(dependency);
             if (artifactNode == null) {
                 continue;
             }

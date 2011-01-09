@@ -30,33 +30,33 @@ import java.util.Map;
  */
 public interface DependencyDatabaseSearcher<N> {
     /**
-     * Find the version node for specified {@link org.apache.maven.model.Dependency}
+     * Find the version statement for specified {@link org.apache.maven.model.Dependency}
      *
      * @param dependency The dependency
-     * @return the Found node, null if not found
+     * @return the Found statement, null if not found
      */
     VersionNode findVersionNode(Dependency dependency);
 
     /**
-     * Find the artifact node for specified {@link org.apache.maven.model.Dependency}
+     * Find the artifact statement for specified {@link org.apache.maven.model.Dependency}
      *
      * @param dependency The dependency
-     * @return the Found node, null if not found
+     * @return the Found statement, null if not found
      */
     ArtifactNode findArtifactNode(Dependency dependency);
 
     /**
-     * Find the group node for specified {@link org.apache.maven.model.Dependency}
+     * Find the group statement for specified {@link org.apache.maven.model.Dependency}
      *
      * @param dependency The dependency
-     * @return the Found node, null if not found
+     * @return the Found statement, null if not found
      */
     GroupNode findGroupNode(Dependency dependency);
 
     /**
      * Retrieve all version nodes
      * @param dependency the artifact
-     * @return the list of version node for the artifact
+     * @return the list of version statement for the artifact
      */
     List<VersionNode> getVersionNodes(Dependency dependency);
 
@@ -82,7 +82,7 @@ public interface DependencyDatabaseSearcher<N> {
 
     /**
      * Add index entry for the specified property
-     * @param node the node
+     * @param node the statement
      * @param key  the key
      */
     void indexOnProperty(final N node, final String key);

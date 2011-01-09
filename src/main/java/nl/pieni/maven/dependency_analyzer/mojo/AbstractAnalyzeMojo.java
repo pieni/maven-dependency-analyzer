@@ -17,7 +17,9 @@
 package nl.pieni.maven.dependency_analyzer.mojo;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
+import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearcherImpl;
 import nl.pieni.maven.dependency_analyzer.repository.RepositorySearcher;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * base class for the Mojo's
  */
-public abstract class AbstractDependencyMojo extends AbstractMojo {
+public abstract class AbstractAnalyzeMojo extends AbstractMojo {
 
     /*
      * The searching engine
@@ -42,14 +44,28 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
     /**
      * The Dependency database
      */
-    DependencyDatabase database;
+    private DependencyDatabase database;
+
+    /**
+     * The searcher
+     */
+    private DependencyDatabaseSearcher searcher;
 
 
-    void setup() throws MojoExecutionException {
+    protected void setup() throws MojoExecutionException {
         database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
+        searcher = new DependencyDatabaseSearcherImpl(getLog(), database);
     }
 
-    void tearDown() {
+    protected void tearDown() {
         database.shutdownDatabase();
+    }
+
+    public DependencyDatabase getDatabase() {
+        return database;
+    }
+
+    public DependencyDatabaseSearcher getSearcher() {
+        return searcher;
     }
 }

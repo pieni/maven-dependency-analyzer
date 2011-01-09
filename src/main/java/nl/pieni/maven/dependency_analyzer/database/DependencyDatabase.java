@@ -22,7 +22,7 @@ import org.apache.maven.plugin.logging.Log;
 /**
  * Interface to the Dependency database.
  * @param <DB> the Database implementation
- * @param <N> The node type of the implementation
+ * @param <N> The statement type of the implementation
  */
 public interface DependencyDatabase<DB, N>  {
 
@@ -39,8 +39,8 @@ public interface DependencyDatabase<DB, N>  {
     Log getLOGGER();
 
     /**
-     * Create a node in the database, see {@link #getDatabase()}.
-     * @return the new node
+     * Create a statement in the database, see {@link #getDatabase()}.
+     * @return the new statement
      */
     N createNode();
 
