@@ -27,8 +27,10 @@ import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,9 +65,15 @@ public class GroupNodeFactoryTest {
     @Test
     public void createTest() {
         Dependency dependency = mock(Dependency.class);
+        when(dependency.getGroupId()).thenReturn("nl.pieni");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
+        GraphDatabaseService dbService = mock(GraphDatabaseService.class);
+        when(database.getDatabase()).thenReturn(dbService);
+        Node refNode = mock(Node.class);
+        when(dbService.getReferenceNode()).thenReturn(refNode);
+
 
         Log log = mock(Log.class);
         Node node = createMockNode();
@@ -73,17 +81,18 @@ public class GroupNodeFactoryTest {
 
         GroupNodeFactory factory = new GroupNodeFactory(database, searcher, log);
         factory.create(dependency);
-
-        verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
+        verify(refNode).createRelationshipTo(Matchers.<Node>anyObject(), Matchers.<RelationshipType>anyObject());
+        verify(node, times(2)).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log).info(startsWith("Create GroupNode:"));
+        verify(log, times(2)).info(startsWith("Create GroupNode:"));
     }
 
     @Test
     public void insertNewTest() {
         Dependency dependency = mock(Dependency.class);
         when(dependency.getVersion()).thenReturn("1.0");
+        when(dependency.getGroupId()).thenReturn("nl.pieni.maven");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
@@ -100,12 +109,12 @@ public class GroupNodeFactoryTest {
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
         GroupNodeFactory factory = new GroupNodeFactory(database, searcher, log);
-        assertEquals(1, factory.insert(dependency));
-        verify(groupNode).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
-        verify(searcher).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
-        verify(database, times(2)).startTransaction();
-        verify(database, times(2)).stopTransaction();
-        verify(log).info(startsWith("Create GroupNode: "));
+        assertEquals(3, factory.insert(dependency));
+        verify(groupNode, times(3)).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
+        verify(searcher, times(3)).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
+        verify(database, times(1)).startTransaction();
+        verify(database, times(1)).stopTransaction();
+        verify(log, times(3)).info(startsWith("Create GroupNode: "));
     }
 
     @Test

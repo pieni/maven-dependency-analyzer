@@ -61,7 +61,7 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
         Dependency dependencyB = getDependency();
         dependencyB.setScope("compile");
         int count = processor.addArtifact(dependencyA);
-        assertEquals(3, count);
+        assertEquals(6, count);
         count = processor.addArtifact(dependencyB);
         assertEquals(3, count);
         count = processor.addRelation(dependencyA, dependencyB);
@@ -100,6 +100,18 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
         Dependency dependency = getDependency();
         int count = processor.addArtifact(dependency);
         assertEquals(3, count);
+    }
+
+    @Test
+    public void addTwoArtifactNewTest() {
+        Dependency dependency = getDependency();
+        int count = processor.addArtifact(dependency);
+        assertEquals(3, count);
+        dependency = getDependency();
+        count = processor.addArtifact(dependency);
+        assertEquals(3, count);
+
+
     }
 
     @Test

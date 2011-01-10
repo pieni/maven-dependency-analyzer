@@ -19,11 +19,14 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Node;
+
+import java.util.StringTokenizer;
 
 import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.GROUP_ID;
 
@@ -44,34 +47,80 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
      * {@inheritDoc}
      */
     @Override
-    protected GroupNode create( final Dependency dependency) {
+    protected GroupNode create(final Dependency dependency) {
+        create(dependency, "");
+        return getSearcher().findGroupNode(dependency);
+    }
+
+    private int create(final Dependency dependency, final String existingPath) {
+        int createCount = 0;
+        GroupNodeDecorator currentNode = (GroupNodeDecorator) getSearcher().findGroupNode(existingPath);
+        String tmp = dependency.getGroupId().substring(existingPath.length(), dependency.getGroupId().length());
+        StringTokenizer stringTokenizer = new StringTokenizer(tmp, ".");
+        String createPath = "";
         getDatabase().startTransaction();
-        Node node = getDatabase().createNode();
-        GroupNode groupNode = new GroupNodeDecorator(node, dependency);
-        getSearcher().indexOnProperty(node, GROUP_ID);
-        LOGGER.info("Create GroupNode: " + node);
+        while (stringTokenizer.hasMoreTokens()) {
+            String token = stringTokenizer.nextToken();
+            Node node = getDatabase().createNode();
+            createCount++;
+            Dependency nextDependency = new Dependency();
+            createPath = existingPath + (existingPath.length() != 0 ? "." : "") + createPath + (createPath.length() != 0 ? "." : "") + token;
+            nextDependency.setGroupId(createPath);
+            GroupNodeDecorator nextNode = new GroupNodeDecorator(node, nextDependency);
+            getSearcher().indexOnProperty(node, GROUP_ID);
+            LOGGER.info("Create GroupNode: " + node);
+            if (currentNode == null) {
+                Node refNode = getDatabase().getDatabase().getReferenceNode();
+                refNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+            } else {
+                currentNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+            }
+            LOGGER.info("Created relation " + ArtifactRelations.has + "between " + currentNode + " and " + nextNode);
+            currentNode = nextNode;
+        }
         getDatabase().stopTransaction();
-        return groupNode;
+        return createCount;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int insert( final Dependency dependency) {
+    public int insert(final Dependency dependency) {
         int nodeCount = 0;
-        GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
-        if (groupNode == null) {
-            groupNode = (GroupNodeDecorator)create(dependency);
-            nodeCount++;
-            getDatabase().startTransaction();
-            getDatabase().getDatabase().getReferenceNode().createRelationshipTo(groupNode, ArtifactRelations.has);
 
-            LOGGER.info("Created relation " + ArtifactRelations.has + "between referenceNode and " + groupNode);
 
-            getDatabase().stopTransaction();
+        GroupNodeDecorator node = (GroupNodeDecorator) getSearcher().findGroupNode(dependency);
+        if (node != null) {
+            return nodeCount;
         }
-        return nodeCount;
+
+        String existingPath = findExistingPath(dependency);
+
+        if (existingPath.length() == 0) {
+            //Insert full path
+            return create(dependency, "");
+        }
+        //Partial path known
+        return create(dependency, existingPath);
     }
 
+    private String findExistingPath(Dependency dependency) {
+        String key = NodeProperties.GROUP_ID;
+        boolean found = false;
+        String groupId = dependency.getGroupId();
+        StringTokenizer strTok = new StringTokenizer(groupId, ".");
+        String searchGroup = "";
+        String foundPath = "";
+        int count = strTok.countTokens();
+        for (int i = 0; i < count; i++) {
+            searchGroup += strTok.nextToken();
+            if (getSearcher().findGroupNode(searchGroup) == null) {
+                return foundPath;
+            }
+            foundPath = searchGroup;
+            searchGroup = foundPath + ".";
+        }
+        return foundPath;
+    }
 }

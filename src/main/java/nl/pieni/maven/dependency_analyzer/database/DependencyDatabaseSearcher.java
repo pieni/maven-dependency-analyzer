@@ -53,6 +53,14 @@ public interface DependencyDatabaseSearcher<N> {
      */
     GroupNode findGroupNode(Dependency dependency);
 
+
+    /**
+     * //TODO JAVADOC
+     * @param partialGroupId
+     * @return
+     */
+    GroupNode findGroupNode(String partialGroupId);
+
     /**
      * Retrieve all version nodes
      * @param dependency the artifact

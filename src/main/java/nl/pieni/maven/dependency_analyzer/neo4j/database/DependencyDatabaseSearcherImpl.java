@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Searcher for the database
@@ -69,7 +70,7 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      * {@inheritDoc}
      */
     @Override
-    public VersionNode findVersionNode( final Dependency dependency) {
+    public VersionNode findVersionNode(final Dependency dependency) {
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) findArtifactNode(dependency);
         Traverser traverser = artifactNode.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL_BUT_START_NODE, ArtifactRelations.version, Direction.OUTGOING);
         for (Node node : traverser) {
@@ -87,7 +88,7 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      * {@inheritDoc}
      */
     @Override
-    public ArtifactNode findArtifactNode( final Dependency dependency) {
+    public ArtifactNode findArtifactNode(final Dependency dependency) {
         GroupNodeDecorator groupNode = (GroupNodeDecorator) findGroupNode(dependency);
         if (groupNode == null) {
             LOGGER.error("Unable to find groupNode for " + dependency);
@@ -109,7 +110,7 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      * {@inheritDoc}
      */
     @Override
-    public GroupNode findGroupNode( final Dependency dependency) {
+    public GroupNode findGroupNode(final Dependency dependency) {
         String key = NodeProperties.GROUP_ID;
         Node node = index.getSingleNode(key, dependency.getGroupId());
         if (node == null) {
@@ -117,6 +118,20 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
         }
         return new GroupNodeDecorator(node, dependency);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GroupNode findGroupNode(final String partialGroupId) {
+        String key = NodeProperties.GROUP_ID;
+        Node node = index.getSingleNode(key, partialGroupId);
+        if (node == null) {
+            return null;
+        }
+        return new GroupNodeDecorator(node);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -199,7 +214,7 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      * {@inheritDoc}
      */
     @Override
-    public void indexOnProperty( final Node node, final String key) {
+    public void indexOnProperty(final Node node, final String key) {
         index.index(node, key, node.getProperty(key));
     }
 

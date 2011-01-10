@@ -83,6 +83,7 @@ public abstract class AbstractDatabaseImplTest {
         testDirectory = createTempDirectory();
         log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
+        when(log.isInfoEnabled()).thenReturn(true);
     }
 
     static void afterBase() {
@@ -96,7 +97,7 @@ public abstract class AbstractDatabaseImplTest {
     Dependency getDependency() {
         Dependency dependency = new Dependency();
         dependency.setArtifactId("artifactId_" + dependencyCnt);
-        dependency.setGroupId("groupId_" + dependencyCnt);
+        dependency.setGroupId("nl.pieni.maven.groupId_" + dependencyCnt);
         dependency.setVersion("1.0");
         dependency.setType("jar");
         dependencyCnt++;

@@ -21,14 +21,18 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.ArtifactNodeFactory;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.GroupNodeFactory;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.VersionNodeFactory;
+import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.*;
+
+import java.util.StringTokenizer;
 
 /**
  * Processing of Dependency elements
@@ -37,7 +41,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     private final ArtifactNodeFactory artifactNodeFactory;
     private final GroupNodeFactory groupNodeFactory;
     private final VersionNodeFactory versionNodeFactory;
-    private final DependencyDatabase database;
+    private final DependencyDatabase<GraphDatabaseService, Node> database;
     private final DependencyDatabaseSearcher searcher;
     private final Log logger;
 
@@ -142,7 +146,6 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
         }
         return result;
     }
-
 
     /**
      * Get the logger.
