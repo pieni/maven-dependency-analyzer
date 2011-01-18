@@ -17,34 +17,11 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
-import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.node.GroupNode;
-import nl.pieni.maven.dependency_analyzer.node.VersionNode;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ReturnableEvaluator;
-import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.Traverser;
-import org.neo4j.index.IndexService;
-import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract base class for accessing the GRaph Database
@@ -98,20 +75,35 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
      */
     @Override
     public void startTransaction() {
-        getLOGGER().debug("Starting Transaction");
-        transactionCount++;
-        this.transaction = getDatabase().beginTx();
+
+        if (this.transactionCount == 0) {
+            getLOGGER().debug("Starting Transaction");
+            this.transaction = getDatabase().beginTx();
+        } else {
+            if (getLOGGER().isDebugEnabled()) {
+                getLOGGER().debug("Reusing Transaction");
+            }
         }
+        this.transactionCount++;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void stopTransaction() {
-        this.transaction.success();
-        this.transaction.finish();
-        transactionCount--;
-        getLOGGER().debug("Finish Transaction");
+        this.transactionCount--;
+        if (this.transactionCount == 0) {
+            this.transaction.success();
+            this.transaction.finish();
+            if (getLOGGER().isDebugEnabled()) {
+                getLOGGER().debug("Closed Transaction");
+            }
+        } else {
+            if (getLOGGER().isDebugEnabled()) {
+                getLOGGER().debug("Not closing transaction (enclosed)");
+            }
+        }
     }
 
     /**

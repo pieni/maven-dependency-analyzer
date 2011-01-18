@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.pieni.maven.dependency_analyzer.report.impl;
+package nl.pieni.maven.dependency_analyzer.neo4j.export;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
-import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
+import nl.pieni.maven.dependency_analyzer.export.DependencyReport;
 import org.apache.maven.model.Dependency;
 
 import java.io.IOException;

@@ -18,33 +18,23 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERSION;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,8 +73,6 @@ public class VersionNodeFactoryTest {
         factory.create(dependency);
 
         verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
-        verify(database).startTransaction();
-        verify(database).stopTransaction();
         verify(log).info(startsWith("Create versionNode: Node{ Id = 1"));
     }
 
@@ -125,8 +113,8 @@ public class VersionNodeFactoryTest {
         assertEquals(1, factory.insert(dependency));
 
         verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
-        verify(database, times(2)).startTransaction();
-        verify(database, times(2)).stopTransaction();
+        verify(database).startTransaction();
+        verify(database).stopTransaction();
         verify(log).info(startsWith("Create versionNode: "));
     }
 }

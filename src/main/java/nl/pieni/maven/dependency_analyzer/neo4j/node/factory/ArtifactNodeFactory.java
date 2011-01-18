@@ -18,7 +18,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
@@ -26,6 +26,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.ARTIFACT_ID;
 
@@ -46,13 +47,13 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
      * {@inheritDoc}
      */
     @Override
-    protected ArtifactNode create( final Dependency dependency) {
-        getDatabase().startTransaction();
+    protected ArtifactNode create(final Dependency dependency) {
         Node node = getDatabase().createNode();
         ArtifactNode artifactNode = new ArtifactNodeDecorator(node, dependency);
         getSearcher().indexOnProperty(node, ARTIFACT_ID);
-        LOGGER.info("Create ArtifactNode: " + artifactNode);
-        getDatabase().stopTransaction();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Created ArtifactNode: " + artifactNode);
+        }
         return artifactNode;
     }
 
@@ -60,16 +61,18 @@ public class ArtifactNodeFactory extends AbstractNodeFactory<ArtifactNode> {
      * {@inheritDoc}
      */
     @Override
-    public int insert( final Dependency dependency) {
+    public int insert(final Dependency dependency) {
         int nodeCount = 0;
-        GroupNodeDecorator groupNode = (GroupNodeDecorator)getSearcher().findGroupNode(dependency);
-        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator)getSearcher().findArtifactNode(dependency);
+        GroupNodeDecorator groupNode = (GroupNodeDecorator) getSearcher().findGroupNode(dependency);
+        ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getSearcher().findArtifactNode(dependency);
         if (artifactNode == null) {
-            artifactNode = (ArtifactNodeDecorator)create(dependency);
-            nodeCount++;
             getDatabase().startTransaction();
-            groupNode.createRelationshipTo(artifactNode, ArtifactRelations.has);
-            LOGGER.info("Created relation " + ArtifactRelations.has + "between " + groupNode + " and " + artifactNode);
+            artifactNode = (ArtifactNodeDecorator) create(dependency);
+            nodeCount++;
+            Relationship relationship = groupNode.createRelationshipTo(artifactNode, ArtifactRelations.has);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Added " + relationship + " between " + groupNode + " and " + artifactNode);
+            }
             getDatabase().stopTransaction();
         }
         return nodeCount;

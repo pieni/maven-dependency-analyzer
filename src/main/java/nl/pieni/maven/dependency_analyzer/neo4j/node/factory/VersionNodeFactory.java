@@ -18,15 +18,13 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.*;
-
-import static nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties.VERSION;
 
 /**
  * version Node
@@ -45,11 +43,11 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
      * {@inheritDoc}
      */
     @Override
-    protected VersionNode create( final Dependency dependency) {
-        getDatabase().startTransaction();
+    protected VersionNode create(final Dependency dependency) {
         VersionNode versionNode = new VersionNodeDecorator(getDatabase().createNode(), dependency);
-        LOGGER.info("Create versionNode: " + versionNode);
-        getDatabase().stopTransaction();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Created versionNode: " + versionNode);
+        }
         return versionNode;
     }
 
@@ -57,16 +55,19 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
      * {@inheritDoc}
      */
     @Override
-    public int insert( final Dependency dependency) {
+    public int insert(final Dependency dependency) {
         int nodeCount = 0;
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) getSearcher().findArtifactNode(dependency);
         VersionNodeDecorator versionNode = (VersionNodeDecorator) getSearcher().findVersionNode(dependency);
         if (versionNode == null) {
+            getDatabase().startTransaction();
             versionNode = (VersionNodeDecorator) create(dependency);
             nodeCount++;
-            getDatabase().startTransaction();
-            artifactNode.createRelationshipTo(versionNode, ArtifactRelations.version);
-            LOGGER.info("Created relation " + ArtifactRelations.version + "between " + artifactNode + " and " + versionNode);
+            Relationship relationship = artifactNode.createRelationshipTo(versionNode, ArtifactRelations.version);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Added " + relationship + " between " + artifactNode + " and " + versionNode);
+            }
+
             getDatabase().stopTransaction();
         }
         return nodeCount;

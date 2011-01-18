@@ -16,7 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.database;
 
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;

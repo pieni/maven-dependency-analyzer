@@ -31,7 +31,7 @@ import org.neo4j.graphdb.Traverser;
  * Abstract Neo4j Node decorator
  * Mainly code to proxy to the {@link Node} object
  */
-public abstract class AbstractNodeDecorator implements Node, DependencyNode {
+public abstract class AbstractNodeDecorator implements Node, DependencyNode, Comparable<Node> {
     private final Node node;
 
     /**
@@ -264,5 +264,31 @@ public abstract class AbstractNodeDecorator implements Node, DependencyNode {
     public Iterable<Object> getPropertyValues() {
         return node.getPropertyValues();
 
+    }
+
+    public int compareTo(Node node) {
+        Node n = node;
+        long ourId = this.getId(), theirId = n.getId();
+
+        if (ourId < theirId) {
+            return -1;
+        } else if (ourId > theirId) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Node)) {
+            return false;
+        }
+        return this.getId() == ((Node) o).getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) getId();
     }
 }

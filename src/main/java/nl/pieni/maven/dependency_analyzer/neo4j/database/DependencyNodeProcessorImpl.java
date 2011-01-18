@@ -19,20 +19,16 @@ package nl.pieni.maven.dependency_analyzer.neo4j.database;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.ArtifactNodeFactory;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.GroupNodeFactory;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.VersionNodeFactory;
-import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.*;
-
-import java.util.StringTokenizer;
 
 /**
  * Processing of Dependency elements
@@ -65,11 +61,10 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * {@inheritDoc}
      */
     @Override
-    public int addArtifact( final Dependency dependency) {
+    public int addArtifact(final Dependency dependency) {
         int nodeCount = 0;
-        if (getLog().isDebugEnabled()) {
-            getLog().debug("Adding nodes for artifact: " + dependency);
-        }
+
+        getLog().info("Adding nodes for artifact: " + dependency);
 
         nodeCount += groupNodeFactory.insert(dependency);
 
@@ -84,32 +79,36 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * {@inheritDoc}
      */
     @Override
-    public int addRelation( final Dependency sourceDependency,  final Dependency targetDependency) {
+    public int addRelation(final Dependency sourceDependency, final Dependency targetDependency) {
         int count = 0;
         ArtifactNodeDecorator sourceArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(sourceDependency);
         ArtifactNodeDecorator targetArtifactNode = (ArtifactNodeDecorator) searcher.findArtifactNode(targetDependency);
 
 
         RelationshipType relationType = determineRelationType(targetDependency);
-
+        database.startTransaction();
 
         if (!hasDependencyRelation(sourceArtifactNode, targetArtifactNode, relationType)) {
-            database.startTransaction();
-            sourceArtifactNode.createRelationshipTo(targetArtifactNode, relationType);
+            Relationship relationship = sourceArtifactNode.createRelationshipTo(targetArtifactNode, relationType);
             count++;
-            getLog().info("Added " + relationType + " between " + sourceDependency + " and " + targetDependency);
-            database.stopTransaction();
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Added " + relationship + " between " + sourceArtifactNode + " and " + targetArtifactNode);
+            }
         }
 
         VersionNodeDecorator targetVersionNode = (VersionNodeDecorator) searcher.findVersionNode(targetDependency);
         VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator) searcher.findVersionNode(sourceDependency);
         if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
-            database.startTransaction();
-            sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
+
+            Relationship relationship = sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
             count++;
-            getLog().info("Added " + ArtifactRelations.VersionsDependency + " between " + sourceDependency + " and " + targetDependency);
-            database.stopTransaction();
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Added " + relationship + " between " + sourceVersionNode + " and " + targetVersionNode);
+            }
         }
+
+        database.stopTransaction();
+
         return count;
     }
 
@@ -139,7 +138,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @param dependency
      * @return the {@link RelationshipType}
      */
-    private RelationshipType determineRelationType( final Dependency dependency) {
+    private RelationshipType determineRelationType(final Dependency dependency) {
         RelationshipType result = DependencyScopeRelations.fromString(dependency.getScope());
         if (result == null) {
             throw new IllegalArgumentException("Unable to determine scope for dependency: " + dependency);

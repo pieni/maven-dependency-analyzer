@@ -19,16 +19,14 @@ package nl.pieni.maven.dependency_analyzer.neo4j.database;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import org.apache.maven.model.Dependency;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -45,6 +43,9 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Non consistency based database tests
+ * TODO write unit test for a artifact that is has under is parent groupId both a groupId and a artifactId
+ * See line: if (node.hasProperty(NodeProperties.ARTIFACT_ID) && node.getProperty(NodeProperties.ARTIFACT_ID).equals(dependency.getArtifactId())) {
+ * minus the hasProperty check
  */
 public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatabaseImplTest {
 

@@ -16,15 +16,12 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.apache.maven.model.Dependency;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 import java.util.Iterator;
 

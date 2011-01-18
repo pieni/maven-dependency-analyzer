@@ -1,6 +1,5 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

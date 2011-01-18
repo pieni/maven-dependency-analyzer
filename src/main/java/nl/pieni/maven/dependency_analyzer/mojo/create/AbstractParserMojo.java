@@ -147,6 +147,7 @@ abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
     protected ProjectBuildingRequest buildRequest;
 
     protected void setup() throws MojoExecutionException {
+        super.setup();
         this.repositorySearcher = new RemoteRepositorySearcher(indexer, indexUpdater, getLog(), indexDirectory, allowSnapshots);
         this.buildRequest = makeBuildingRequest();
         this.includeFilter = new DependencyIncludeFilter(includeFilterPatterns);

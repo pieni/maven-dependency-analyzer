@@ -33,7 +33,7 @@ public abstract class AbstractDatabaseImplTest {
 
     private final static String BASE_TEST_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
     private static File testDirectory;
-    static Log log;
+    public static Log log;
     private static int dependencyCnt = 0;
 
     private static boolean deleteDirectory(File path) {
@@ -79,18 +79,18 @@ public abstract class AbstractDatabaseImplTest {
         return (temp);
     }
 
-    static void beforeBase() throws IOException {
+    static public void beforeBase() throws IOException {
         testDirectory = createTempDirectory();
         log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
         when(log.isInfoEnabled()).thenReturn(true);
     }
 
-    static void afterBase() {
-        deleteDirectory(testDirectory);
+    static public void afterBase() {
+        //deleteDirectory(testDirectory);
     }
 
-    static String getDBDirectory() {
+    protected static String getDBDirectory() {
         return testDirectory.getAbsolutePath();
     }
 

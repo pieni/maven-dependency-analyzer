@@ -18,13 +18,14 @@ package nl.pieni.maven.dependency_analyzer.neo4j.node.factory;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.StringTokenizer;
 
@@ -68,14 +69,22 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
             nextDependency.setGroupId(createPath);
             GroupNodeDecorator nextNode = new GroupNodeDecorator(node, nextDependency);
             getSearcher().indexOnProperty(node, GROUP_ID);
-            LOGGER.info("Create GroupNode: " + node);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Created GroupNode: " + nextNode);
+            }
             if (currentNode == null) {
                 Node refNode = getDatabase().getDatabase().getReferenceNode();
-                refNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+                Relationship relationship = refNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Added " + relationship + " between " + refNode + " and " + nextNode);
+                }
             } else {
-                currentNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+                Relationship relationship = currentNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Added " + relationship + " between " + currentNode + " and " + nextNode);
+                }
             }
-            LOGGER.info("Created relation " + ArtifactRelations.has + "between " + currentNode + " and " + nextNode);
             currentNode = nextNode;
         }
         getDatabase().stopTransaction();

@@ -16,7 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.apache.maven.model.Dependency;

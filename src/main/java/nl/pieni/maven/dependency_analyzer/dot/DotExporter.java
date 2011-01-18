@@ -1,5 +1,5 @@
 /*
- * Copyright  2010 Pieter van der Meer (pieter@pieni.nl)
+ * Copyright (c) 2011 Pieter van der Meer (pieter@pieni.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.enums;
+package nl.pieni.maven.dependency_analyzer.dot;
 
-import org.neo4j.graphdb.RelationshipType;
+import java.io.IOException;
+import java.util.List;
 
 /**
- * The relations that the various artifacts can have
+ * Created by IntelliJ IDEA.
+ * User: pieter
+ * Date: 12-1-11
+ * Time: 21:21
+ * To change this template use File | Settings | File Templates.
  */
-public enum ArtifactRelations implements RelationshipType {
-    version, //version relation
-    has,  //Has or contains relation
-    VersionsDependency //Group artifact relation
+public interface DotExporter {
 
+    void export(List<String> includeFilterPatterns, NodeWriter writer) throws IOException;
 }

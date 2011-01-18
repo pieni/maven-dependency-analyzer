@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.pieni.maven.dependency_analyzer.report.log;
+package nl.pieni.maven.dependency_analyzer.export.log;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 
 /**
  * Wrapper arround the {@link Log} implementation of the plugin logger and allow usage as a
- * writer for the {@link nl.pieni.maven.dependency_analyzer.report.DependencyReport}
+ * writer for the {@link nl.pieni.maven.dependency_analyzer.export.DependencyReport}
  */
 public class LogWriter extends Writer {
     private static final String LINESEPERATOR = System.getProperty("line.separator");

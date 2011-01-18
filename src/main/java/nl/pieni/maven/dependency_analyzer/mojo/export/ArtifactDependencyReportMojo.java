@@ -16,18 +16,16 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo.export;
 
-import nl.pieni.maven.dependency_analyzer.mojo.AbstractAnalyzeMojo;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.report.DependencyReport;
-import nl.pieni.maven.dependency_analyzer.report.impl.DependencyReportImpl;
-import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
+import nl.pieni.maven.dependency_analyzer.export.DependencyReport;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.DependencyReportImpl;
+import nl.pieni.maven.dependency_analyzer.export.log.LogWriter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Depenency grahpDB reporting Mojo.
@@ -36,7 +34,7 @@ import java.util.StringTokenizer;
  * @phase process-sources
  * @requiredProject false
  */
-public class ArtifactDependencyReportMojo extends AbstractAnalyzeMojo {
+public class ArtifactDependencyReportMojo extends AbstractReportMojo {
 
     /**
      * The type of artifacts to search. remember, the search is performed against the packaging that is defined in the
@@ -73,24 +71,5 @@ public class ArtifactDependencyReportMojo extends AbstractAnalyzeMojo {
                 throw  new MojoExecutionException("Error creating output for reporting", e);
             }
         }
-    }
-
-    /**
-     * Convert the string (groupId:artifactId) to a {@link Dependency} object.
-     * @param reportArtifact The G:A string
-     * @return a dependency object
-     */
-    private Dependency stringToGaDependency(String reportArtifact) {
-        StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
-        if (strTok.countTokens() != 2) {
-            getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");
-            return null;
-        }
-        String groupId = strTok.nextToken();
-        String artifactId = strTok.nextToken();
-        Dependency dependency = new Dependency();
-        dependency.setGroupId(groupId);
-        dependency.setArtifactId(artifactId);
-        return dependency;
     }
 }

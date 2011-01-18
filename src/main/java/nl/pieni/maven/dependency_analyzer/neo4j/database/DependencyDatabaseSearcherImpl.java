@@ -18,8 +18,8 @@ package nl.pieni.maven.dependency_analyzer.neo4j.database;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
-import nl.pieni.maven.dependency_analyzer.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Searcher for the database
@@ -96,13 +95,15 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
         }
         Traverser traverser = groupNode.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL_BUT_START_NODE, ArtifactRelations.has, Direction.OUTGOING);
         for (Node node : traverser) {
-            if (node.getProperty(NodeProperties.ARTIFACT_ID).equals(dependency.getArtifactId())) {
+            if (node.hasProperty(NodeProperties.ARTIFACT_ID) && node.getProperty(NodeProperties.ARTIFACT_ID).equals(dependency.getArtifactId())) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Found artifactNode for artifact: " + dependency);
                 }
                 return new ArtifactNodeDecorator(node, dependency);
+
             }
         }
+
         return null;
     }
 

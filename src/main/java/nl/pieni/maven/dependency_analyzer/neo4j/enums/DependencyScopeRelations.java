@@ -1,4 +1,4 @@
-package nl.pieni.maven.dependency_analyzer.enums;
+package nl.pieni.maven.dependency_analyzer.neo4j.enums;
 
 import org.neo4j.graphdb.RelationshipType;
 

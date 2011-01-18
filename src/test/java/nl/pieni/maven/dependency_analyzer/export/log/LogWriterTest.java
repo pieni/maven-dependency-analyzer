@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.pieni.maven.dependency_analyzer.report;
+package nl.pieni.maven.dependency_analyzer.export.log;
 
-import nl.pieni.maven.dependency_analyzer.report.log.LogWriter;
+import nl.pieni.maven.dependency_analyzer.export.log.LogWriter;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
 

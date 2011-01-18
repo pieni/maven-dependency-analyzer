@@ -71,8 +71,6 @@ public class ArtifactNodeFactoryTest {
         factory.create(dependency);
 
         verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
-        verify(database).startTransaction();
-        verify(database).stopTransaction();
         verify(log).info(startsWith("Create ArtifactNode: Node{ Id = 1"));
     }
 
@@ -117,8 +115,8 @@ public class ArtifactNodeFactoryTest {
 
         verify(artifactNode).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
         verify(searcher).indexOnProperty(artifactNode, NodeProperties.ARTIFACT_ID);
-        verify(database, times(2)).startTransaction();
-        verify(database, times(2)).stopTransaction();
+        verify(database).startTransaction();
+        verify(database).stopTransaction();
         verify(log).info(startsWith("Create ArtifactNode: "));
     }
 }
