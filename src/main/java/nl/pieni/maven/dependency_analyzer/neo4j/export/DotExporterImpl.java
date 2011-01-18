@@ -36,7 +36,9 @@ import org.neo4j.graphdb.RelationshipType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Export of the graph (partial) to a file in the dot language. see http://graphviz.org
@@ -49,6 +51,7 @@ public class DotExporterImpl implements DotExporter {
     private NodeWriter nodeWriter;
     private Node lastGroupNode = null;
     private boolean showFullpath = false;
+    private Set<Node> refNodeRelations = new HashSet<Node>();
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, boolean includeVersions, Log log) {
         this.dependencyDatabase = dependencyDatabase;
@@ -70,102 +73,108 @@ public class DotExporterImpl implements DotExporter {
         Iterable<Relationship> iter = refNode.getRelationships(Direction.OUTGOING);
         nodeWriter.writeRootNode(refNode);
         for (Relationship relationship : iter) {
-            lastGroupNode = relationship.getStartNode();
+            lastGroupNode = refNode;
             processNode(relationship.getOtherNode(refNode));
         }
+
+        processReferenceNodeRelations(refNode);
 
         nodeWriter.close();
     }
 
+    private void processReferenceNodeRelations(Node refNode) throws IOException {
+
+
+        for (Node refNodeRelation : refNodeRelations) {
+            nodeWriter.writeReferenceRelation(refNode, refNodeRelation);
+        }
+    }
+
     private void processNode(Node startNode) throws IOException {
-        boolean startProcessed = false;
         LOG.info("Parse: " + nodeToString(startNode));
+
         if (!startNode.hasRelationship(Direction.OUTGOING)) {
-            exportNode(startNode, null);
+            exportNode(startNode);
             return;
         }
         for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING)) {
             LOG.debug("Processing Relationship " + relationship);
-            if (!startProcessed) {
-                exportNode(startNode, relationship);
-                startProcessed = true;
+            boolean exportedStart = exportNode(relationship.getStartNode());
+            Node endNode = relationship.getEndNode();
+            boolean exportedEnd = exportNode(endNode);
+            if (exportedStart && exportedEnd) {
+                nodeWriter.writeRelation(startNode, endNode, relationship);
             }
-            Node otherNode = relationship.getOtherNode(startNode);
-            processNode(otherNode);
+            if (endNode.hasRelationship(Direction.OUTGOING)) {
+                processNode(endNode);
+            }
         }
     }
 
-    private void exportNode(Node node, Relationship type) throws IOException {
+    private boolean exportNode(Node node) throws IOException {
         LOG.info("Processing node: " + nodeToString(node));
         NodeType nodeType = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE).toString());
         switch (nodeType) {
             case ArtifactNode:
-                doArtifactNode(node, type);
-                break;
+                return doArtifactNode(node);
             case GroupNode:
-                doGroupNode(node, type);
-                break;
+                return doGroupNode(node);
             case VersionNode:
                 if (includeVersions) {
-                    doVersionNode(node, type);
+                    return doVersionNode(node);
                 }
-                break;
+                return false;
+            default:
+                throw new IllegalArgumentException("NodeType: " + nodeType + " is not valid in this context");
         }
     }
 
-    private void doGroupNode(Node node, Relationship type) throws IOException {
+    private boolean doGroupNode(Node node) throws IOException {
 
         if (hasOnlyGroupNodeRelations(node)) {
-            return;
+            return false;
         }
-
-        assert type == null;
 
         GroupNodeDecorator groupNodeDecorator = new GroupNodeDecorator(node);
-        nodeWriter.writeRelation(lastGroupNode, groupNodeDecorator, type);
 
-        if (!showFullpath && lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
-            nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
-        } else {
+        if (showFullpath) {
             nodeWriter.writeNode(groupNodeDecorator);
+        } else {
+            if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
+                nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
+            } else {
+                nodeWriter.writeNode(groupNodeDecorator);
+            }
         }
-        lastGroupNode = node;
+
+        if (!lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
+            refNodeRelations.add(node);
+            lastGroupNode = node;
+        }
+
+        return true;
     }
 
-    private void doVersionNode(Node node, Relationship type) throws IOException {
+//        if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
+//            nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
+//            return true;
+
+
+    private boolean doVersionNode(Node node) throws IOException {
         if (!includeVersions) {
-            return;
+            return false;
         }
 
         VersionNodeDecorator versionNode = new VersionNodeDecorator(node);
         nodeWriter.writeNode(versionNode);
-        //A version nodes parent is always has a "version" relation to its parent.
-        Node parentNode = (Node) versionNode.getParent();
-        nodeWriter.writeRelation(parentNode, versionNode, getRelationBetweenNodes(parentNode, versionNode));
-        //Optional it can have a versionDependency to some other node
-        if (type != null) {
-            nodeWriter.writeRelation(type.getOtherNode(node), versionNode, type);
-        }
+        return true;
     }
 
-    private void doArtifactNode(Node node, Relationship type) throws IOException {
+    private boolean doArtifactNode(Node node) throws IOException {
         ArtifactNodeDecorator artifactNode = new ArtifactNodeDecorator(node);
         nodeWriter.writeNode(artifactNode);
-        //The parent of a artifact node is always a group node, therefor a "has" relation
-        Node parentNode = (Node) artifactNode.getParent();
-        nodeWriter.writeRelation(parentNode, artifactNode, getRelationBetweenNodes(parentNode, artifactNode));
+        return true;
     }
-
-    private Relationship getRelationBetweenNodes(Node startNode, Node endNode) {
-        for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING)) {
-            if (relationship.getOtherNode(startNode).equals(endNode)) {
-                return relationship;
-            }
-        }
-        throw new AssertionError("Node: " + startNode + " and Node: " + endNode + " do not share a relation with each other");
-
-    }
-
 
     private boolean hasOnlyGroupNodeRelations(Node node) {
         Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);

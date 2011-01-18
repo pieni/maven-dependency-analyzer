@@ -18,6 +18,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -122,8 +123,15 @@ public class NodeWriterImpl implements NodeWriter {
 
     @Override
     public void writeNode(GroupNodeDecorator current, GroupNodeDecorator last) throws IOException {
-        LOG.debug("Writing GroupNode " + last);
-        writeNode(current.getId(), getAddedGroupIdPart(current.getGroupId(), last.getGroupId()), NodeShape.folder);
+        if (visitedNodes.add(current)) {
+            LOG.debug("Writing GroupNode " + last);
+            writeNode(current.getId(), getAddedGroupIdPart(current.getGroupId(), last.getGroupId()), NodeShape.folder);
+        }
+    }
+
+    @Override
+    public void writeReferenceRelation(Node refNode, Node refNodeRelation) throws IOException {
+        writer.write("\tN" + refNode.getId() + " -> " + "N" + refNodeRelation.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
     }
 
     private String getAddedGroupIdPart(String current, String previous) {

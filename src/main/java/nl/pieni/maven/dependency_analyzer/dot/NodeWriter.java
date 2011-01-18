@@ -46,4 +46,6 @@ public interface NodeWriter {
     void writeRelation(Node startNode, Node otherNode, Relationship type) throws IOException;
 
     void writeNode(GroupNodeDecorator groupNodeDecorator, GroupNodeDecorator lastGroupNode) throws IOException;
+
+    void writeReferenceRelation(Node refNode, Node refNodeRelation) throws IOException;
 }
