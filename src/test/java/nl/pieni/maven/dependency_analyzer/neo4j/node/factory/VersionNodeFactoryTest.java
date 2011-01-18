@@ -66,6 +66,7 @@ public class VersionNodeFactoryTest {
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         Log log = mock(Log.class);
+        when(log.isDebugEnabled()).thenReturn(true);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
@@ -73,7 +74,7 @@ public class VersionNodeFactoryTest {
         factory.create(dependency);
 
         verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
-        verify(log).info(startsWith("Create versionNode: Node{ Id = 1"));
+        verify(log).debug(startsWith("Created versionNode: Node{ Id = 1"));
     }
 
     @Test
@@ -115,6 +116,6 @@ public class VersionNodeFactoryTest {
         verify(versionNode).setProperty(NodeProperties.NODE_TYPE, NodeType.VersionNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log).info(startsWith("Create versionNode: "));
+        verify(log).debug(startsWith("Created versionNode: "));
     }
 }

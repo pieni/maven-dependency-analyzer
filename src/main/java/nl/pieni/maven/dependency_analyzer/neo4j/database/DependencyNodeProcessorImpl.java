@@ -98,9 +98,9 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
 
         VersionNodeDecorator targetVersionNode = (VersionNodeDecorator) searcher.findVersionNode(targetDependency);
         VersionNodeDecorator sourceVersionNode = (VersionNodeDecorator) searcher.findVersionNode(sourceDependency);
-        if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.VersionsDependency)) {
+        if (!hasDependencyRelation(sourceVersionNode, targetVersionNode, ArtifactRelations.depends)) {
 
-            Relationship relationship = sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.VersionsDependency);
+            Relationship relationship = sourceVersionNode.createRelationshipTo(targetVersionNode, ArtifactRelations.depends);
             count++;
             if (getLog().isDebugEnabled()) {
                 getLog().debug("Added " + relationship + " between " + sourceVersionNode + " and " + targetVersionNode);

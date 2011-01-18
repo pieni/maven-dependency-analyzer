@@ -23,7 +23,6 @@ import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.matchers.ArtifactNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorMatcher;
-import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorPartialMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.RelationshipMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.VersionNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.AbstractDatabaseImplTest;
@@ -32,25 +31,14 @@ import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearc
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessorImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.DotExporterImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.NodeWriterImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.test_helpers.SimpleLogger;
 import org.apache.maven.model.Dependency;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +50,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by IntelliJ IDEA.
@@ -203,7 +190,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         verify(writer, atLeast(2)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.version)));
         verify(writer, atLeast(3)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.has)));
         verify(writer, atLeast(1)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
-        verify(writer, atLeast(1)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.VersionsDependency)));
+        verify(writer, atLeast(1)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.depends)));
 
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));

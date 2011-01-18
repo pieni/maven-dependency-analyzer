@@ -64,6 +64,7 @@ public class ArtifactNodeFactoryTest {
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         Log log = mock(Log.class);
+        when(log.isDebugEnabled()).thenReturn(true);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
@@ -71,7 +72,7 @@ public class ArtifactNodeFactoryTest {
         factory.create(dependency);
 
         verify(node).setProperty(NodeProperties.NODE_TYPE, NodeType.ArtifactNode.name());
-        verify(log).info(startsWith("Create ArtifactNode: Node{ Id = 1"));
+        verify(log).debug(startsWith("Created ArtifactNode: Node{ Id = 1"));
     }
 
     @Test
@@ -117,6 +118,6 @@ public class ArtifactNodeFactoryTest {
         verify(searcher).indexOnProperty(artifactNode, NodeProperties.ARTIFACT_ID);
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log).info(startsWith("Create ArtifactNode: "));
+        verify(log).debug(startsWith("Created ArtifactNode: "));
     }
 }

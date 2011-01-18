@@ -72,6 +72,7 @@ public class GroupNodeFactoryTest {
 
 
         Log log = mock(Log.class);
+        when(log.isDebugEnabled()).thenReturn(true);
         Node node = createMockNode();
         when(database.createNode()).thenReturn(node);
 
@@ -81,7 +82,7 @@ public class GroupNodeFactoryTest {
         verify(node, times(2)).setProperty(NodeProperties.NODE_TYPE, NodeType.GroupNode.name());
         verify(database).startTransaction();
         verify(database).stopTransaction();
-        verify(log, times(2)).info(startsWith("Create GroupNode:"));
+        verify(log, times(2)).debug(startsWith("Created GroupNode:"));
     }
 
     @Test
@@ -110,7 +111,7 @@ public class GroupNodeFactoryTest {
         verify(searcher, times(3)).indexOnProperty(groupNode, NodeProperties.GROUP_ID);
         verify(database, times(1)).startTransaction();
         verify(database, times(1)).stopTransaction();
-        verify(log, times(3)).info(startsWith("Create GroupNode: "));
+        verify(log, times(3)).debug(startsWith("Created GroupNode: "));
     }
 
     @Test

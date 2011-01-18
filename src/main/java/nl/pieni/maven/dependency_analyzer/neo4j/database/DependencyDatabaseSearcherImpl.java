@@ -202,7 +202,7 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
             versionNodeListMap.put(versionNode, versionNodes);
 
 
-            Iterable<Relationship> versionRelations = versionNode.getRelationships(ArtifactRelations.VersionsDependency, Direction.INCOMING);
+            Iterable<Relationship> versionRelations = versionNode.getRelationships(ArtifactRelations.depends, Direction.INCOMING);
             for (Relationship versionRelation : versionRelations) {
                 Node relationNode = versionRelation.getOtherNode(versionNode);
                 versionNodes.add(new VersionNodeDecorator(relationNode));
