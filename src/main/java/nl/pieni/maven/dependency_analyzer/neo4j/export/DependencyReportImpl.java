@@ -22,6 +22,7 @@ import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
 import nl.pieni.maven.dependency_analyzer.export.DependencyReport;
 import org.apache.maven.model.Dependency;
+import org.neo4j.graphdb.Node;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -33,13 +34,14 @@ import java.util.Map;
  */
 public class DependencyReportImpl implements DependencyReport {
     private final String lineSeperator = System.getProperty("line.separator");
-    private final DependencyDatabaseSearcher searcher;
+    private final DependencyDatabaseSearcher<Node> searcher;
 
     /**
      * Default constructor
      *
      * @param dependencyDatabaseSearcher the Searcher
      */
+    @SuppressWarnings("unchecked")
     public DependencyReportImpl(DependencyDatabaseSearcher dependencyDatabaseSearcher) {
         this.searcher = dependencyDatabaseSearcher;
     }

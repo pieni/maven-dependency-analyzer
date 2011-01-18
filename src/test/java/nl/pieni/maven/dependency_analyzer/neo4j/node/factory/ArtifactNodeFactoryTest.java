@@ -62,6 +62,7 @@ public class ArtifactNodeFactoryTest {
         Dependency dependency = mock(Dependency.class);
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         Log log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
@@ -81,6 +82,7 @@ public class ArtifactNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
         when(searcher.findGroupNode(dependency)).thenReturn(groupNode);
@@ -100,6 +102,7 @@ public class ArtifactNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
         when(searcher.findGroupNode(dependency)).thenReturn(groupNode);

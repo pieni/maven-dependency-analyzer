@@ -35,6 +35,7 @@ public class VersionNodeFactory extends AbstractNodeFactory<VersionNode> {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public VersionNodeFactory(DependencyDatabase database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
         super(database, searcher, logger);
     }

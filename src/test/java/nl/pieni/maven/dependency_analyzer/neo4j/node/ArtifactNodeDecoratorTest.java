@@ -133,9 +133,11 @@ public class ArtifactNodeDecoratorTest {
         Node parentNode = mock(Node.class);
         when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode.name());
         when(parentNode.getId()).thenReturn(99L);
+        @SuppressWarnings("unchecked")
         Iterable<Relationship> parentRelations = mock(Iterable.class);
         when(artifactNode.getRelationships(ArtifactRelations.has, Direction.INCOMING)).thenReturn(parentRelations);
         Relationship relation = mock(Relationship.class);
+        @SuppressWarnings("unchecked")
         Iterator<Relationship> iter = mock(Iterator.class);
         when(parentRelations.iterator()).thenReturn(iter);
         when(iter.hasNext()).thenReturn(true);
@@ -154,8 +156,10 @@ public class ArtifactNodeDecoratorTest {
         Node parentNode = mock(Node.class);
         when(parentNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
         when(parentNode.getId()).thenReturn(99L);
+        @SuppressWarnings("unchecked")
         Iterable<Relationship> parentRelations = mock(Iterable.class);
         when(artifactNode.getRelationships(ArtifactRelations.has, Direction.INCOMING)).thenReturn(parentRelations);
+        @SuppressWarnings("unchecked")
         Iterator<Relationship> iter = mock(Iterator.class);
         when(parentRelations.iterator()).thenReturn(iter);
         when(iter.hasNext()).thenReturn(false);

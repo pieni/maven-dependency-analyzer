@@ -40,6 +40,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public GroupNodeFactory(DependencyDatabase database, DependencyDatabaseSearcher<Node> searcher, final Log logger) {
         super(database, searcher, logger);
     }

@@ -48,6 +48,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @param searcher The searcher
      * @param logger   the Logger
      */
+    @SuppressWarnings("unchecked")
     public DependencyNodeProcessorImpl(DependencyDatabase database, DependencyDatabaseSearcher searcher, final Log logger) {
         this.database = database;
         this.searcher = searcher;

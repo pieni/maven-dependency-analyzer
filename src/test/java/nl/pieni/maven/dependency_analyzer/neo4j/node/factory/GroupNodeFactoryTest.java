@@ -64,7 +64,9 @@ public class GroupNodeFactoryTest {
         when(dependency.getGroupId()).thenReturn("nl.pieni");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
+        @SuppressWarnings("unchecked")
         GraphDatabaseService dbService = mock(GraphDatabaseService.class);
         when(database.getDatabase()).thenReturn(dbService);
         Node refNode = mock(Node.class);
@@ -92,6 +94,7 @@ public class GroupNodeFactoryTest {
         when(dependency.getGroupId()).thenReturn("nl.pieni.maven");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         when(searcher.findGroupNode(dependency)).thenReturn(null);
 
@@ -120,6 +123,7 @@ public class GroupNodeFactoryTest {
         when(dependency.getVersion()).thenReturn("1.0");
         @SuppressWarnings("unchecked")
         DependencyDatabase<GraphDatabaseService, Node> database = mock(DependencyDatabase.class);
+        @SuppressWarnings("unchecked")
         DependencyDatabaseSearcher<Node> searcher = mock(DependencyDatabaseSearcher.class);
         GroupNodeDecorator groupNode = mock(GroupNodeDecorator.class);
         when(searcher.findGroupNode(dependency)).thenReturn(groupNode);

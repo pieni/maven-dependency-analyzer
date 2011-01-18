@@ -52,6 +52,7 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
     private DependencyDatabaseSearcher searcher;
 
 
+    @SuppressWarnings("unchecked")
     protected void setup() throws MojoExecutionException {
         database = new DependencyDatabaseImpl(getLog(), databaseDirectory);
         searcher = new DependencyDatabaseSearcherImpl(getLog(), database);
