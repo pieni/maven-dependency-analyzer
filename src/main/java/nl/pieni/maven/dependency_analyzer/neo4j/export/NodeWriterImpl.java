@@ -58,6 +58,12 @@ public class NodeWriterImpl implements NodeWriter {
         startGraph();
     }
 
+    public NodeWriterImpl(Writer osWriter, Log LOG) throws IOException {
+        this.LOG = LOG;
+        this.writer = osWriter;
+        startGraph();
+    }
+
     private void startGraph() throws IOException {
         writer.write(" digraph G {" + lineSeparator);
     }
@@ -76,7 +82,7 @@ public class NodeWriterImpl implements NodeWriter {
 
     @Override
     public void writeNode(VersionNodeDecorator node) throws IOException {
-        if (visitedNodes.add((Node)node)) {
+        if (visitedNodes.add(node)) {
             LOG.debug("Writing VersionNode " + node);
             String version = node.getVersion();
             long nodeId = node.getId();
@@ -114,18 +120,20 @@ public class NodeWriterImpl implements NodeWriter {
     }
 
     @Override
-    public void writeRelation(Node startNode, Node otherNode, Relationship type) throws IOException {
-        if (visitedRelations.add(type)) {
-            LOG.debug("Writing Relation " + startNode.getId() + "-> " + otherNode.getId() + " (" + type + ")");
-            writer.write("\tN" + startNode.getId() + " -> " + "N" + otherNode.getId() + " [label=\"" + type.getType() + "\"]" + lineSeparator);
+    public void writeRelation(Relationship relationship) throws IOException {
+        if (visitedRelations.add(relationship)) {
+            Node startNode = relationship.getStartNode();
+            Node endNode = relationship.getEndNode();
+            LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
+            writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + lineSeparator);
         }
     }
 
     @Override
-    public void writeNode(GroupNodeDecorator current, GroupNodeDecorator last) throws IOException {
+    public void writeNode(GroupNodeDecorator current, GroupNodeDecorator previous) throws IOException {
         if (visitedNodes.add(current)) {
-            LOG.debug("Writing GroupNode " + last);
-            writeNode(current.getId(), getAddedGroupIdPart(current.getGroupId(), last.getGroupId()), NodeShape.folder);
+            LOG.debug("Writing GroupNode " + previous);
+            writeNode(current.getId(), getAddedGroupIdPart(current.getGroupId(), previous.getGroupId()), NodeShape.folder);
         }
     }
 

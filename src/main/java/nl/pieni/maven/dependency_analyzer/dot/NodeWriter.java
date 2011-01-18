@@ -43,7 +43,7 @@ public interface NodeWriter {
 
     void writeNode(GroupNodeDecorator node) throws IOException;
 
-    void writeRelation(Node startNode, Node otherNode, Relationship type) throws IOException;
+    void writeRelation(Relationship type) throws IOException;
 
     void writeNode(GroupNodeDecorator groupNodeDecorator, GroupNodeDecorator lastGroupNode) throws IOException;
 

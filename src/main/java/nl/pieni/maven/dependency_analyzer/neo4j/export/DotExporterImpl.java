@@ -103,7 +103,7 @@ public class DotExporterImpl implements DotExporter {
             Node endNode = relationship.getEndNode();
             boolean exportedEnd = exportNode(endNode);
             if (exportedStart && exportedEnd) {
-                nodeWriter.writeRelation(startNode, endNode, relationship);
+                nodeWriter.writeRelation(relationship);
             }
             if (endNode.hasRelationship(Direction.OUTGOING)) {
                 processNode(endNode);

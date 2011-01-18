@@ -139,8 +139,8 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
         verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
         verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, times(2)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, times(2)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.has)));
+        verify(writer, times(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
+        verify(writer, times(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
     }
 
 
@@ -187,16 +187,10 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
         verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
         verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, atLeast(2)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, atLeast(3)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.has)));
-        verify(writer, atLeast(1)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
-        verify(writer, atLeast(1)).writeRelation(any(Node.class), any(Node.class), argThat(new RelationshipMatcher(ArtifactRelations.depends)));
-
-//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-//        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-//        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-//        verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+        verify(writer, atLeast(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
+        verify(writer, atLeast(3)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
+        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.depends)));
     }
 
 
