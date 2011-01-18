@@ -50,14 +50,6 @@ public class NodeWriterImpl implements NodeWriter {
     private Set<Node> visitedNodes = new HashSet<Node>();
     private Set<Relationship> visitedRelations = new HashSet<Relationship>();
 
-    public NodeWriterImpl(String outputFile, Log LOG) throws IOException {
-        this.LOG = LOG;
-        FileOutputStream fos = new FileOutputStream(outputFile);
-        LOG.info("Created output file: " + outputFile);
-        this.writer = new OutputStreamWriter(fos, "UTF-8");
-        startGraph();
-    }
-
     public NodeWriterImpl(Writer osWriter, Log LOG) throws IOException {
         this.LOG = LOG;
         this.writer = osWriter;

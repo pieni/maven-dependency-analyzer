@@ -26,7 +26,10 @@ import nl.pieni.maven.dependency_analyzer.neo4j.export.NodeWriterImpl;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -69,7 +72,9 @@ public class DependencyTreeDotExportMojo extends AbstractReportMojo {
         exporter = new DotExporterImpl(getDatabase(), includeVersions, getLog());
 
         try {
-            NodeWriter writer = new NodeWriterImpl(dotFile, getLog());
+            FileOutputStream fos = new FileOutputStream(dotFile);
+            Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+            NodeWriter writer = new NodeWriterImpl(osWriter, getLog());
             exporter.export(includeFilterPatterns, writer);
         } catch (IOException e) {
             getLog().error("Error creating output for reporting");
