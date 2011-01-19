@@ -20,6 +20,7 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -94,6 +95,7 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
     /**
      * Sort of BS Test cause i can't test the index here
      */
+    @Ignore
     @Test(expected = NotInTransactionException.class)
     public void indexOnPropertyNotInTransactionTest() {
         database.startTransaction();
