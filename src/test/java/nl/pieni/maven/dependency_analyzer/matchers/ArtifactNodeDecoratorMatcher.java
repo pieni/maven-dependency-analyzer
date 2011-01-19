@@ -29,7 +29,7 @@ import org.mockito.ArgumentMatcher;
  * To change this template use File | Settings | File Templates.
  */
 public class ArtifactNodeDecoratorMatcher extends ArgumentMatcher<ArtifactNodeDecorator> {
-    private String artifactId;
+    private final String artifactId;
 
     public ArtifactNodeDecoratorMatcher(String artifactId) {
         this.artifactId = artifactId;
@@ -37,8 +37,6 @@ public class ArtifactNodeDecoratorMatcher extends ArgumentMatcher<ArtifactNodeDe
 
     @Override
     public boolean matches(Object argument) {
-        System.out.println("(ArtifactNodeDecorator)argument = " + (ArtifactNodeDecorator) argument);
-        System.out.println("artifactId = " + artifactId);
         return artifactId.equals(((ArtifactNodeDecorator)argument).getArtifactId());
     }
 }

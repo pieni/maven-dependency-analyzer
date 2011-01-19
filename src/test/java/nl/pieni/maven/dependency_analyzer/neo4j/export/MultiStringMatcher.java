@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatcher;
  * Time: 17:25
  * To change this template use File | Settings | File Templates.
  */
-public class MultiStringMatcher extends ArgumentMatcher<String> {
+class MultiStringMatcher extends ArgumentMatcher<String> {
     private String[] matchList;
 
     public MultiStringMatcher(String[] matchList) {

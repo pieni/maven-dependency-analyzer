@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  */
 public class RepositoryTransferListenerTest {
     private Log log;
-    RepositoryTransferListener listener;
+    private RepositoryTransferListener listener;
 
     @Before
     public void before() {

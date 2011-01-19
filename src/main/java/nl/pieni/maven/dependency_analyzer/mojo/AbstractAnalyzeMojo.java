@@ -39,7 +39,7 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
      *
      * @parameter property="databaseDirectory" default-value="target/neo4j"
      */
-    String databaseDirectory;
+    private String databaseDirectory;
 
     /**
      * The Dependency database
@@ -62,11 +62,11 @@ public abstract class AbstractAnalyzeMojo extends AbstractMojo {
         database.shutdownDatabase();
     }
 
-    public DependencyDatabase getDatabase() {
+    protected DependencyDatabase getDatabase() {
         return database;
     }
 
-    public DependencyDatabaseSearcher getSearcher() {
+    protected DependencyDatabaseSearcher getSearcher() {
         return searcher;
     }
 }

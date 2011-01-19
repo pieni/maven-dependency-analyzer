@@ -48,8 +48,8 @@ import static org.mockito.Mockito.when;
  */
 public class NodeWriterImplTest {
 
-    NodeWriter writer;
-    Writer outputWriter;
+    private NodeWriter writer;
+    private Writer outputWriter;
 
     @Before
     public void before() throws IOException {

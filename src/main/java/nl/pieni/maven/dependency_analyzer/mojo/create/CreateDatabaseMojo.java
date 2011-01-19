@@ -49,7 +49,7 @@ public class CreateDatabaseMojo
     /**
      * Node Processor
      */
-    protected DependencyNodeProcessor nodeProcessor;
+    private DependencyNodeProcessor nodeProcessor;
 
 
     /**

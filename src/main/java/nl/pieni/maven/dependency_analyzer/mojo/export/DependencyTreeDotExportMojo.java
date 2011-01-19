@@ -36,7 +36,7 @@ import java.util.List;
  * @phase process-sources
  * @requiredProject false
  */
-public class DependencyTreeDotExportMojo extends AbstractReportMojo {
+class DependencyTreeDotExportMojo extends AbstractReportMojo {
 
     /**
      * File where the output is written.
@@ -60,14 +60,12 @@ public class DependencyTreeDotExportMojo extends AbstractReportMojo {
      */
     private List<String> includeFilterPatterns;
 
-    private DotExporter exporter;
-
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.setup();
 
-        exporter = new DotExporterImpl(getDatabase(), includeVersions, getLog());
+        DotExporter exporter=new DotExporterImpl(getDatabase(), includeVersions, getLog());
 
         try {
             FileOutputStream fos = new FileOutputStream(dotFile);

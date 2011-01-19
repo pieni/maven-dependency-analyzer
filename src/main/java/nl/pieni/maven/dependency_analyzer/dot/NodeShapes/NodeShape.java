@@ -27,5 +27,5 @@ public enum NodeShape {
     box,
     rect,
     folder,
-    component;
+    component
 }

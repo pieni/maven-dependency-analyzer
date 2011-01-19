@@ -32,7 +32,7 @@ public abstract class AbstractReportMojo extends AbstractAnalyzeMojo {
      * @param reportArtifact The G:A string
      * @return a dependency object
      */
-    protected Dependency stringToGaDependency(String reportArtifact) {
+    Dependency stringToGaDependency(String reportArtifact) {
         StringTokenizer strTok = new StringTokenizer(reportArtifact, ":");
         if (strTok.countTokens() != 2) {
             getLog().error("reportArtifacts string: " + reportArtifact + " is not valid, requires groupId:artifactId");

@@ -68,6 +68,8 @@ public class NodeWriterImpl implements NodeWriter {
     public void close() throws IOException {
         LOG.debug("Closing file");
         endGraph();
+        LOG.info("Exported " + visitedNodes.size() + " nodes");
+        LOG.info("Exported " + visitedRelations.size() + " edges");
         writer.flush();
         writer.close();
     }

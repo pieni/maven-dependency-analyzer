@@ -28,8 +28,8 @@ import java.util.StringTokenizer;
  * Time: 2:04
  * To change this template use File | Settings | File Templates.
  */
-public class GroupNodeDecoratorPartialMatcher extends ArgumentMatcher<GroupNodeDecorator>  {
-    String part;
+class GroupNodeDecoratorPartialMatcher extends ArgumentMatcher<GroupNodeDecorator>  {
+    private String part;
 
     public GroupNodeDecoratorPartialMatcher(String part) {
         this.part = part;

@@ -34,7 +34,7 @@ import java.util.List;
  * @phase process-sources
  * @requiredProject false
  */
-public class ArtifactDependencyReportMojo extends AbstractReportMojo {
+class ArtifactDependencyReportMojo extends AbstractReportMojo {
 
     /**
      * The type of artifacts to search. remember, the search is performed against the packaging that is defined in the

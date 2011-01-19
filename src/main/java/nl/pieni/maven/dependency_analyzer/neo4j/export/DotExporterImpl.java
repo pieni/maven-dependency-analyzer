@@ -50,8 +50,8 @@ public class DotExporterImpl implements DotExporter {
     private final Log LOG;
     private NodeWriter nodeWriter;
     private Node lastGroupNode = null;
-    private boolean showFullpath = false;
     private Set<Node> refNodeRelations = new HashSet<Node>();
+    private IncludeFilterPatternMatcher includeFilterPatternMatcher;
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, boolean includeVersions, Log log) {
         this.dependencyDatabase = dependencyDatabase;
@@ -59,15 +59,9 @@ public class DotExporterImpl implements DotExporter {
         this.includeVersions = includeVersions;
     }
 
-    public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, boolean includeVersions, boolean showPath, Log log) {
-        this.dependencyDatabase = dependencyDatabase;
-        this.LOG = log;
-        this.includeVersions = includeVersions;
-        this.showFullpath = showPath;
-    }
-
     @Override
     public void export(List<String> includeFilterPatterns, NodeWriter nodeWriter) throws IOException {
+        this.includeFilterPatternMatcher = new IncludeFilterPatternMatcher(includeFilterPatterns);
         this.nodeWriter = nodeWriter;
         Node refNode = dependencyDatabase.getDatabase().getReferenceNode();
         Iterable<Relationship> iter = refNode.getRelationships(Direction.OUTGOING);
@@ -83,15 +77,15 @@ public class DotExporterImpl implements DotExporter {
     }
 
     private void processReferenceNodeRelations(Node refNode) throws IOException {
-
-
         for (Node refNodeRelation : refNodeRelations) {
-            nodeWriter.writeReferenceRelation(refNode, refNodeRelation);
+            if (includeFilterPatternMatcher.include(refNodeRelation)) {
+                nodeWriter.writeReferenceRelation(refNode, refNodeRelation);
+            }
         }
     }
 
     private void processNode(Node startNode) throws IOException {
-        LOG.info("Parse: " + nodeToString(startNode));
+        LOG.debug("Parse: " + nodeToString(startNode));
 
         if (!startNode.hasRelationship(Direction.OUTGOING)) {
             exportNode(startNode);
@@ -111,8 +105,12 @@ public class DotExporterImpl implements DotExporter {
         }
     }
 
+
     private boolean exportNode(Node node) throws IOException {
-        LOG.info("Processing node: " + nodeToString(node));
+        LOG.debug("Processing node: " + nodeToString(node));
+        if (!includeFilterPatternMatcher.include(node)) {
+            return false;
+        }
         NodeType nodeType = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE).toString());
         switch (nodeType) {
             case ArtifactNode:
@@ -137,14 +135,10 @@ public class DotExporterImpl implements DotExporter {
 
         GroupNodeDecorator groupNodeDecorator = new GroupNodeDecorator(node);
 
-        if (showFullpath) {
-            nodeWriter.writeNode(groupNodeDecorator);
+        if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
+            nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
         } else {
-            if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
-                nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
-            } else {
-                nodeWriter.writeNode(groupNodeDecorator);
-            }
+            nodeWriter.writeNode(groupNodeDecorator);
         }
 
         if (!lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
@@ -154,11 +148,6 @@ public class DotExporterImpl implements DotExporter {
 
         return true;
     }
-
-//        if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
-//            nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
-//            return true;
-
 
     private boolean doVersionNode(Node node) throws IOException {
         if (!includeVersions) {
@@ -194,7 +183,7 @@ public class DotExporterImpl implements DotExporter {
      *
      * @return a String
      */
-    public String nodeToString(Node node) {
+    String nodeToString(Node node) {
         StringBuffer buff = new StringBuffer();
         buff.append("Node{ Id = ");
         buff.append(node.getId());

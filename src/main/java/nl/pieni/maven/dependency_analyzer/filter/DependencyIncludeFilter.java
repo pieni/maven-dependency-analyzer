@@ -25,7 +25,7 @@ import java.util.List;
  * Include filter for the list of dependencies supplied.
  * (See http://maven.apache.org/shared/maven-common-artifact-filters/source-repository.html)
  */
-public class DependencyIncludeFilter {
+public class DependencyIncludeFilter extends AbstractIncludeFilter{
     //The pattern list
     private final List<String> patterns;
 
@@ -94,51 +94,5 @@ public class DependencyIncludeFilter {
         return matched;
     }
 
-    /**
-     * Gets whether the specified token matches the specified pattern segment.
-     *
-     * @param token
-     *            the token to check
-     * @param pattern
-     *            the pattern segment to match, as defined above
-     * @return <code>true</code> if the specified token is matched by the specified pattern segment
-     */
-    private boolean matches(  final String token,  final String pattern )
-    {
-        boolean matches;
 
-        // support full wildcard and implied wildcard
-        if ( "*".equals( pattern ) || pattern.length() == 0 )
-        {
-            matches = true;
-        }
-        // support contains wildcard
-        else if ( pattern.startsWith( "*" ) && pattern.endsWith( "*" ) )
-        {
-            String contains = pattern.substring( 1, pattern.length() - 1 );
-
-            matches = ( token.indexOf( contains ) != -1 );
-        }
-        // support leading wildcard
-        else if ( pattern.startsWith( "*" ) )
-        {
-            String suffix = pattern.substring( 1, pattern.length() );
-
-            matches = token.endsWith( suffix );
-        }
-        // support trailing wildcard
-        else if ( pattern.endsWith( "*" ) )
-        {
-            String prefix = pattern.substring( 0, pattern.length() - 1 );
-
-            matches = token.startsWith( prefix );
-        }
-        // support exact match
-        else
-        {
-            matches = token.equals( pattern );
-        }
-
-        return matches;
-    }
 }

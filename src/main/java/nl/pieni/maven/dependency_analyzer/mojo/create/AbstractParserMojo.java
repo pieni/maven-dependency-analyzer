@@ -59,63 +59,63 @@ abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
      *
      * @component
      */
-    protected NexusIndexer indexer;
+    private NexusIndexer indexer;
 
     /**
      * Updater for Nexus index (download)
      *
      * @component
      */
-    protected IndexUpdater indexUpdater;
+    private IndexUpdater indexUpdater;
 
     /**
      * used to for creation of the MavenProject
      *
      * @component
      */
-    protected SettingsBuilder settingsBuilder;
+    private SettingsBuilder settingsBuilder;
 
     /**
      * Location of the local repository
      *
      * @parameter default-value="${localRepository}"
      */
-    protected ArtifactRepository localRepository;
+    private ArtifactRepository localRepository;
 
     /**
      * Maven builder for Projects
      *
      * @component
      */
-    protected ProjectBuilder projectBuilder;
+    private ProjectBuilder projectBuilder;
 
     /**
      * List of all defined remote repositories from settings.xml
      *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      */
-    protected List<ArtifactRepository> remoteRepositories;
+    List<ArtifactRepository> remoteRepositories;
 
     /**
      * Allow the snapshot repositories defined in settings.xml to be used in the search.
      *
      * @parameter property="allowSnapshots" default-value="true"
      */
-    protected Boolean allowSnapshots;
+    private Boolean allowSnapshots;
 
     /**
      * Select the latest released version of the artifacts found.
      *
      * @parameter property="useLatestOnly" default-value="true"
      */
-    protected Boolean useLatestOnly;
+    Boolean useLatestOnly;
 
     /**
      * Folder to store the DB in
      *
      * @parameter property="indexDirectory" default-value="${project.build.directory}"
      */
-    protected File indexDirectory;
+    private File indexDirectory;
 
     /**
      * List of groupId's to retrieve from the repository.
@@ -144,7 +144,7 @@ abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
     /*
      * Required to process the pom file
      */
-    protected ProjectBuildingRequest buildRequest;
+    private ProjectBuildingRequest buildRequest;
 
     protected void setup() throws MojoExecutionException {
         super.setup();
@@ -161,10 +161,8 @@ abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
      * @return A {@link org.apache.maven.project.MavenProject}
      * @throws org.apache.maven.project.ProjectBuildingException
      *          Error parsing the POM file.
-     * @throws org.apache.maven.settings.building.SettingsBuildingException
-     *          Unable to parse the settings file
      */
-    MavenProject artifactInfo2MavenProject(ArtifactInfo artifactInfo) throws ProjectBuildingException, SettingsBuildingException {
+    MavenProject artifactInfo2MavenProject(ArtifactInfo artifactInfo) throws ProjectBuildingException {
         VersionRange versionRange = VersionRange.createFromVersion(artifactInfo.version);
         Artifact parentArtifact = new DefaultArtifact(artifactInfo.groupId, artifactInfo.artifactId, versionRange, "compile", "pom", null, new DefaultArtifactHandler());
         ProjectBuildingResult buildingResult = projectBuilder.build(parentArtifact, this.buildRequest);
@@ -200,11 +198,11 @@ abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
         }
     }
 
-    public List<String> getGroupFilterPatterns() {
+    List<String> getGroupFilterPatterns() {
         return groupFilterPatterns;
     }
 
-    public DependencyIncludeFilter getIncludeFilter() {
+    DependencyIncludeFilter getIncludeFilter() {
         return includeFilter;
     }
 }

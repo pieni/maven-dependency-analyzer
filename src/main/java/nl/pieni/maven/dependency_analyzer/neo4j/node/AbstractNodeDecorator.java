@@ -267,8 +267,7 @@ public abstract class AbstractNodeDecorator implements Node, DependencyNode, Com
     }
 
     public int compareTo(Node node) {
-        Node n = node;
-        long ourId = this.getId(), theirId = n.getId();
+        long ourId = this.getId(), theirId = node.getId();
 
         if (ourId < theirId) {
             return -1;

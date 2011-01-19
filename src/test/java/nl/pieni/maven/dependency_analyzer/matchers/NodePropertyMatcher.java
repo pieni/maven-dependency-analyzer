@@ -17,25 +17,35 @@
 package nl.pieni.maven.dependency_analyzer.matchers;
 
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import org.mockito.ArgumentMatcher;
+import org.neo4j.graphdb.Node;
+
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 16-1-11
- * Time: 0:08
+ * Date: 18-1-11
+ * Time: 20:47
  * To change this template use File | Settings | File Templates.
  */
-public class GroupNodeDecoratorMatcher extends ArgumentMatcher<GroupNodeDecorator> {
+class NodePropertyMatcher extends ArgumentMatcher<Node> {
+    private Map<String, String> keyValues;
 
-        private String groupId;
+    public NodePropertyMatcher(Map<String, String> keyValues) {
+        this.keyValues = keyValues;
+    }
 
-        public GroupNodeDecoratorMatcher(String groupId) {
-            this.groupId = groupId;
+    @Override
+    public boolean matches(Object argument) {
+        Node node = (Node)argument;
+        for (String key : keyValues.keySet()) {
+            String value = (String)node.getProperty(key);
+            if (!keyValues.get(key).equals(value)) {
+                return false;
+            }
         }
-
-        @Override
-        public boolean matches(Object argument) {
-            return groupId.equals(((GroupNodeDecorator)argument).getGroupId());
-        }
+        return true;
+    }
 }
