@@ -17,7 +17,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <!-- <goal>create</goal> -->
+                            <goal>create</goal>
                             <!-- <goal>report</goal> -->
                             <goal>export-dot</goal>
                         </goals>
@@ -25,15 +25,17 @@
                 </executions>
                 <configuration>
                     <groupFilterPatterns>
-                        <groupFilterPattern>nl.rabobank</groupFilterPattern>
+                        <groupFilterPattern>nl.rabobank*</groupFilterPattern>
                     </groupFilterPatterns>
                     <packaging>
                         <package>jar</package>
                         <package>war</package>
                         <package>ear</package>
                     </packaging>
+                    <includeVersions>true</includeVersions>
                     <includeFilterPatterns>
-                        <includeFilterPattern>junit</includeFilterPattern>
+                        <includeFilterPattern>*</includeFilterPattern>
+                        <!--<includeFilterPattern>junit*</includeFilterPattern>-->
                     </includeFilterPatterns>
                     <reportArtifacts>
                         <reportArtifact>junit:junit</reportArtifact>
