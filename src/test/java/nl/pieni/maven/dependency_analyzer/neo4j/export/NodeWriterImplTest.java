@@ -40,11 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 18-1-11
- * Time: 16:35
- * To change this template use File | Settings | File Templates.
+ * Node writer test cases
  */
 public class NodeWriterImplTest {
 

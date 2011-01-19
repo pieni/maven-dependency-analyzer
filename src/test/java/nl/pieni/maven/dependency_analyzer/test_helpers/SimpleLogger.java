@@ -20,11 +20,7 @@ package nl.pieni.maven.dependency_analyzer.test_helpers;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 15-1-11
- * Time: 21:37
- * To change this template use File | Settings | File Templates.
+ * Log implementation for test classes
  */
 public class SimpleLogger implements Log {
     @Override

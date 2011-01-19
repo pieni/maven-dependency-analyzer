@@ -25,26 +25,24 @@ import java.util.List;
  * Include filter for the list of dependencies supplied.
  * (See http://maven.apache.org/shared/maven-common-artifact-filters/source-repository.html)
  */
-public class DependencyIncludeFilter extends AbstractIncludeFilter{
-    //The pattern list
-    private final List<String> patterns;
+public class DependencyIncludeFilter extends AbstractIncludeFilter<List<Dependency>, List<Dependency>> {
 
     /**
      * Default constructor
      * @param includePatterns patters to include
      */
     public DependencyIncludeFilter(final List<String> includePatterns) {
-        this.patterns = includePatterns;
+        super(includePatterns);
     }
 
     /**
      * Perform a filtering
-     * @param dependencies list of dependencies to filter
+     * @param toFilter list of dependencies to filter
      * @return filtered list
      */
-    public List<Dependency> filter(final List<Dependency> dependencies) {
+    public List<Dependency> filter(final List<Dependency> toFilter) {
         List<Dependency> result = new ArrayList<Dependency>();
-        for (Dependency gav : dependencies) {
+        for (Dependency gav : toFilter) {
             boolean add = include(gav);
             if (add) {
                 result.add(gav);

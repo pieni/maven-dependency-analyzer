@@ -16,14 +16,31 @@
 
 package nl.pieni.maven.dependency_analyzer.filter;
 
+import org.apache.maven.model.Dependency;
+
+import java.util.List;
+
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 18-1-11
- * Time: 21:40
- * To change this template use File | Settings | File Templates.
+ * Abstract base class for pattern matching on artifacts (i.e. the GAV coordinates)
+ * (@See http://maven.apache.org/shared/maven-common-artifact-filters/source-repository.html)
  */
-public class AbstractIncludeFilter {
+public abstract class AbstractIncludeFilter<T, R> {
+
+    //The pattern list
+    final List<String> patterns;
+
+    AbstractIncludeFilter(List<String> patterns) {
+        this.patterns = patterns;
+    }
+
+    /**
+     * Perform a filtering
+     *
+     * @param toFilter the Type to filter list of dependencies to filter
+     * @return R the result of the filtering
+     */
+    abstract public R filter(final T toFilter);
+
     /**
      * Gets whether the specified token matches the specified pattern segment.
      *

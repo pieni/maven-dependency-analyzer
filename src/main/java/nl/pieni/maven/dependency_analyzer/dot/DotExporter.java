@@ -20,11 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 12-1-11
- * Time: 21:21
- * To change this template use File | Settings | File Templates.
+ * Interface for Exporting the Graph to a Dot file.
  */
 public interface DotExporter {
 

@@ -20,14 +20,10 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import org.mockito.ArgumentMatcher;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 16-1-11
- * Time: 0:11
- * To change this template use File | Settings | File Templates.
+ * Matcher for test cases
  */
 public class VersionNodeDecoratorMatcher extends ArgumentMatcher<VersionNodeDecorator> {
-    private String version;
+    private final String version;
 
     public VersionNodeDecoratorMatcher(String version) {
         this.version = version;

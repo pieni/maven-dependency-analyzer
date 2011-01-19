@@ -116,8 +116,6 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
     }
 
     private String findExistingPath(Dependency dependency) {
-        String key = NodeProperties.GROUP_ID;
-        boolean found = false;
         String groupId = dependency.getGroupId();
         StringTokenizer strTok = new StringTokenizer(groupId, ".");
         String searchGroup = "";

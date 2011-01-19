@@ -136,7 +136,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
     /**
      * Convert the {@link Dependency} scope attribute to a {@link RelationshipType}
      *
-     * @param dependency
+     * @param dependency the dependency
      * @return the {@link RelationshipType}
      */
     private RelationshipType determineRelationType(final Dependency dependency) {

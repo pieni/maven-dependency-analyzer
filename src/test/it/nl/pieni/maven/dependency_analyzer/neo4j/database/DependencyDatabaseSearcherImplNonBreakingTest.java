@@ -55,7 +55,7 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
 
     /**
      * Setup for the tests
-     * @throws IOException
+     * @throws IOException in case of error
      */
     @BeforeClass
     public static void beforeClass() throws IOException {

@@ -36,34 +36,47 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 15-1-11
- * Time: 23:10
- * To change this template use File | Settings | File Templates.
+ * Implementation of a DOT (@see http://graphviz.org) format Node file.
  */
 public class NodeWriterImpl implements NodeWriter {
 
-    private Writer writer;
+    private final Writer writer;
     private final String lineSeparator = System.getProperty("line.separator");
     private final Log LOG;
-    private Set<Node> visitedNodes = new HashSet<Node>();
-    private Set<Relationship> visitedRelations = new HashSet<Relationship>();
+    private final Set<Node> visitedNodes = new HashSet<Node>();
+    private final Set<Relationship> visitedRelations = new HashSet<Relationship>();
 
-    public NodeWriterImpl(Writer osWriter, Log LOG) throws IOException {
+    /**
+     * Default constructor
+     * @param writer the putput stream writer
+     * @param LOG the Logger
+     * @throws IOException in case of error
+     */
+    public NodeWriterImpl(Writer writer, Log LOG) throws IOException {
         this.LOG = LOG;
-        this.writer = osWriter;
+        this.writer = writer;
         startGraph();
     }
 
+    /**
+     * Insert the standard start of a DOT graph
+     * @throws IOException in case of error
+     */
     private void startGraph() throws IOException {
         writer.write(" digraph G {" + lineSeparator);
     }
 
+    /**
+     * End the graph correctly
+     * @throws IOException in case of error;
+     */
     private void endGraph() throws IOException {
         writer.write("}");
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
         LOG.debug("Closing file");
@@ -74,6 +87,9 @@ public class NodeWriterImpl implements NodeWriter {
         writer.close();
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeNode(VersionNodeDecorator node) throws IOException {
         if (visitedNodes.add(node)) {
@@ -85,6 +101,9 @@ public class NodeWriterImpl implements NodeWriter {
     }
 
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeRootNode(Node node) throws IOException {
         if (visitedNodes.add(node)) {
@@ -93,9 +112,12 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeNode(ArtifactNodeDecorator node) throws IOException {
-        if (visitedNodes.add((Node)node)) {
+        if (visitedNodes.add(node)) {
             LOG.debug("Writing ArtifactNode " + node);
             String artifactId = node.getArtifactId();
             long nodeId = node.getId();
@@ -103,6 +125,9 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeNode(GroupNodeDecorator node) throws IOException {
         if (visitedNodes.add(node)) {
@@ -113,6 +138,9 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeRelation(Relationship relationship) throws IOException {
         if (visitedRelations.add(relationship)) {
@@ -123,19 +151,32 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
-    public void writeNode(GroupNodeDecorator current, GroupNodeDecorator previous) throws IOException {
-        if (visitedNodes.add(current)) {
+    public void writeNode(GroupNodeDecorator currentNode, GroupNodeDecorator previous) throws IOException {
+        if (visitedNodes.add(currentNode)) {
             LOG.debug("Writing GroupNode " + previous);
-            writeNode(current.getId(), getAddedGroupIdPart(current.getGroupId(), previous.getGroupId()), NodeShape.folder);
+            writeNode(currentNode.getId(), getAddedGroupIdPart(currentNode.getGroupId(), previous.getGroupId()), NodeShape.folder);
         }
     }
 
+        /**
+     * {@inheritDoc}
+     */
     @Override
-    public void writeReferenceRelation(Node refNode, Node refNodeRelation) throws IOException {
-        writer.write("\tN" + refNode.getId() + " -> " + "N" + refNodeRelation.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
+    public void writeReferenceRelation(Node refNode, Node childNode) throws IOException {
+        writer.write("\tN" + refNode.getId() + " -> " + "N" + childNode.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
     }
 
+    /**
+     * Determine the part of the groupId that is added.
+     * current.length() > previous.length()
+     * @param current the current value (full path)
+     * @param previous the previous part
+     * @return the difference.
+     */
     private String getAddedGroupIdPart(String current, String previous) {
         StringTokenizer stringTokenizer = new StringTokenizer(previous, ".");
         String tmp = "";
@@ -151,6 +192,13 @@ public class NodeWriterImpl implements NodeWriter {
         return current.substring(match.length(), current.length());
     }
 
+    /**
+     * Actual write of the Node to the writer
+     * @param id the Id
+     * @param labelText the label text
+     * @param shape the shape of the node
+     * @throws IOException in case of error
+     */
     private void writeNode(long id, String labelText, NodeShape shape) throws IOException {
         writer.write("\tN" + id + " [label=\"" + labelText + "\"" + " shape=" + shape + "]" + lineSeparator);
     }

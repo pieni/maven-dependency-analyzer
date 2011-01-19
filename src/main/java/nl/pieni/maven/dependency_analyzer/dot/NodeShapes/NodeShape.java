@@ -17,11 +17,7 @@
 package nl.pieni.maven.dependency_analyzer.dot.NodeShapes;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 16-1-11
- * Time: 0:58
- * To change this template use File | Settings | File Templates.
+ * Shapes supported by DOT
  */
 public enum NodeShape {
     box,

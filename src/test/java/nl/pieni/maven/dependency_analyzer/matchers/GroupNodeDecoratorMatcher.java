@@ -20,15 +20,11 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import org.mockito.ArgumentMatcher;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 16-1-11
- * Time: 0:08
- * To change this template use File | Settings | File Templates.
+ * Matcher for GroupNodes
  */
 public class GroupNodeDecoratorMatcher extends ArgumentMatcher<GroupNodeDecorator> {
 
-        private String groupId;
+        private final String groupId;
 
         public GroupNodeDecoratorMatcher(String groupId) {
             this.groupId = groupId;

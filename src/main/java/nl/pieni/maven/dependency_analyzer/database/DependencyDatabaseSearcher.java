@@ -55,9 +55,9 @@ public interface DependencyDatabaseSearcher<N> {
 
 
     /**
-     * //TODO JAVADOC
-     * @param partialGroupId
-     * @return
+     * Find a partial groupId
+     * @param partialGroupId the part
+     * @return the node that matches
      */
     GroupNode findGroupNode(String partialGroupId);
 

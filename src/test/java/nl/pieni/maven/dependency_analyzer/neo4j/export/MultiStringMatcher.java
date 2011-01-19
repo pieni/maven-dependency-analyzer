@@ -19,14 +19,10 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export;
 import org.mockito.ArgumentMatcher;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 18-1-11
- * Time: 17:25
- * To change this template use File | Settings | File Templates.
+ * Specialized matcher for test cases
  */
 class MultiStringMatcher extends ArgumentMatcher<String> {
-    private String[] matchList;
+    private final String[] matchList;
 
     public MultiStringMatcher(String[] matchList) {
         this.matchList = matchList;

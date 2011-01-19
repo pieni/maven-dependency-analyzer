@@ -33,19 +33,26 @@ import org.neo4j.graphdb.Relationship;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 18-1-11
- * Time: 21:20
- * To change this template use File | Settings | File Templates.
- */
+ * Pattern matcher for for Nodes.
+ * depends of the {@link GAVIncludeFilter} for its processing.
+ * Determines if a {@link Node} must be included in the file exported
+ **/
 class IncludeFilterPatternMatcher {
     private final GAVIncludeFilter gavIncludeFilter;
 
+    /**
+     * Default constructor
+     * @param includeFilterPatterns the patters to match {@link GAVIncludeFilter} for format
+     */
     public IncludeFilterPatternMatcher(List<String> includeFilterPatterns) {
         this.gavIncludeFilter = new GAVIncludeFilter(includeFilterPatterns);
     }
 
+    /**
+     * Test to see of the provided node must be included
+     * @param node the Node
+     * @return true when it must be included
+     */
     public boolean include(Node node) {
         if (!node.hasProperty(NodeProperties.NODE_TYPE)) {
             throw new IllegalArgumentException("Matcher can not be called with a non Dependency node");
@@ -65,6 +72,11 @@ class IncludeFilterPatternMatcher {
         }
     }
 
+    /**
+     * Perform the matching for an GroupNode
+     * @param node the artifact node
+     * @return true when matches
+     */
     private boolean matchGroupNode(Node node) {
         GroupNodeDecorator groupNode = new GroupNodeDecorator(node);
         String gav = groupNode.getGroupId();
@@ -72,18 +84,22 @@ class IncludeFilterPatternMatcher {
             return true;
         }
 
-        //Due to the structure of the DB "nl.pieni.maven" is stored as: nl -> nl.pieni -> nl.pieni.maven
-        //So a false match needs some more work to be false
         return hasMatchFurtherDown(groupNode);
 
     }
 
+    /**
+     * Due to the structure of the DB "nl.pieni.maven" is stored as: nl -> nl.pieni -> nl.pieni.maven
+     * So a false match needs some more work to be false
+     * @param groupNodeDecorator the GroupNode
+     * @return true when a match is found
+     */
     private boolean hasMatchFurtherDown(GroupNodeDecorator groupNodeDecorator) {
 
         Iterable<Relationship> relationships = groupNodeDecorator.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
         for (Relationship relationship : relationships) {
             Node otherNode = relationship.getOtherNode(groupNodeDecorator);
-            if (NodeType.ArtifactNode == NodeType.fromString((String)otherNode.getProperty(NodeProperties.NODE_TYPE.toString()))) {
+            if (NodeType.ArtifactNode == NodeType.fromString((String)otherNode.getProperty(NodeProperties.NODE_TYPE))) {
                 return matchArtifactNode(otherNode);
             }
 
@@ -93,6 +109,11 @@ class IncludeFilterPatternMatcher {
         return false;
     }
 
+    /**
+     * Match an ArtifactNode
+     * @param node the Node
+     * @return true when matched
+     */
     private boolean matchArtifactNode(Node node) {
         ArtifactNode artifactNode = new ArtifactNodeDecorator(node);
         GroupNode groupNode = artifactNode.getParent();
@@ -100,6 +121,11 @@ class IncludeFilterPatternMatcher {
         return gavIncludeFilter.filter(gav);
     }
 
+    /**
+     * Match a version node
+     * @param node the Node
+     * @return true when matched
+     */
     private boolean matchVersionNode(Node node) {
         VersionNode versionNode = new VersionNodeDecorator(node);
         ArtifactNode artifactNode = versionNode.getParent();
@@ -107,5 +133,4 @@ class IncludeFilterPatternMatcher {
         String gav = groupNode.getGroupId() + ":" + artifactNode.getArtifactId() + ":" + versionNode.getVersion();
         return gavIncludeFilter.filter(gav);
     }
-
 }

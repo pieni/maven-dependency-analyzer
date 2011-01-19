@@ -25,17 +25,13 @@ import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.node.GroupNode;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +46,7 @@ public class DotExporterImpl implements DotExporter {
     private final Log LOG;
     private NodeWriter nodeWriter;
     private Node lastGroupNode = null;
-    private Set<Node> refNodeRelations = new HashSet<Node>();
+    private final Set<Node> refNodeRelations = new HashSet<Node>();
     private IncludeFilterPatternMatcher includeFilterPatternMatcher;
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, boolean includeVersions, Log log) {
@@ -118,10 +114,7 @@ public class DotExporterImpl implements DotExporter {
             case GroupNode:
                 return doGroupNode(node);
             case VersionNode:
-                if (includeVersions) {
-                    return doVersionNode(node);
-                }
-                return false;
+                return includeVersions && doVersionNode(node);
             default:
                 throw new IllegalArgumentException("NodeType: " + nodeType + " is not valid in this context");
         }
@@ -179,8 +172,9 @@ public class DotExporterImpl implements DotExporter {
     }
 
     /**
-     * Create a string represention of the node
+     * Create a string representation of the node
      *
+     * @param node the Node
      * @return a String
      */
     String nodeToString(Node node) {

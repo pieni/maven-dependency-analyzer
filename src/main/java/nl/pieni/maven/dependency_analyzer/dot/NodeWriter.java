@@ -26,26 +26,65 @@ import org.neo4j.graphdb.RelationshipType;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 15-1-11
- * Time: 23:39
- * To change this template use File | Settings | File Templates.
+ * Interface to the NodeWriter
  */
 public interface NodeWriter {
+    /**
+     * Close the file
+     * @throws IOException in case of error
+     */
     void close() throws IOException;
 
+    /**
+     * Write a Node
+     * @param node the Node
+     * @throws IOException in case of error
+     */
     void writeNode(VersionNodeDecorator node) throws IOException;
 
+    /**
+     * Write the root or reference node
+     * @param node the Node
+     * @throws IOException in case of error
+     */
     void writeRootNode(Node node) throws IOException;
 
+    /**
+     * Write an ArtifactNode
+     * @param node the Node
+     * @throws IOException in case of error
+     */
     void writeNode(ArtifactNodeDecorator node) throws IOException;
 
+    /**
+     * Write a GRoupNode
+     * @param node the Node
+     * @throws IOException in case of error
+     */
     void writeNode(GroupNodeDecorator node) throws IOException;
 
-    void writeRelation(Relationship type) throws IOException;
+    /**
+     * Write a Relation
+     * @param relationship the relation
+     * @throws IOException in case of error
+     */
+    void writeRelation(Relationship relationship) throws IOException;
 
-    void writeNode(GroupNodeDecorator groupNodeDecorator, GroupNodeDecorator lastGroupNode) throws IOException;
+    /**
+     * Write a Node that requires some tweaking. i.e. not the entire path must be printed in the
+     * Node. A part (the lastGroupNode) is already printed.
+     * @param currentNode the node to print
+     * @param lastGroupNode the previous node in the graph
+     * @throws IOException un case of error
+     */
+    void writeNode(GroupNodeDecorator currentNode, GroupNodeDecorator lastGroupNode) throws IOException;
 
-    void writeReferenceRelation(Node refNode, Node refNodeRelation) throws IOException;
+    /**
+     * Write the top level nodes. i.e. the references from the root (refnode) to the ones
+     * directly below it.
+     * @param refNode the refNode
+     * @param childNode the relation.
+     * @throws IOException in case of error
+     */
+    void writeReferenceRelation(Node refNode, Node childNode) throws IOException;
 }

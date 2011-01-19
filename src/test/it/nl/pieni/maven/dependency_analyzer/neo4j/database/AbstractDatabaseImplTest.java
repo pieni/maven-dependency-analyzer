@@ -61,7 +61,9 @@ public abstract class AbstractDatabaseImplTest {
 
         File basedir = new File(BASE_TEST_LOCATION);
         if (!basedir.exists()) {
-            basedir.mkdir();
+            if (!basedir.mkdir()) {
+                throw new IOException("Unable to create file");
+            }
         }
 
         temp = File.createTempFile("test-db", "xx", basedir);

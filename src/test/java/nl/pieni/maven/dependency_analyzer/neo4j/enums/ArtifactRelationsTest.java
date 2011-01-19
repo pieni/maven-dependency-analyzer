@@ -7,7 +7,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * Artifact Relations tests
  */
-public class ArtifactRelationsTest2 {
+public class ArtifactRelationsTest {
 
     /**
      * Verify all defined relations

@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.matchers;
+package nl.pieni.maven.dependency_analyzer.dot.nodeshapes;
 
-import org.mockito.ArgumentMatcher;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
+import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
+import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
- * Matcher for test cases
+ * Code coverage test class
  */
-public class RelationshipMatcher extends ArgumentMatcher<Relationship> {
+public class NodeShapeTest {
 
-    private final RelationshipType relationshipType;
-
-    public RelationshipMatcher(RelationshipType relationshipType) {
-        this.relationshipType = relationshipType;
-    }
-
-    @Override
-    public boolean matches(Object argument) {
-        return ((Relationship)argument).getType().equals(relationshipType);
+    /**
+     * Verify all defined relations
+     */
+    @Test
+    public void nodeShapeTest() {
+        NodeShape[] values = NodeShape.values();
+        for (NodeShape shape : values) {
+            NodeShape value = NodeShape.valueOf(shape.toString());
+            assertEquals(value, shape);
+        }
     }
 }

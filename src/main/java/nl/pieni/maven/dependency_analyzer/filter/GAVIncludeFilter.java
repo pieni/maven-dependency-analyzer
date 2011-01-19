@@ -16,21 +16,12 @@
 
 package nl.pieni.maven.dependency_analyzer.filter;
 
-import org.apache.maven.model.Dependency;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 18-1-11
- * Time: 21:36
- * To change this template use File | Settings | File Templates.
+ * Filter for GAV coordinates
  */
-public class GAVIncludeFilter extends AbstractIncludeFilter {
-    //The pattern list
-    private final List<String> patterns;
+public class GAVIncludeFilter extends AbstractIncludeFilter<String, Boolean> {
 
     /**
      * Default constructor
@@ -38,12 +29,12 @@ public class GAVIncludeFilter extends AbstractIncludeFilter {
      * @param includePatterns patters to include
      */
     public GAVIncludeFilter(final List<String> includePatterns) {
-        this.patterns = includePatterns;
+        super(includePatterns);
     }
 
-    public boolean filter(final String gavString) {
+    public Boolean filter(final String toFilter) {
         for (String pattern : patterns) {
-            if (include(gavString, pattern)) {
+            if (include(toFilter, pattern)) {
                 return true;
             }
         }

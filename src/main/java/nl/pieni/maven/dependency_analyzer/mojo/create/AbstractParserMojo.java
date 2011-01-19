@@ -46,11 +46,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 5-1-11
- * Time: 23:04
- * To change this template use File | Settings | File Templates.
+ * Abstract base class for the creational Mojo's
  */
 abstract public class AbstractParserMojo extends AbstractAnalyzeMojo {
 
