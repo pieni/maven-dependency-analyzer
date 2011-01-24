@@ -24,5 +24,9 @@ import java.util.List;
  */
 public interface DotExporter {
 
-    void export(List<String> includeFilterPatterns, NodeWriter writer) throws IOException;
+    void setIncludePatters(List<String> includeFilterPatterns);
+
+    void setIncludeVersions(boolean includeVersions);
+
+    void export(NodeWriter writer) throws IOException;
 }

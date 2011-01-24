@@ -90,6 +90,7 @@ public class NodeWriterImpl implements NodeWriter {
         endGraph();
         LOG.info("Exported " + visitedNodes.size() + " nodes");
         LOG.info("Exported " + visitedRelations.size() + " edges");
+        LOG.info("Exported " + nodeNodeRelations.size() + " edges (node2node");
         writer.flush();
         writer.close();
     }
@@ -153,7 +154,7 @@ public class NodeWriterImpl implements NodeWriter {
         if (visitedRelations.add(relationship)) {
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
-            if (isScoperelation(relationship)) {
+            if (isScoperelation(relationship.getType())) {
                 LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
                 writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\" style=dotted]" + lineSeparator);
             } else {
@@ -163,11 +164,9 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
-    private boolean isScoperelation(Relationship relationship) {
-        for (RelationshipType dependencyScopeRelation : DependencyScopeRelations.values()) {
-            if (relationship.isType(dependencyScopeRelation)) {
-                return true;
-            }
+    private boolean isScoperelation(RelationshipType relationship) {
+        if (relationship instanceof DependencyScopeRelations) {
+            return true;
         }
         return false;
     }
@@ -180,7 +179,7 @@ public class NodeWriterImpl implements NodeWriter {
         if (visitedNodes.add(currentNode)) {
             LOG.debug("Writing GroupNode " + previous);
             writeNode(currentNode.getId(), getAddedGroupIdPart(currentNode.getGroupId(), previous.getGroupId()), NodeShape.folder);
-            writeNode2NodeRelation(previous, currentNode);
+            writeNode2NodeRelation(previous, currentNode, ArtifactRelations.has);
         }
     }
 
@@ -188,17 +187,21 @@ public class NodeWriterImpl implements NodeWriter {
      * {@inheritDoc}
      */
     @Override
-    public void writeNode2NodeRelation(Node refNode, Node childNode) throws IOException {
+    public void writeNode2NodeRelation(Node startNode, Node endNode, RelationshipType type) throws IOException {
 
-        Set<Node> related = nodeNodeRelations.get(refNode);
+        Set<Node> related = nodeNodeRelations.get(startNode);
         if (related == null) {
             related = new HashSet<Node>();
-            nodeNodeRelations.put(refNode, related);
+            nodeNodeRelations.put(startNode, related);
         }
 
-        if (related.add(childNode)) {
-            LOG.debug("Writing Node 2 Node Relation " + refNode + " -> "+ childNode);
-            writer.write("\tN" + refNode.getId() + " -> " + "N" + childNode.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
+        if (related.add(endNode)) {
+            LOG.debug("Writing Node 2 Node Relation " + startNode + " -> " + endNode + " type = " + type);
+            if (isScoperelation(type)) {
+                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\" style=dotted]" + lineSeparator);
+            } else {
+                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\"]" + lineSeparator);
+            }
         }
     }
 

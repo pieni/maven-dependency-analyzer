@@ -139,7 +139,7 @@ public class NodeWriterImplTest {
         Node refNode = mock(Node.class);
         when(groupNode.getId()).thenReturn(1L);
         when(refNode.getId()).thenReturn(0L);
-        writer.writeNode2NodeRelation(refNode, groupNode);
+        writer.writeNode2NodeRelation(refNode, groupNode, ArtifactRelations.has);
         writer.close();
         verifyDotFile();
         verify(outputWriter).write(argThat(new MultiStringMatcher(new String[]{"N0 -> N1", ArtifactRelations.has.toString()})));

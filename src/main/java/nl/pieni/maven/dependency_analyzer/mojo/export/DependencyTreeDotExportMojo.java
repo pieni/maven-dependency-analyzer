@@ -65,13 +65,15 @@ class DependencyTreeDotExportMojo extends AbstractReportMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.setup();
 
-        DotExporter exporter=new DotExporterImpl(getDatabase(), includeVersions, getLog());
+        DotExporter exporter=new DotExporterImpl(getDatabase(), getLog());
+        exporter.setIncludeVersions(includeVersions);
+        exporter.setIncludePatters(includeFilterPatterns);
 
         try {
             FileOutputStream fos = new FileOutputStream(dotFile);
             Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
             NodeWriter writer = new NodeWriterImpl(osWriter, getLog());
-            exporter.export(includeFilterPatterns, writer);
+            exporter.export(writer);
         } catch (IOException e) {
             getLog().error("Error creating output for reporting");
             throw new MojoExecutionException("Error creating output for reporting", e);

@@ -24,6 +24,7 @@ import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.matchers.ArtifactNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.RelationshipMatcher;
+import nl.pieni.maven.dependency_analyzer.matchers.RelationshipTypeMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.VersionNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.AbstractDatabaseImplTest;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
@@ -36,6 +37,7 @@ import org.apache.maven.model.Dependency;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
@@ -63,11 +65,11 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
     private static DotExporter exporter;
     private static final String BASE_GROUP_ID = "nl.pieni.maven";
     private int dependencyCnt;
-    private final List<String> emptyIncludeList;
+    private final List<String> starIncludeList;
 
     public DotExporterImplTest() {
-        this.emptyIncludeList = new ArrayList<String>();
-        this.emptyIncludeList.add("*");
+        this.starIncludeList = new ArrayList<String>();
+        this.starIncludeList.add("*");
     }
 
 
@@ -91,13 +93,17 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency = getDependency(BASE_GROUP_ID);
         processor.addArtifact(dependency);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
+        exporter.setIncludePatters(starIncludeList);
+        exporter.export(writer);
 
         verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency.getArtifactId())));
         verify(writer).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency.getVersion())));
+        verify(writer, times(4)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
+        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
     }
 
     @Test
@@ -110,37 +116,42 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
+        exporter.setIncludePatters(starIncludeList);
+        exporter.export(writer);
 
         verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
         verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+        verify(writer, times(5)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
+        verify(writer, times(2)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
     }
 
     @Test
     public void testTwoArtifactDifferentGroupId() throws IOException {
 
-        Dependency dependency_1 = getDependency(BASE_GROUP_ID + ".i_1");
+        Dependency dependency_1 = getDependency("nl.pieni.maven");
         processor.addArtifact(dependency_1);
 
-        Dependency dependency_2 = getDependency(BASE_GROUP_ID + ".i_2");
+        Dependency dependency_2 = getDependency("org.pieni.maven");
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
+        exporter.setIncludePatters(starIncludeList);
+        exporter.export(writer);
 
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
         verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, times(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, times(4)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+        verify(writer, times(2)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
+        verify(writer, times(8)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
     }
 
 
@@ -154,15 +165,19 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
+        exporter.setIncludePatters(starIncludeList);
+        exporter.export(writer);
 
         verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+        verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+        verify(writer, times(6)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
+        verify(writer, times(2)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
     }
 
     @Test
@@ -177,65 +192,25 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         dependency_2.setScope("compile");
         processor.addRelation(dependency_1, dependency_2);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
+        exporter.setIncludePatters(starIncludeList);
+        exporter.export(writer);
 
         verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
         verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, atLeast(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, atLeast(3)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.depends)));
+        verify(writer, times(2)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
+        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(DependencyScopeRelations.compile)));
+        verify(writer, times(6)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
+        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.depends)));
     }
 
     @Test
-    public void testTwoArtifactDifferentTopLevelGroup() throws IOException {
-        String groupId_1 = "nl.pieni.maven";
-
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-        String groupId_2 = "org.pieni.maven";
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-
-        exporter = new DotExporterImpl(database, true, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_1)));
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_2)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-        verify(writer, times(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, times(2)).writeNode2NodeRelation(any(Node.class), any(Node.class));
-    }
-
-    @Test
-    public void testIncludeStarVersionsTwoArtifact() throws IOException {
-        String groupId = BASE_GROUP_ID;
-
-        Dependency dependency_1 = getDependency(groupId);
-        processor.addArtifact(dependency_1);
-
-        Dependency dependency_2 = getDependency(groupId);
-        processor.addArtifact(dependency_2);
-
-        exporter = new DotExporterImpl(database, false, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        exporter.export(emptyIncludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-    }
-
-    @Test
-    public void testIncludeListNoDependency() throws IOException {
+    public void testIncludeListTwoTreesNoDependencies() throws IOException {
         String groupId_1 = "nl.pieni.maven";
         Dependency dependency_1 = getDependency(groupId_1);
         processor.addArtifact(dependency_1);
@@ -244,324 +219,259 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId_2);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, true, log);
+        exporter = new DotExporterImpl(database, log);
+        exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_1)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, times(1)).writeNode2NodeRelation(any(Node.class), any(Node.class));
-    }
-
-    @Test
-    public void testIncludeListWithStarNoDependency() throws IOException {
-        String groupId_1 = "nl.pieni.maven";
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-        String groupId_2 = "nl.pieni.maven.xx";
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-
-        exporter = new DotExporterImpl(database, true, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven*");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_1)));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, times(1)).writeNode2NodeRelation(any(Node.class), any(Node.class));
-    }
-
-    @Test
-    public void testIncludeListSingleCompileDependency() throws IOException {
-        String groupId = BASE_GROUP_ID;
-        Dependency dependency_1 = getDependency(groupId);
-        processor.addArtifact(dependency_1);
-
-        groupId = groupId + ".cgi_1";
-        Dependency dependency_2 = getDependency(groupId);
-        processor.addArtifact(dependency_2);
-        dependency_2.setScope("compile");
-        processor.addRelation(dependency_1, dependency_2);
-
-        exporter = new DotExporterImpl(database, true, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-    }
-
-    @Test
-    public void testIncludeListSingleCompileDependencyNoVersions() throws IOException {
-        String groupId = BASE_GROUP_ID;
-        Dependency dependency_1 = getDependency(groupId);
-        processor.addArtifact(dependency_1);
-
-        groupId = groupId + ".cgi_1";
-        Dependency dependency_2 = getDependency(groupId);
-        processor.addArtifact(dependency_2);
-        dependency_2.setScope("compile");
-        processor.addRelation(dependency_1, dependency_2);
-
-        exporter = new DotExporterImpl(database, false, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-    }
-
-    @Test
-    public void testIncludeListSingleCompileDependencyExcludePart() throws IOException {
-        String groupId = BASE_GROUP_ID;
-        Dependency dependency_1 = getDependency(groupId);
-        processor.addArtifact(dependency_1);
-
-        groupId = groupId + ".cgi_1";
-        Dependency dependency_2 = getDependency(groupId);
-        processor.addArtifact(dependency_2);
-        dependency_2.setScope("compile");
-        processor.addRelation(dependency_1, dependency_2);
-
-        groupId = "a.b.c";
-        Dependency dependency_3 = getDependency(groupId);
-        processor.addArtifact(dependency_3);
-        dependency_3.setScope("compile");
-        processor.addRelation(dependency_1, dependency_3);
-
-        exporter = new DotExporterImpl(database, true, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-    }
-
-    @Test
-    public void testIncludeListSingleCompileDependencyWithStar() throws IOException {
-        String groupId = BASE_GROUP_ID;
-        Dependency dependency_1 = getDependency(groupId);
-        processor.addArtifact(dependency_1);
-
-        groupId = groupId + ".cgi_1";
-        Dependency dependency_2 = getDependency(groupId);
-        processor.addArtifact(dependency_2);
-        dependency_2.setScope("compile");
-        processor.addRelation(dependency_1, dependency_2);
-
-        exporter = new DotExporterImpl(database, true, log);
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.maven*");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
-        verify(writer, atLeast(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
-        verify(writer, atLeast(3)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
-        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.depends)));
-    }
-
-
-    @Test
-    public void testFilterWithStartSingleArtifact() throws IOException {
-        Dependency dependency = getDependency(BASE_GROUP_ID);
-        processor.addArtifact(dependency);
-
-        exporter = new DotExporterImpl(database, true, log);
-
-        NodeWriter writer = mock(NodeWriter.class);
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add("nl.pieni.*");
-        exporter.export(excludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency.getArtifactId())));
-        verify(writer).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency.getVersion())));
-    }
-
-    @Test
-    public void testTwoGroupsAndArtifacts() throws IOException {
-        String groupId_1 = BASE_GROUP_ID + ".group_1";
-        String groupId_2 = BASE_GROUP_ID + ".group_2";
-
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-
-        exporter = new DotExporterImpl(database, false, log);
-        NodeWriter writer = mock(NodeWriter.class);
-//        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
-//        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
-//        NodeWriter writer = new NodeWriterImpl(osWriter, log);
-
-        exporter.export(emptyIncludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-    }
-
-    @Test
-    public void testFourGroupsAndArtifacts() throws IOException {
-        String groupId_1 = BASE_GROUP_ID + ".group_1";
-        String groupId_2 = BASE_GROUP_ID + ".group_2";
-        String groupId_3 = BASE_GROUP_ID + ".group_2.a";
-        String groupId_4 = BASE_GROUP_ID + ".group_3.b";
-
-
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-        Dependency dependency_3 = getDependency(groupId_3);
-        processor.addArtifact(dependency_3);
-        Dependency dependency_4 = getDependency(groupId_4);
-        processor.addArtifact(dependency_4);
-
-        exporter = new DotExporterImpl(database, false, log);
-        NodeWriter writer = mock(NodeWriter.class);
-//        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
-//        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
-//        NodeWriter writer = new NodeWriterImpl(osWriter, log);
-
-        exporter.export(emptyIncludeList, writer);
-
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId()))
-        );
-
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId()))
-        );
-
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID + ".group_2"))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId()))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId()))
-        );
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_3.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_4.getArtifactId())));
-    }
-
-@Test
-    public void testFourGroupsAndArtifactsWithExclude() throws IOException {
-        String groupId_1 = BASE_GROUP_ID + ".group_1";
-        String groupId_2 = BASE_GROUP_ID + ".group_2";
-        String groupId_3 = BASE_GROUP_ID + ".group_2.a";
-        String groupId_4 = "com.pieni.xx" + ".group_3.b";
-
-
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-        Dependency dependency_3 = getDependency(groupId_3);
-        processor.addArtifact(dependency_3);
-        Dependency dependency_4 = getDependency(groupId_4);
-        processor.addArtifact(dependency_4);
-
-        exporter = new DotExporterImpl(database, false, log);
-//        NodeWriter writer = mock(NodeWriter.class);
-        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
-        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
-        NodeWriter writer = new NodeWriterImpl(osWriter, log);
         List<String> includeList = new ArrayList<String>();
-        includeList.add(BASE_GROUP_ID + "*");
-        exporter.export(includeList, writer);
+        includeList.add("nl.pieni.maven*");
+        exporter.setIncludePatters(includeList);
+        exporter.export(writer);
 
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId()))
-        );
+        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+        verify(writer).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+        verify(writer, times(4)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
+        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
 
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId()))
-        );
+    }
 
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID + ".group_2"))
-        );
-        verify(writer, atLeast(1)).writeNode(
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
-                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId()))
-        );
+    //    @Test
+//    public void testIncludeListWithStarNoDependency() throws IOException {
+//        String groupId_1 = "nl.pieni.maven";
+//        Dependency dependency_1 = getDependency(groupId_1);
+//        processor.addArtifact(dependency_1);
+//
+//        String groupId_2 = "nl.pieni.maven.xx";
+//        Dependency dependency_2 = getDependency(groupId_2);
+//        processor.addArtifact(dependency_2);
+//
+//        exporter = new DotExporterImpl(database, true, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.maven*");
+//        exporter.setIncludePatters(excludeList);
+//        exporter.export(writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_1)));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+//        verify(writer, times(1)).writeNode2NodeRelation(any(Node.class), any(Node.class));
+//    }
+//
+//    @Test
+//    public void testIncludeListSingleCompileDependency() throws IOException {
+//        String groupId = BASE_GROUP_ID;
+//        Dependency dependency_1 = getDependency(groupId);
+//        processor.addArtifact(dependency_1);
+//
+//        groupId = groupId + ".cgi_1";
+//        Dependency dependency_2 = getDependency(groupId);
+//        processor.addArtifact(dependency_2);
+//        dependency_2.setScope("compile");
+//        processor.addRelation(dependency_1, dependency_2);
+//
+//        exporter = new DotExporterImpl(database, true, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.maven");
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+//    }
+//
+//    @Test
+//    public void testIncludeListSingleCompileDependencyNoVersions() throws IOException {
+//        String groupId = BASE_GROUP_ID;
+//        Dependency dependency_1 = getDependency(groupId);
+//        processor.addArtifact(dependency_1);
+//
+//        groupId = groupId + ".cgi_1";
+//        Dependency dependency_2 = getDependency(groupId);
+//        processor.addArtifact(dependency_2);
+//        dependency_2.setScope("compile");
+//        processor.addRelation(dependency_1, dependency_2);
+//
+//        exporter = new DotExporterImpl(database, false, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.maven");
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+//    }
+//
+//    @Test
+//    public void testIncludeListSingleCompileDependencyExcludePart() throws IOException {
+//        String groupId = BASE_GROUP_ID;
+//        Dependency dependency_1 = getDependency(groupId);
+//        processor.addArtifact(dependency_1);
+//
+//        groupId = groupId + ".cgi_1";
+//        Dependency dependency_2 = getDependency(groupId);
+//        processor.addArtifact(dependency_2);
+//        dependency_2.setScope("compile");
+//        processor.addRelation(dependency_1, dependency_2);
+//
+//        groupId = "a.b.c";
+//        Dependency dependency_3 = getDependency(groupId);
+//        processor.addArtifact(dependency_3);
+//        dependency_3.setScope("compile");
+//        processor.addRelation(dependency_1, dependency_3);
+//
+//        exporter = new DotExporterImpl(database, true, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.maven");
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+//    }
+//
+//    @Test
+//    public void testIncludeListSingleCompileDependencyWithStar() throws IOException {
+//        String groupId = BASE_GROUP_ID;
+//        Dependency dependency_1 = getDependency(groupId);
+//        processor.addArtifact(dependency_1);
+//
+//        groupId = groupId + ".cgi_1";
+//        Dependency dependency_2 = getDependency(groupId);
+//        processor.addArtifact(dependency_2);
+//        dependency_2.setScope("compile");
+//        processor.addRelation(dependency_1, dependency_2);
+//
+//        exporter = new DotExporterImpl(database, true, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.maven*");
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+//        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
+//        verify(writer, atLeast(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
+//        verify(writer, atLeast(3)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.depends)));
+//    }
+//
+//
+//    @Test
+//    public void testFilterWithStartSingleArtifact() throws IOException {
+//        Dependency dependency = getDependency(BASE_GROUP_ID);
+//        processor.addArtifact(dependency);
+//
+//        exporter = new DotExporterImpl(database, true, log);
+//
+//        NodeWriter writer = mock(NodeWriter.class);
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add("nl.pieni.*");
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency.getArtifactId())));
+//        verify(writer).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency.getVersion())));
+//    }
+//
+//    @Test
+//    public void testTwoGroupsAndArtifacts() throws IOException {
+//        String groupId_1 = BASE_GROUP_ID + ".group_1";
+//        String groupId_2 = BASE_GROUP_ID + ".group_2";
+//
+//        Dependency dependency_1 = getDependency(groupId_1);
+//        processor.addArtifact(dependency_1);
+//
+//
+//        Dependency dependency_2 = getDependency(groupId_2);
+//        processor.addArtifact(dependency_2);
+//
+//        exporter = new DotExporterImpl(database, false, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+////        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+////        NodeWriter writer = new NodeWriterImpl(osWriter, log);
+//
+//        exporter.export(starIncludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+//    }
+//
+//    @Test
+//    public void testFourGroupsAndArtifacts() throws IOException {
+//        String groupId_1 = BASE_GROUP_ID + ".group_1";
+//        String groupId_2 = BASE_GROUP_ID + ".group_2";
+//        String groupId_3 = BASE_GROUP_ID + ".group_2.a";
+//        String groupId_4 = BASE_GROUP_ID + ".group_3.b";
+//
+//
+//        Dependency dependency_1 = getDependency(groupId_1);
+//        processor.addArtifact(dependency_1);
+//
+//        Dependency dependency_2 = getDependency(groupId_2);
+//        processor.addArtifact(dependency_2);
+//        Dependency dependency_3 = getDependency(groupId_3);
+//        processor.addArtifact(dependency_3);
+//        Dependency dependency_4 = getDependency(groupId_4);
+//        processor.addArtifact(dependency_4);
+//
+//        exporter = new DotExporterImpl(database, false, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+////        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
+////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+////        NodeWriter writer = new NodeWriterImpl(osWriter, log);
+//
+//        exporter.export(starIncludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId()))
+//        );
+//
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId()))
+//        );
+//
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID + ".group_2"))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId()))
+//        );
 //        verify(writer, atLeast(1)).writeNode(
 //                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
 //                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
@@ -571,38 +481,114 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
 //                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId()))
 //        );
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_3.getArtifactId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_4.getArtifactId())));
-    }
-
-    @Test
-    public void testTwoGroupsAndArtifactsOneExcluded() throws IOException {
-        String groupId_1 = BASE_GROUP_ID + ".group_1";
-        String groupId_2 = BASE_GROUP_ID + ".group_2";
-
-        Dependency dependency_1 = getDependency(groupId_1);
-        processor.addArtifact(dependency_1);
-
-
-        Dependency dependency_2 = getDependency(groupId_2);
-        processor.addArtifact(dependency_2);
-
-        exporter = new DotExporterImpl(database, false, log);
-        NodeWriter writer = mock(NodeWriter.class);
-//        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_3.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_4.getArtifactId())));
+//    }
+//
+//@Test
+//    public void testFourGroupsAndArtifactsWithExclude() throws IOException {
+//        String groupId_1 = BASE_GROUP_ID + ".group_1";
+//        String groupId_2 = BASE_GROUP_ID + ".group_2";
+//        String groupId_3 = BASE_GROUP_ID + ".group_2.a";
+//        String groupId_4 = "com.pieni.xx" + ".group_3.b";
+//
+//
+//        Dependency dependency_1 = getDependency(groupId_1);
+//        processor.addArtifact(dependency_1);
+//
+//        Dependency dependency_2 = getDependency(groupId_2);
+//        processor.addArtifact(dependency_2);
+//        Dependency dependency_3 = getDependency(groupId_3);
+//        processor.addArtifact(dependency_3);
+//        Dependency dependency_4 = getDependency(groupId_4);
+//        processor.addArtifact(dependency_4);
+//
+//        exporter = new DotExporterImpl(database, false, log);
+////        NodeWriter writer = mock(NodeWriter.class);
+//        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
 //        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
 //        NodeWriter writer = new NodeWriterImpl(osWriter, log);
+//        List<String> includeList = new ArrayList<String>();
+//        includeList.add(BASE_GROUP_ID + "*");
+//        exporter.export(includeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId()))
+//        );
+//
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId()))
+//        );
+//
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID + ".group_2"))
+//        );
+//        verify(writer, atLeast(1)).writeNode(
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId())),
+//                argThat(new GroupNodeDecoratorMatcher(dependency_3.getGroupId()))
+//        );
+////        verify(writer, atLeast(1)).writeNode(
+////                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
+////                argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID))
+////
+////        );
+////        verify(writer, atLeast(1)).writeNode(
+////                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId())),
+////                argThat(new GroupNodeDecoratorMatcher(dependency_4.getGroupId()))
+////        );
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_3.getArtifactId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_4.getArtifactId())));
+//    }
+//
+//    @Test
+//    public void testTwoGroupsAndArtifactsOneExcluded() throws IOException {
+//        String groupId_1 = BASE_GROUP_ID + ".group_1";
+//        String groupId_2 = BASE_GROUP_ID + ".group_2";
+//
+//        Dependency dependency_1 = getDependency(groupId_1);
+//        processor.addArtifact(dependency_1);
+//
+//
+//        Dependency dependency_2 = getDependency(groupId_2);
+//        processor.addArtifact(dependency_2);
+//
+//        exporter = new DotExporterImpl(database, false, log);
+//        NodeWriter writer = mock(NodeWriter.class);
+////        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+////        NodeWriter writer = new NodeWriterImpl(osWriter, log);
+//
+//        List<String> excludeList = new ArrayList<String>();
+//        excludeList.add(groupId_1);
+//        exporter.export(excludeList, writer);
+//
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
+//        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
+//    }
+//
 
-        List<String> excludeList = new ArrayList<String>();
-        excludeList.add(groupId_1);
-        exporter.export(excludeList, writer);
+//    FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+//    Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+//    NodeWriter writer = new NodeWriterImpl(osWriter, log);
 
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
-        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
-    }
 
     private Dependency getDependency(String groupId) {
         Dependency dependency = new Dependency();

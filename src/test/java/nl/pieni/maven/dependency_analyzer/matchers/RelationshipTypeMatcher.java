@@ -24,17 +24,17 @@ import org.neo4j.graphdb.RelationshipType;
 /**
  * Matcher for test cases
  */
-public class RelationshipMatcher extends ArgumentMatcher<Relationship> {
+public class RelationshipTypeMatcher extends ArgumentMatcher<RelationshipType> {
 
     private final RelationshipType relationshipType;
 
-    public RelationshipMatcher(RelationshipType relationshipType) {
+    public RelationshipTypeMatcher(RelationshipType relationshipType) {
         this.relationshipType = relationshipType;
     }
 
     @Override
     public boolean matches(Object argument) {
-        return ((Relationship)argument).getType().equals(relationshipType);
+        return argument.equals(relationshipType);
     }
 
     public void describeTo(Description description) {

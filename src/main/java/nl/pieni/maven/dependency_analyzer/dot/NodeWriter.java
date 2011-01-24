@@ -16,6 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.dot;
 
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -82,9 +83,11 @@ public interface NodeWriter {
     /**
      * Write the top level nodes. i.e. the references from the root (refnode) to the ones
      * directly below it.
+     *
      * @param refNode the refNode
      * @param childNode the relation.
+     * @param has
      * @throws IOException in case of error
      */
-    void writeNode2NodeRelation(Node refNode, Node childNode) throws IOException;
+    void writeNode2NodeRelation(Node refNode, Node childNode, RelationshipType has) throws IOException;
 }
