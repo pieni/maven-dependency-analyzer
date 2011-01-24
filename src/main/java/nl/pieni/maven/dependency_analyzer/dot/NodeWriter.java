@@ -86,5 +86,5 @@ public interface NodeWriter {
      * @param childNode the relation.
      * @throws IOException in case of error
      */
-    void writeReferenceRelation(Node refNode, Node childNode) throws IOException;
+    void writeNode2NodeRelation(Node refNode, Node childNode) throws IOException;
 }

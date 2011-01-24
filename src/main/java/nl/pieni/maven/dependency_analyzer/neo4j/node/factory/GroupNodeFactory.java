@@ -56,24 +56,28 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
 
     private int create(final Dependency dependency, final String existingPath) {
         int createCount = 0;
-        GroupNodeDecorator currentNode = (GroupNodeDecorator) getSearcher().findGroupNode(existingPath);
+        GroupNodeDecorator startNode = (GroupNodeDecorator) getSearcher().findGroupNode(existingPath);
         String tmp = dependency.getGroupId().substring(existingPath.length(), dependency.getGroupId().length());
         StringTokenizer stringTokenizer = new StringTokenizer(tmp, ".");
         String createPath = "";
+        String startPath = existingPath;
         getDatabase().startTransaction();
         while (stringTokenizer.hasMoreTokens()) {
             String token = stringTokenizer.nextToken();
             Node node = getDatabase().createNode();
             createCount++;
             Dependency nextDependency = new Dependency();
-            createPath = existingPath + (existingPath.length() != 0 ? "." : "") + createPath + (createPath.length() != 0 ? "." : "") + token;
+            createPath = startPath + (startPath.length() != 0 ? "." : "") + token;
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Fixed path for groupId = \"" + createPath + "\"");
+            }
             nextDependency.setGroupId(createPath);
             GroupNodeDecorator nextNode = new GroupNodeDecorator(node, nextDependency);
             getSearcher().indexOnProperty(node, GROUP_ID);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Created GroupNode: " + nextNode);
             }
-            if (currentNode == null) {
+            if (startNode == null) {
                 Node refNode = getDatabase().getDatabase().getReferenceNode();
                 Relationship relationship = refNode.createRelationshipTo(nextNode, ArtifactRelations.has);
 
@@ -81,12 +85,13 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
                     LOGGER.debug("Added " + relationship + " between " + refNode + " and " + nextNode);
                 }
             } else {
-                Relationship relationship = currentNode.createRelationshipTo(nextNode, ArtifactRelations.has);
+                Relationship relationship = startNode.createRelationshipTo(nextNode, ArtifactRelations.has);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Added " + relationship + " between " + currentNode + " and " + nextNode);
+                    LOGGER.debug("Added " + relationship + " between " + startNode + " and " + nextNode);
                 }
             }
-            currentNode = nextNode;
+            startPath = createPath;
+            startNode = nextNode;
         }
         getDatabase().stopTransaction();
         return createCount;

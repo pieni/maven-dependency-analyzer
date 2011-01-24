@@ -17,7 +17,11 @@
 package nl.pieni.maven.dependency_analyzer.matchers;
 
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
+
+import java.util.Iterator;
 
 /**
  * Matcher for GroupNodes
@@ -34,4 +38,13 @@ public class GroupNodeDecoratorMatcher extends ArgumentMatcher<GroupNodeDecorato
         public boolean matches(Object argument) {
             return groupId.equals(((GroupNodeDecorator)argument).getGroupId());
         }
+
+    public String toString() {
+        return "GroupId = " + groupId;
+    }
+
+    public void describeTo(Description description) {
+        description.appendText("groupId matches ");
+        description.appendText("\"" + groupId + "\"");
+    }
 }

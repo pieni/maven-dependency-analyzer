@@ -216,6 +216,9 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      */
     @Override
     public void indexOnProperty(final Node node, final String key) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Index node: " + node + " on " + key + "=\"" + node.getProperty(key) + "\"");
+        }
         index.index(node, key, node.getProperty(key));
     }
 

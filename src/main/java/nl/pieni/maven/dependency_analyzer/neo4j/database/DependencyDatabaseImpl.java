@@ -26,12 +26,14 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 /**
  * Abstract base class for accessing the GRaph Database
  */
+/**
+ * Abstract base class for accessing the GRaph Database
+ */
 public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseService, Node> {
     private final Log LOGGER;
     private GraphDatabaseService graphDb;
     private Transaction transaction;
     private int transactionCount = 0;
-    private static int BATCH_SIZE = 100;
 
 
     /**
@@ -93,24 +95,18 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
      */
     @Override
     public void stopTransaction() {
-        if (this.transactionCount < BATCH_SIZE) {
+        this.transactionCount--;
+        if (this.transactionCount == 0) {
+            this.transaction.success();
+            this.transaction.finish();
             if (getLOGGER().isDebugEnabled()) {
-                getLOGGER().debug("Batch size (" + BATCH_SIZE + ") not reached, not finishing (yet)");
+                getLOGGER().debug("Closed Transaction");
             }
-            return;
+        } else {
+            if (getLOGGER().isDebugEnabled()) {
+                getLOGGER().debug("Not closing transaction (enclosed)");
+            }
         }
-        getLOGGER().info("Reached batch size (" + BATCH_SIZE + ") finishing transaction");
-        finishTransactions();
-    }
-
-    private void finishTransactions() {
-
-        this.transaction.success();
-        this.transaction.finish();
-        if (getLOGGER().isDebugEnabled()) {
-            getLOGGER().debug("Closed Transaction");
-        }
-        this.transactionCount = 0;
     }
 
     /**
@@ -119,8 +115,7 @@ public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseS
     @Override
     public void shutdownDatabase() {
         if (transactionCount != 0) {
-            finishTransactions();
-            getLOGGER().info("Finished open transactions");
+            getLOGGER().error("Transaction count = " + transactionCount);
         }
 
         getDatabase().shutdown();

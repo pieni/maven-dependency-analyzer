@@ -47,6 +47,7 @@ public class DotExporterImpl implements DotExporter {
     private NodeWriter nodeWriter;
     private Node lastGroupNode = null;
     private final Set<Node> refNodeRelations = new HashSet<Node>();
+    private final Set<Node> writtenGroupNodes = new HashSet<Node>();
     private IncludeFilterPatternMatcher includeFilterPatternMatcher;
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, boolean includeVersions, Log log) {
@@ -75,7 +76,7 @@ public class DotExporterImpl implements DotExporter {
     private void processReferenceNodeRelations(Node refNode) throws IOException {
         for (Node refNodeRelation : refNodeRelations) {
             if (includeFilterPatternMatcher.include(refNodeRelation)) {
-                nodeWriter.writeReferenceRelation(refNode, refNodeRelation);
+                nodeWriter.writeNode2NodeRelation(refNode, refNodeRelation);
             }
         }
     }
@@ -83,10 +84,12 @@ public class DotExporterImpl implements DotExporter {
     private void processNode(Node startNode) throws IOException {
         LOG.debug("Parse: " + nodeToString(startNode));
 
+        //Version nodes
         if (!startNode.hasRelationship(Direction.OUTGOING)) {
             exportNode(startNode);
             return;
         }
+
         for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING)) {
             LOG.debug("Processing Relationship " + relationship);
             boolean exportedStart = exportNode(relationship.getStartNode());
@@ -95,6 +98,7 @@ public class DotExporterImpl implements DotExporter {
             if (exportedStart && exportedEnd) {
                 nodeWriter.writeRelation(relationship);
             }
+
             if (endNode.hasRelationship(Direction.OUTGOING)) {
                 processNode(endNode);
             }
@@ -122,24 +126,62 @@ public class DotExporterImpl implements DotExporter {
 
     private boolean doGroupNode(Node node) throws IOException {
 
-        if (hasOnlyGroupNodeRelations(node)) {
+        boolean artifacts = hasArtifactRelations(node);
+        boolean multiPathWrites = hasWritesInMultiplePaths(node);
+
+        if (!artifacts && !multiPathWrites) {
             return false;
         }
 
-        GroupNodeDecorator groupNodeDecorator = new GroupNodeDecorator(node);
+        return writeGroupNode(node);
+    }
 
-        if (lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
-            nodeWriter.writeNode(groupNodeDecorator, new GroupNodeDecorator(lastGroupNode));
+    private boolean writeGroupNode(Node groupNode) throws IOException {
+
+        Node writtenParent = findWrittenParent(groupNode);
+
+        boolean result = true;
+        if (null != writtenParent && writtenParent.hasProperty(NodeProperties.NODE_TYPE)) {
+            nodeWriter.writeNode(new GroupNodeDecorator(groupNode), new GroupNodeDecorator(writtenParent));
+            result = false;
         } else {
-            nodeWriter.writeNode(groupNodeDecorator);
+            nodeWriter.writeNode(new GroupNodeDecorator(groupNode));
+            refNodeRelations.add(groupNode);
         }
 
-        if (!lastGroupNode.hasProperty(NodeProperties.NODE_TYPE)) {
-            refNodeRelations.add(node);
-            lastGroupNode = node;
+        lastGroupNode = writtenParent;
+        writtenGroupNodes.add(groupNode);
+        return result;
+    }
+
+    private Node findWrittenParent(Node node) {
+        if (node == null || !node.hasProperty(NodeProperties.NODE_TYPE)) {
+            return null;
         }
 
-        return true;
+        if (writtenGroupNodes.contains(node)) {
+            return node;
+        }
+
+        Iterable<Relationship> parentRelationships = node.getRelationships(ArtifactRelations.has, Direction.INCOMING);
+        for (Relationship parentRelationship : parentRelationships) {
+            Node parentNode = parentRelationship.getOtherNode(node);
+            return findWrittenParent(findWrittenParent(parentNode));
+        }
+
+        throw new IllegalArgumentException("GroupNode " + nodeToString(node) + " has no parent");
+    }
+
+    private boolean hasArtifactRelations(Node node) {
+        Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
+        for (Relationship relationship : iterable) {
+            Node endNode = relationship.getEndNode();
+            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
+            if (type == NodeType.ArtifactNode) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean doVersionNode(Node node) throws IOException {
@@ -158,17 +200,27 @@ public class DotExporterImpl implements DotExporter {
         return true;
     }
 
-    private boolean hasOnlyGroupNodeRelations(Node node) {
+    /**
+     * Check to see if writes are required in the sub tree
+     *
+     * @param node
+     * @return
+     */
+    private boolean hasWritesInMultiplePaths(Node node) {
+        LOG.debug("hasWritesInMultiplePaths: " + nodeToString(node));
+
+        int count = 0;
+        //Get all the group relations
         Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
         for (Relationship relationship : iterable) {
             Node otherNode = relationship.getOtherNode(node);
-            NodeType nodeType = NodeType.fromString(otherNode.getProperty(NodeProperties.NODE_TYPE).toString());
-            if (nodeType == NodeType.ArtifactNode) {
-                return false;
+            if (hasWriteInPath(otherNode)) {
+                count++;
             }
         }
-        LOG.debug(nodeToString(node) + " has only relations to GroupNodes");
-        return true;
+
+        LOG.debug("hasWritesInMultiplePaths count = " + count);
+        return count >= 2;
     }
 
     /**
@@ -177,6 +229,24 @@ public class DotExporterImpl implements DotExporter {
      * @param node the Node
      * @return a String
      */
+
+    private boolean hasWriteInPath(Node node) {
+        Iterable<Relationship> iterable = node.getRelationships(Direction.OUTGOING);
+        for (Relationship relationship : iterable) {
+            Node endNode = relationship.getEndNode();
+            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
+            if (type == NodeType.ArtifactNode && includeFilterPatternMatcher.include(endNode)) {
+                LOG.debug("hasWritesInPath result = " + true);
+                return true;
+            }
+
+            if (type == NodeType.GroupNode && includeFilterPatternMatcher.include(endNode)) {
+                return hasWriteInPath(endNode);
+            }
+        }
+        return false;
+    }
+
     String nodeToString(Node node) {
         StringBuffer buff = new StringBuffer();
         buff.append("Node{ Id = ");

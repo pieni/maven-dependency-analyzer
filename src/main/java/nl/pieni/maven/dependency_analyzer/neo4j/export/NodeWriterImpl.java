@@ -19,21 +19,18 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export;
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Implementation of a DOT (@see http://graphviz.org) format Node file.
@@ -45,11 +42,19 @@ public class NodeWriterImpl implements NodeWriter {
     private final Log LOG;
     private final Set<Node> visitedNodes = new HashSet<Node>();
     private final Set<Relationship> visitedRelations = new HashSet<Relationship>();
+    private final Map<Node, Set<Node>> nodeNodeRelations = new HashMap<Node, Set<Node>>();
+
+    private class NodeNodeRelations {
+        Node node;
+        Set<Node> relatedNodes;
+    }
+
 
     /**
      * Default constructor
+     *
      * @param writer the putput stream writer
-     * @param LOG the Logger
+     * @param LOG    the Logger
      * @throws IOException in case of error
      */
     public NodeWriterImpl(Writer writer, Log LOG) throws IOException {
@@ -60,6 +65,7 @@ public class NodeWriterImpl implements NodeWriter {
 
     /**
      * Insert the standard start of a DOT graph
+     *
      * @throws IOException in case of error
      */
     private void startGraph() throws IOException {
@@ -68,13 +74,14 @@ public class NodeWriterImpl implements NodeWriter {
 
     /**
      * End the graph correctly
+     *
      * @throws IOException in case of error;
      */
     private void endGraph() throws IOException {
         writer.write("}");
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -87,7 +94,7 @@ public class NodeWriterImpl implements NodeWriter {
         writer.close();
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -101,7 +108,7 @@ public class NodeWriterImpl implements NodeWriter {
     }
 
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -112,7 +119,7 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -125,7 +132,7 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -138,7 +145,7 @@ public class NodeWriterImpl implements NodeWriter {
         }
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -146,12 +153,26 @@ public class NodeWriterImpl implements NodeWriter {
         if (visitedRelations.add(relationship)) {
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
-            LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
-            writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + lineSeparator);
+            if (isScoperelation(relationship)) {
+                LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
+                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\" style=dotted]" + lineSeparator);
+            } else {
+                LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
+                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + lineSeparator);
+            }
         }
     }
 
-        /**
+    private boolean isScoperelation(Relationship relationship) {
+        for (RelationshipType dependencyScopeRelation : DependencyScopeRelations.values()) {
+            if (relationship.isType(dependencyScopeRelation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -159,21 +180,33 @@ public class NodeWriterImpl implements NodeWriter {
         if (visitedNodes.add(currentNode)) {
             LOG.debug("Writing GroupNode " + previous);
             writeNode(currentNode.getId(), getAddedGroupIdPart(currentNode.getGroupId(), previous.getGroupId()), NodeShape.folder);
+            writeNode2NodeRelation(previous, currentNode);
         }
     }
 
-        /**
+    /**
      * {@inheritDoc}
      */
     @Override
-    public void writeReferenceRelation(Node refNode, Node childNode) throws IOException {
-        writer.write("\tN" + refNode.getId() + " -> " + "N" + childNode.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
+    public void writeNode2NodeRelation(Node refNode, Node childNode) throws IOException {
+
+        Set<Node> related = nodeNodeRelations.get(refNode);
+        if (related == null) {
+            related = new HashSet<Node>();
+            nodeNodeRelations.put(refNode, related);
+        }
+
+        if (related.add(childNode)) {
+            LOG.debug("Writing Node 2 Node Relation " + refNode + " -> "+ childNode);
+            writer.write("\tN" + refNode.getId() + " -> " + "N" + childNode.getId() + " [label=\"" + ArtifactRelations.has + "\"]" + lineSeparator);
+        }
     }
 
     /**
      * Determine the part of the groupId that is added.
      * current.length() > previous.length()
-     * @param current the current value (full path)
+     *
+     * @param current  the current value (full path)
      * @param previous the previous part
      * @return the difference.
      */
@@ -194,9 +227,10 @@ public class NodeWriterImpl implements NodeWriter {
 
     /**
      * Actual write of the Node to the writer
-     * @param id the Id
+     *
+     * @param id        the Id
      * @param labelText the label text
-     * @param shape the shape of the node
+     * @param shape     the shape of the node
      * @throws IOException in case of error
      */
     private void writeNode(long id, String labelText, NodeShape shape) throws IOException {

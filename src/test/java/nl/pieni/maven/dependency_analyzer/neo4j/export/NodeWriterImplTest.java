@@ -24,7 +24,6 @@ import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.test_helpers.SimpleLogger;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.velocity.runtime.visitor.NodeViewMode;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
@@ -140,7 +139,7 @@ public class NodeWriterImplTest {
         Node refNode = mock(Node.class);
         when(groupNode.getId()).thenReturn(1L);
         when(refNode.getId()).thenReturn(0L);
-        writer.writeReferenceRelation(refNode, groupNode);
+        writer.writeNode2NodeRelation(refNode, groupNode);
         writer.close();
         verifyDotFile();
         verify(outputWriter).write(argThat(new MultiStringMatcher(new String[]{"N0 -> N1", ArtifactRelations.has.toString()})));
