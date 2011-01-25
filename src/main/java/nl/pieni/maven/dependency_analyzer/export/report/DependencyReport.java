@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.export;
+package nl.pieni.maven.dependency_analyzer.export.report;
 
 import org.apache.maven.model.Dependency;
 

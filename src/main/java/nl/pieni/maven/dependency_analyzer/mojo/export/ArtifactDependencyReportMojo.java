@@ -16,9 +16,9 @@
 
 package nl.pieni.maven.dependency_analyzer.mojo.export;
 
+import nl.pieni.maven.dependency_analyzer.neo4j.export.report.DependencyReportImpl;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
-import nl.pieni.maven.dependency_analyzer.export.DependencyReport;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.DependencyReportImpl;
+import nl.pieni.maven.dependency_analyzer.export.report.DependencyReport;
 import nl.pieni.maven.dependency_analyzer.export.log.LogWriter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;

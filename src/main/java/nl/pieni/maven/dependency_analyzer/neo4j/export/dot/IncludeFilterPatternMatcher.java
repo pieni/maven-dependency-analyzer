@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.export;
+package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 
 import nl.pieni.maven.dependency_analyzer.filter.GAVIncludeFilter;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;

@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.export;
+package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import org.apache.maven.plugin.logging.Log;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,51 +41,36 @@ import java.util.Set;
  */
 public class DotExporterImpl implements DotExporter {
 
-    private boolean includeVersions = false;
-    private IncludeFilterPatternMatcher includeFilterPatternMatcher = new IncludeFilterPatternMatcher(new ArrayList<String>() {
-    });
-
-
     private final DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase;
 
     private final Log LOG;
     private NodeWriter nodeWriter;
-    private Set<Node> exportNodes = new HashSet<Node>();
-    private Map<Node, Set<Relationship>> exportNodesRelationships = new HashMap<Node, Set<Relationship>>();
-    private Set<Relationship> referenceNodeRelationships = new HashSet<Relationship>();
-
-
-    private final Set<Node> refNodeRelations = new HashSet<Node>();
-    private final Set<Node> writtenGroupNodes = new HashSet<Node>();
+    private Set<Node> exportNodes_Refactor = new HashSet<Node>();
+    private Map<Node, Set<Relationship>> exportNodeMap = new HashMap<Node, Set<Relationship>>();
+    private final NodeSelector nodeSelector;
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
         this.LOG = log;
+        this.nodeSelector = new NodeSelector(dependencyDatabase, log);
     }
 
 
     @Override
     public void setIncludePatters(List<String> includeFilterPatterns) {
-        this.includeFilterPatternMatcher = new IncludeFilterPatternMatcher(includeFilterPatterns);
+        this.nodeSelector.setIncludeFilterPatterns(includeFilterPatterns);
     }
 
     @Override
     public void setIncludeVersions(boolean includeVersions) {
-        this.includeVersions = includeVersions;
+        this.nodeSelector.setIncludeVersions(includeVersions);
     }
 
     @Override
     public void export(NodeWriter nodeWriter) throws IOException {
         this.nodeWriter = nodeWriter;
 
-        //Select the Nodes
-        selectNodes();
-
-        //Select the relations
-        selectRelationShips();
-
-        //Select all references to the root node
-        selectRefNodeRelationsShips();
+        exportNodeMap = nodeSelector.selectNodesAndRelations();
 
         //Write the selected nodes and relations ships to file
         writeDotFile();
@@ -98,116 +78,46 @@ public class DotExporterImpl implements DotExporter {
         nodeWriter.close();
     }
 
-    private void selectRefNodeRelationsShips() {
-        for (Node exportNode : exportNodes) {
-            Iterable<Relationship> refRelationships = exportNode.getRelationships(Direction.INCOMING);
-            for (Relationship refRelationship : refRelationships) {
-                if (refRelationship.getStartNode().getId() == 0) {
-                    referenceNodeRelationships.add(refRelationship);
-                }
-            }
-        }
-    }
 
     private void writeDotFile() throws IOException {
 
         nodeWriter.writeRootNode(dependencyDatabase.getDatabase().getReferenceNode());
 
-        for (Node exportNode : exportNodes) {
-            NodeType type = NodeType.fromString(exportNode.getProperty(NodeProperties.NODE_TYPE).toString());
-            switch (type) {
-                case ArtifactNode:
-                    nodeWriter.writeNode(new ArtifactNodeDecorator(exportNode));
-                    break;
-                case GroupNode:
-                    nodeWriter.writeNode(new GroupNodeDecorator(exportNode));
-                    break;
-                case VersionNode:
-                    nodeWriter.writeNode(new VersionNodeDecorator(exportNode));
-            }
-        }
+        writeNodes();
 
-        for (Relationship referenceNodeRelationship : referenceNodeRelationships) {
-            nodeWriter.writeNode2NodeRelation(referenceNodeRelationship.getStartNode(), referenceNodeRelationship.getEndNode(), ArtifactRelations.has);
-        }
+        writeNodeRelations();
+    }
 
-        Set<Node> nodes = exportNodesRelationships.keySet();
-        for (Node startNode: nodes) {
-            Set<Relationship> relationshipSet = exportNodesRelationships.get(startNode);
+    private void writeNodeRelations() throws IOException {
+        Set<Node> nodes = exportNodeMap.keySet();
+        for (Node startNode : nodes) {
+            Set<Relationship> relationshipSet = exportNodeMap.get(startNode);
             for (Relationship relationship : relationshipSet) {
                 nodeWriter.writeNode2NodeRelation(startNode, relationship.getEndNode(), relationship.getType());
             }
         }
     }
 
-    /**
-     * Parse through all nodes of the graph and select the nodes that must be written
-     */
-    private void selectNodes() {
-        //
-        Node refNode = dependencyDatabase.getDatabase().getReferenceNode();
-        Iterable<Relationship> iter = refNode.getRelationships(Direction.OUTGOING);
-        for (Relationship relationship : iter) {
-            parseNode(relationship.getOtherNode(refNode));
-        }
-    }
-
-    /**
-     * Select all valid relations from the nodes in the exportNodes set
-     */
-    private void selectRelationShips() {
-        for (Node exportedNode : exportNodes) {
-            Iterable<Relationship> relations = exportedNode.getRelationships(Direction.OUTGOING);
-            for (Relationship relation : relations) {
-                if (exportNodes.contains(relation.getEndNode())) {
-                    Set<Relationship> relationshipSet = exportNodesRelationships.get(exportedNode);
-                    if (relationshipSet == null) {
-                        relationshipSet = new HashSet<Relationship>();
-                        exportNodesRelationships.put(exportedNode, relationshipSet);
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Selected relation: " + relation2String(relation) +  " for export");
-                    }
-                    relationshipSet.add(relation);
+    private void writeNodes() throws IOException {
+        for (Node node : exportNodeMap.keySet()) {
+            if (node.hasProperty(NodeProperties.NODE_TYPE)) {
+                NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE).toString());
+                switch (type) {
+                    case ArtifactNode:
+                        nodeWriter.writeNode(new ArtifactNodeDecorator(node));
+                        break;
+                    case GroupNode:
+                        nodeWriter.writeNode(new GroupNodeDecorator(node));
+                        break;
+                    case VersionNode:
+                        nodeWriter.writeNode(new VersionNodeDecorator(node));
+                }
+            } else {
+                if (node.getId() == 0) {
+                    nodeWriter.writeRootNode(node);
                 }
             }
         }
-    }
-
-    private void parseNode(Node startNode) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Parse: " + nodeToString(startNode));
-        }
-
-        for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Processing Relationship " + relationship);
-            }
-            exportNode(relationship.getStartNode());
-            Node endNode = relationship.getEndNode();
-            exportNode(endNode);
-            if (endNode.hasRelationship(Direction.OUTGOING)) {
-                parseNode(endNode);
-            }
-        }
-    }
-
-
-    private void exportNode(Node node) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing node: " + nodeToString(node));
-        }
-        if (!includeFilterPatternMatcher.include(node)) {
-            return;
-        }
-        NodeType nodeType = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE).toString());
-        if (nodeType == NodeType.VersionNode && !includeVersions) {
-            return;
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Node: " + nodeToString(node) + " selected for output");
-        }
-        exportNodes.add(node);
     }
 
 

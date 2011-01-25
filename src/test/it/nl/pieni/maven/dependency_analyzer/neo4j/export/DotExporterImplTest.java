@@ -23,7 +23,6 @@ import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.matchers.ArtifactNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorMatcher;
-import nl.pieni.maven.dependency_analyzer.matchers.RelationshipMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.RelationshipTypeMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.VersionNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.AbstractDatabaseImplTest;
@@ -32,6 +31,7 @@ import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearc
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessorImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.DotExporterImpl;
 import nl.pieni.maven.dependency_analyzer.test_helpers.SimpleLogger;
 import org.apache.maven.model.Dependency;
 import org.junit.After;
@@ -41,10 +41,7 @@ import org.mockito.Matchers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,6 +93,9 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         exporter = new DotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
+//    FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+//    Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+//    NodeWriter writer = new NodeWriterImpl(osWriter, log);
         exporter.setIncludePatters(starIncludeList);
         exporter.export(writer);
 
