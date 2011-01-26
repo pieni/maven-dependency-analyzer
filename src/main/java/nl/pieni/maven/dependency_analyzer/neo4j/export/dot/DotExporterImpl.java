@@ -83,19 +83,6 @@ public class DotExporterImpl implements DotExporter {
         nodeWriter.close();
     }
 
-    private Map<DotShape, Set<DotEdge>> optimize(Map<Node, Set<Relationship>> nodeSetMap) {
-        return null;
-    }
-
-    private boolean hasSingleGroupRelation(Node node) {
-        Set<Relationship> relationshipSet = exportNodeMap.get(node);
-        if (relationshipSet.size() > 1) {
-            return false;
-        }
-        return true;
-    }
-
-
     private void writeDotFile() throws IOException {
 
         nodeWriter.writeRootNode(dependencyDatabase.getDatabase().getReferenceNode());
@@ -137,18 +124,6 @@ public class DotExporterImpl implements DotExporter {
         }
     }
 
-
-    private boolean hasNoArtifactRelations(Node node) {
-        Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
-        for (Relationship relationship : iterable) {
-            Node endNode = relationship.getEndNode();
-            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
-            if (type == NodeType.ArtifactNode) {
-                return false;
-            }
-        }
-        return true;
-    }
 
 
 //    /**
