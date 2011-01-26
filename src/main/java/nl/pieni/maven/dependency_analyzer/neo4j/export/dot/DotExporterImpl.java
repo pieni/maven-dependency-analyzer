@@ -19,17 +19,22 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import org.apache.maven.plugin.logging.Log;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,9 +50,9 @@ public class DotExporterImpl implements DotExporter {
 
     private final Log LOG;
     private NodeWriter nodeWriter;
-    private Set<Node> exportNodes_Refactor = new HashSet<Node>();
     private Map<Node, Set<Relationship>> exportNodeMap = new HashMap<Node, Set<Relationship>>();
     private final NodeSelector nodeSelector;
+    private Long grpCount = new Long(0L);
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
@@ -76,6 +81,18 @@ public class DotExporterImpl implements DotExporter {
         writeDotFile();
 
         nodeWriter.close();
+    }
+
+    private Map<DotShape, Set<DotEdge>> optimize(Map<Node, Set<Relationship>> nodeSetMap) {
+        return null;
+    }
+
+    private boolean hasSingleGroupRelation(Node node) {
+        Set<Relationship> relationshipSet = exportNodeMap.get(node);
+        if (relationshipSet.size() > 1) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -121,53 +138,17 @@ public class DotExporterImpl implements DotExporter {
     }
 
 
-//    private boolean writeGroupNode(Node groupNode) throws IOException {
-//
-//        Node writtenParent = findWrittenParent(groupNode);
-//
-//        boolean result = true;
-//        if (null != writtenParent && writtenParent.hasProperty(NodeProperties.NODE_TYPE)) {
-//            nodeWriter.writeNode(new GroupNodeDecorator(groupNode), new GroupNodeDecorator(writtenParent));
-//            result = false;
-//        } else {
-//            nodeWriter.writeNode(new GroupNodeDecorator(groupNode));
-//            refNodeRelations.add(groupNode);
-//        }
-//
-//        //lastGroupNode = writtenParent;
-//        writtenGroupNodes.add(groupNode);
-//        return result;
-//    }
-
-//    private Node findWrittenParent(Node node) {
-//        if (node == null || !node.hasProperty(NodeProperties.NODE_TYPE)) {
-//            return null;
-//        }
-//
-//        if (writtenGroupNodes.contains(node)) {
-//            return node;
-//        }
-//
-//        Iterable<Relationship> parentRelationships = node.getRelationships(ArtifactRelations.has, Direction.INCOMING);
-//        for (Relationship parentRelationship : parentRelationships) {
-//            Node parentNode = parentRelationship.getOtherNode(node);
-//            return findWrittenParent(findWrittenParent(parentNode));
-//        }
-//
-//        throw new IllegalArgumentException("GroupNode " + nodeToString(node) + " has no parent");
-//    }
-
-//    private boolean hasArtifactRelations(Node node) {
-//        Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
-//        for (Relationship relationship : iterable) {
-//            Node endNode = relationship.getEndNode();
-//            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
-//            if (type == NodeType.ArtifactNode) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    private boolean hasNoArtifactRelations(Node node) {
+        Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
+        for (Relationship relationship : iterable) {
+            Node endNode = relationship.getEndNode();
+            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
+            if (type == NodeType.ArtifactNode) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 //    /**
