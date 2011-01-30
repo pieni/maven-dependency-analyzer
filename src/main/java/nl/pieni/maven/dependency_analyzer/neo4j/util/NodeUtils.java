@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
+package nl.pieni.maven.dependency_analyzer.neo4j.util;
 
 import org.neo4j.graphdb.Node;
-
-import java.util.Collections;
-import java.util.List;
+import org.neo4j.graphdb.Relationship;
 
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 26-1-11
- * Time: 22:21
+ * Date: 30-1-11
+ * Time: 20:06
  * To change this template use File | Settings | File Templates.
  */
-public class OptimizedGroupDotShape extends DotShape {
-    private List<Node> containedNodes;
+public class NodeUtils {
+    public static String nodeToString(Node node) {
+        StringBuffer buff = new StringBuffer();
+        buff.append("Node{ Id = ");
+        buff.append(node.getId());
+        for (String key : node.getPropertyKeys()) {
+            buff.append(" key = ");
+            buff.append(key);
+            buff.append(" value = ");
+            buff.append(node.getProperty(key));
+        }
+        buff.append("}");
 
-    public boolean contains(Node node) {
-        return containedNodes.contains(node);
+        return buff.toString();
     }
 
-    public List<Node> getNodes() {
-        return Collections.unmodifiableList(containedNodes);
-    }
-
-    public void add(Node node) {
-        this.containedNodes.add(node);
+    public static String relation2String(Relationship relation) {
+        return "Relationship { Id = " + relation.getId() + " type = " + relation.getType() + "}";
     }
 
 }

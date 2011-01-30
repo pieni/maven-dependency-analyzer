@@ -67,9 +67,9 @@ class IncludeFilterPatternMatcher {
                 return matchArtifactNode(node);
             case GroupNode:
                 return matchGroupNode(node);
-            default:
-                return false;
         }
+
+        return false;
     }
 
     /**
@@ -105,7 +105,6 @@ class IncludeFilterPatternMatcher {
 
             return matchGroupNode(otherNode);
         }
-
         return false;
     }
 

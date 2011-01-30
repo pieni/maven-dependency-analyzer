@@ -19,7 +19,6 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.IncludeFilterPatternMatcher;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -80,6 +79,8 @@ public class NodeSelector {
         Set<Node> nodeSet = new HashSet<Node>();
 
         Node refNode = dependencyDatabase.getDatabase().getReferenceNode();
+
+        nodeSet.add(refNode);
 
         Iterable<Relationship> iter = refNode.getRelationships(Direction.OUTGOING);
         for (Relationship relationship : iter) {

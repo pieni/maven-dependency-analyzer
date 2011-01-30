@@ -20,6 +20,10 @@ import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,31 +32,60 @@ import org.neo4j.graphdb.Node;
  * Time: 20:58
  * To change this template use File | Settings | File Templates.
  */
-public class DotShape {
-    private long id;
+public abstract class DotShape {
+    private String id;
     private NodeShape nodeShape;
     private String label;
 
-    protected DotShape(long id, NodeShape nodeShape, String label) {
-        this.id = id;
-        this.nodeShape = nodeShape;
-        this.label = label;
+    private final Node node;
+    private final Set<Relationship> relations;
+
+    public DotShape(Node node, Set<Relationship> relations) {
+        this.node = node;
+        this.relations = relations;
     }
 
-    public long getId() {
-        return id;
+    public String getId() {
+        return ShapeIdPrefix.Artifact.toString() + node.getId();
     }
 
-    public NodeShape getNodeShape() {
-        return nodeShape;
+    public NodeShape getShape() {
+         if (node.hasProperty(NodeProperties.NODE_TYPE)) {
+            switch (NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE))) {
+                case VersionNode:
+                    return NodeShape.component;
+                case ArtifactNode:
+                    return NodeShape.rect;
+                case GroupNode:
+                    return NodeShape.folder;
+            }
+        }
+        return NodeShape.box;
     }
 
-    public String getLabel() {
-        return label;
+
+    public abstract String getLabel();
+
+    public Node getNode() {
+        return node;
+    }
+
+    public Set<DotEdge> getEdges() {
+        Set<DotEdge> result = new HashSet<DotEdge>();
+        for (Relationship relation : relations) {
+            result.add(new DotEdge(relation));
+        }
+        return result;
     }
 
     @Override
     public String toString() {
-        return "N" + id + " [style=" + nodeShape + "label=" + label + "]";
+        return getId() + " [ label=\"" + getLabel() + "\" style=\"" + getShape() + "\" ]";
     }
+
+    @Override
+    public int hashCode() {
+        return node.hashCode();
+    }
+
 }

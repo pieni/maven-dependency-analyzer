@@ -17,6 +17,10 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,19 +30,51 @@ import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
  * To change this template use File | Settings | File Templates.
  */
 public class DotEdge {
-    private long startId;
-    private long endId;
-    private EdgeStyle edgeStyle;
-    private String label;
+    private final String endId;
+    private final String startId;
+    private final EdgeStyle edgeStyle;
+    private final String label;
 
-    public DotEdge(long startId, long endId, EdgeStyle edgeStyle, String label) {
-        this.startId = startId;
-        this.endId = endId;
-        this.edgeStyle = edgeStyle;
-        this.label = label;
+
+    public DotEdge(Relationship relationship) {
+        Node startNode = relationship.getStartNode();
+        this.startId = ShapeIdPrefix.fromNode(startNode) + startNode.getId();
+        Node endNode = relationship.getEndNode();
+        this.endId = ShapeIdPrefix.fromNode(endNode) + endNode.getId();
+
+        if (isScoperelation(relationship.getType())) {
+            this.edgeStyle = EdgeStyle.dotted;
+        } else {
+            this.edgeStyle = EdgeStyle.solid;
+        }
+
+        this.label = relationship.getType().toString();
+    }
+
+    public String getStartId() {
+        return this.startId;
+    }
+
+    public String getEndId() {
+        return this.endId;
+    }
+
+    public EdgeStyle getEdgeStyle() {
+        return this.edgeStyle;
+    }
+
+    public String getLabel() {
+        return this.label;
     }
 
     public String toString() {
-        return this.startId + " -> " + this.endId + " [label=" + this.label + "style=" + this.edgeStyle + "]";
+        return this.getStartId() + " -> " + this.getEndId() + " [label=" + this.getLabel() + " style=" + this.getEdgeStyle() + "]";
+    }
+
+    private boolean isScoperelation(RelationshipType relationship) {
+        if (relationship instanceof DependencyScopeRelations) {
+            return true;
+        }
+        return false;
     }
 }

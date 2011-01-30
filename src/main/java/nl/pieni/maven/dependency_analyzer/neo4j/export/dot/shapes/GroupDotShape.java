@@ -16,39 +16,27 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 
-import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 26-1-11
- * Time: 22:42
+ * Date: 29-1-11
+ * Time: 18:06
  * To change this template use File | Settings | File Templates.
  */
 public class GroupDotShape extends DotShape {
 
-    public GroupDotShape(Node node) {
-        super(node.getId(), NodeShape.folder, node.getProperty(NodeProperties.GROUP_ID).toString());
+    public GroupDotShape(Node node, Set<Relationship> relations) {
+        super(node, relations);
     }
 
-    public GroupDotShape(Node node, int tokenCount) {
-        super(node.getId(), NodeShape.folder, makeLabel(node, tokenCount));
-    }
-
-    private static String makeLabel(Node node, int tokenCount) {
-        String groupId = node.getProperty(NodeProperties.GROUP_ID).toString();
-        String[] tokens = groupId.split(".");
-        String result = "";
-
-        for(int i=tokens.length - tokenCount;i<tokens.length;i++) {
-            if (result.length() > 0) {
-                result += ".";
-            }
-            result += tokens[i];
-        }
-
-        return result;
+    @Override
+    public String getLabel() {
+        return getNode().getProperty(NodeProperties.GROUP_ID).toString();
     }
 }

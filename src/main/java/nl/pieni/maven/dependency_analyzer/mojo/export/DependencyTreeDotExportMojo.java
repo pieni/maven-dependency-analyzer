@@ -19,7 +19,7 @@ package nl.pieni.maven.dependency_analyzer.mojo.export;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.DotExporterImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.NodeWriterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.NodeWriterImpl;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 

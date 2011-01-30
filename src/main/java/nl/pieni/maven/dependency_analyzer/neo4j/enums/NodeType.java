@@ -46,4 +46,14 @@ public enum NodeType {
     public static NodeType fromString(final String pcode) {
         return STRING2ENUM.get(pcode);
     }
+
+    /**
+     * Gets the enum for a code.
+     *
+     * @param pcode the code.
+     * @return the corresponding enum.
+     */
+    public static NodeType fromString(final Object pcode) {
+        return STRING2ENUM.get(pcode.toString());
+    }
 }

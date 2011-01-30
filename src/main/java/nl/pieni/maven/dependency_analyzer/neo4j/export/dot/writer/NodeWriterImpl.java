@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
+package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
@@ -43,12 +43,6 @@ public class NodeWriterImpl implements NodeWriter {
     private final Set<Node> visitedNodes = new HashSet<Node>();
     private final Set<Relationship> visitedRelations = new HashSet<Relationship>();
     private final Map<Node, Set<Node>> nodeNodeRelations = new HashMap<Node, Set<Node>>();
-
-    private class NodeNodeRelations {
-        Node node;
-        Set<Node> relatedNodes;
-    }
-
 
     /**
      * Default constructor

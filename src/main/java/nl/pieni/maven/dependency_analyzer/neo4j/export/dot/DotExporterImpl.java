@@ -22,6 +22,7 @@ import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.convert.RawExport;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
@@ -52,14 +53,12 @@ public class DotExporterImpl implements DotExporter {
     private NodeWriter nodeWriter;
     private Map<Node, Set<Relationship>> exportNodeMap = new HashMap<Node, Set<Relationship>>();
     private final NodeSelector nodeSelector;
-    private Long grpCount = new Long(0L);
 
     public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
         this.LOG = log;
         this.nodeSelector = new NodeSelector(dependencyDatabase, log);
     }
-
 
     @Override
     public void setIncludePatters(List<String> includeFilterPatterns) {
@@ -73,122 +72,17 @@ public class DotExporterImpl implements DotExporter {
 
     @Override
     public void export(NodeWriter nodeWriter) throws IOException {
-        this.nodeWriter = nodeWriter;
+        exportNodeMap = nodeSelector.selectNodesAndRelations();
+
+        exportRaw(nodeWriter);
+    }
+
+    private void exportRaw(NodeWriter writer) throws IOException {
 
         exportNodeMap = nodeSelector.selectNodesAndRelations();
 
-        //Write the selected nodes and relations ships to file
-        writeDotFile();
+        RawExport exporter = new RawExport(writer, exportNodeMap);
 
-        nodeWriter.close();
-    }
-
-    private void writeDotFile() throws IOException {
-
-        nodeWriter.writeRootNode(dependencyDatabase.getDatabase().getReferenceNode());
-
-        writeNodes();
-
-        writeNodeRelations();
-    }
-
-    private void writeNodeRelations() throws IOException {
-        Set<Node> nodes = exportNodeMap.keySet();
-        for (Node startNode : nodes) {
-            Set<Relationship> relationshipSet = exportNodeMap.get(startNode);
-            for (Relationship relationship : relationshipSet) {
-                nodeWriter.writeNode2NodeRelation(startNode, relationship.getEndNode(), relationship.getType());
-            }
-        }
-    }
-
-    private void writeNodes() throws IOException {
-        for (Node node : exportNodeMap.keySet()) {
-            if (node.hasProperty(NodeProperties.NODE_TYPE)) {
-                NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE).toString());
-                switch (type) {
-                    case ArtifactNode:
-                        nodeWriter.writeNode(new ArtifactNodeDecorator(node));
-                        break;
-                    case GroupNode:
-                        nodeWriter.writeNode(new GroupNodeDecorator(node));
-                        break;
-                    case VersionNode:
-                        nodeWriter.writeNode(new VersionNodeDecorator(node));
-                }
-            } else {
-                if (node.getId() == 0) {
-                    nodeWriter.writeRootNode(node);
-                }
-            }
-        }
-    }
-
-
-
-//    /**
-//     * Check to see if writes are required in the sub tree
-//     *
-//     * @param node
-//     * @return
-//     */
-//    private boolean hasWritesInMultiplePaths(Node node) {
-//        LOG.debug("hasWritesInMultiplePaths: " + nodeToString(node));
-//
-//        int count = 0;
-//        //Get all the group relations
-//        Iterable<Relationship> iterable = node.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
-//        for (Relationship relationship : iterable) {
-//            Node otherNode = relationship.getOtherNode(node);
-//            if (hasWriteInPath(otherNode)) {
-//                count++;
-//            }
-//        }
-//
-//        LOG.debug("hasWritesInMultiplePaths count = " + count);
-//        return count >= 2;
-//    }
-
-//    /**
-//     * Create a string representation of the node
-//     *
-//     * @param node the Node
-//     * @return a String
-//     */
-//
-//    private boolean hasWriteInPath(Node node) {
-//        Iterable<Relationship> iterable = node.getRelationships(Direction.OUTGOING);
-//        for (Relationship relationship : iterable) {
-//            Node endNode = relationship.getEndNode();
-//            NodeType type = NodeType.fromString(endNode.getProperty(NodeProperties.NODE_TYPE).toString());
-//            if (type == NodeType.ArtifactNode && includeFilterPatternMatcher.include(endNode)) {
-//                LOG.debug("hasWritesInPath result = " + true);
-//                return true;
-//            }
-//
-//            if (type == NodeType.GroupNode && includeFilterPatternMatcher.include(endNode)) {
-//                return hasWriteInPath(endNode);
-//            }
-//        }
-//        return false;
-//    }
-
-    String nodeToString(Node node) {
-        StringBuffer buff = new StringBuffer();
-        buff.append("Node{ Id = ");
-        buff.append(node.getId());
-        for (String key : node.getPropertyKeys()) {
-            buff.append(" key = ");
-            buff.append(key);
-            buff.append(" value = ");
-            buff.append(node.getProperty(key));
-        }
-        buff.append("}");
-
-        return buff.toString();
-    }
-
-    private String relation2String(Relationship relation) {
-        return "Relationship { Id = " + relation.getId() + " type = " + relation.getType() + "}";
+        exporter.writeDotFile();
     }
 }

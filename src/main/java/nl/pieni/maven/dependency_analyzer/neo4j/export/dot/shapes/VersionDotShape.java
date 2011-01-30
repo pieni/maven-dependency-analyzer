@@ -26,18 +26,18 @@ import java.util.Set;
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 26-1-11
- * Time: 22:40
+ * Date: 29-1-11
+ * Time: 12:47
  * To change this template use File | Settings | File Templates.
  */
-public class ArtifactDotShape extends DotShape {
-    public ArtifactDotShape(Node node, Set<Relationship> relations) {
-        super(node, relations);
+public class VersionDotShape extends DotShape {
 
+    public VersionDotShape(Node node, Set<Relationship> relationships) {
+        super(node, relationships);
     }
 
     @Override
     public String getLabel() {
-        return getNode().getProperty(NodeProperties.ARTIFACT_ID).toString();
+        return getNode().getProperty(NodeProperties.VERSION).toString();
     }
 }
