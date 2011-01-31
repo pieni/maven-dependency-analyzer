@@ -86,8 +86,8 @@ public class ArtifactNodeDecorator extends AbstractNodeDecorator implements Arti
     @Override
     public GroupNode getParent() {
         Iterable<Relationship> hasRelations = getRelationships(ArtifactRelations.has, Direction.INCOMING);
-        for (Relationship relationship : hasRelations) {
-            Node relationNode = relationship.getOtherNode(this);
+        if (hasRelations.iterator().hasNext()) {
+            Node relationNode = hasRelations.iterator().next().getOtherNode(this);
             return new GroupNodeDecorator(relationNode);
         }
 

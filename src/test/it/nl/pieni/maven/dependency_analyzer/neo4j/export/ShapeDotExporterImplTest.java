@@ -20,17 +20,10 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.matchers.ArtifactNodeDecoratorMatcher;
-import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorMatcher;
-import nl.pieni.maven.dependency_analyzer.matchers.RelationshipTypeMatcher;
-import nl.pieni.maven.dependency_analyzer.matchers.VersionNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.AbstractDatabaseImplTest;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearcherImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessorImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.RawDotExporterImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.ShapeDotExporterImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.shape.ShapeDotWriter;
@@ -39,7 +32,6 @@ import org.apache.maven.model.Dependency;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
@@ -50,10 +42,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -91,7 +80,6 @@ public class ShapeDotExporterImplTest extends AbstractDatabaseImplTest {
     @After
     public void after() {
         database.shutdownDatabase();
-        afterBase();
     }
 
     @Test
@@ -205,7 +193,7 @@ public class ShapeDotExporterImplTest extends AbstractDatabaseImplTest {
 //        verify(writer).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_2.getArtifactId())));
 //        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
 //        verify(writer, times(2)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.version)));
-//        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(DependencyScopeRelations.compile)));
+//        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ScopedRelation.compile)));
 //        verify(writer, times(6)).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.has)));
 //        verify(writer).writeNode2NodeRelation(Matchers.<Node>any(), Matchers.<Node>any(), argThat(new RelationshipTypeMatcher(ArtifactRelations.depends)));
     }
@@ -361,7 +349,7 @@ public class ShapeDotExporterImplTest extends AbstractDatabaseImplTest {
 //        verify(writer, atLeast(2)).writeNode(argThat(new VersionNodeDecoratorMatcher(dependency_1.getVersion())));
 //        verify(writer, atLeast(2)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.version)));
 //        verify(writer, atLeast(3)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.has)));
-//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(DependencyScopeRelations.compile)));
+//        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ScopedRelation.compile)));
 //        verify(writer, atLeast(1)).writeRelation(argThat(new RelationshipMatcher(ArtifactRelations.depends)));
 //    }
 //

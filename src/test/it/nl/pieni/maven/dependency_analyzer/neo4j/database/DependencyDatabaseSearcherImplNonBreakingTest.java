@@ -19,7 +19,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.database;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -75,7 +75,6 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         } catch (Exception e) {
             //Ignored
         }
-            afterBase();
     }
 
     @Test
@@ -168,24 +167,24 @@ public class DependencyDatabaseSearcherImplNonBreakingTest extends AbstractDatab
         dependencyA.setScope("compile");
         Dependency dependencyB = getDependency();
 
-        Map<DependencyScopeRelations, List<ArtifactNode>> result;
+        Map<ScopedRelation, List<ArtifactNode>> result;
         DependencyNodeProcessor processor = new DependencyNodeProcessorImpl(database, searcher, log);
         processor.addArtifact(dependencyA);
         processor.addArtifact(dependencyB);
         processor.addRelation(dependencyB, dependencyA);
         result = searcher.getDependingArtifacts(dependencyA);
-        assertTrue(result.containsKey(DependencyScopeRelations.compile));
-        assertTrue(result.get(DependencyScopeRelations.compile).size() == 1);
-        assertTrue(result.get(DependencyScopeRelations.compile).get(0).getArtifactId().equals(dependencyB.getArtifactId()));
+        assertTrue(result.containsKey(ScopedRelation.compile));
+        assertTrue(result.get(ScopedRelation.compile).size() == 1);
+        assertTrue(result.get(ScopedRelation.compile).get(0).getArtifactId().equals(dependencyB.getArtifactId()));
     }
 
     @Test
     public void getDependingArtifactsNotFoundDependency() {
         Dependency dependency = getDependency();
-        Map<DependencyScopeRelations, List<ArtifactNode>> result;
+        Map<ScopedRelation, List<ArtifactNode>> result;
         result = searcher.getDependingArtifacts(dependency);
-        for (DependencyScopeRelations dependencyScopeRelations : result.keySet()) {
-            assertTrue(result.get(dependencyScopeRelations).size() == 0);
+        for (ScopedRelation scopedRelation : result.keySet()) {
+            assertTrue(result.get(scopedRelation).size() == 0);
         }
     }
 

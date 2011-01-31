@@ -9,7 +9,7 @@ import java.util.Map;
  * The scope of a dependency, Enumeration of the Maven dependency scope identifier
  * Implements the J Bloch implementation for String to enum value casting
  */
-public enum DependencyScopeRelations implements RelationshipType {
+public enum ScopedRelation implements RelationshipType {
 
     compile,    //This dependency is needed for compilation of the main source
     test,       //This dependency is needed for compiling and running tests. It is not needed for compiling the main source or running the final artifact.
@@ -19,10 +19,10 @@ public enum DependencyScopeRelations implements RelationshipType {
     tag;        // <optional />
 
 
-    private static final Map<String, DependencyScopeRelations> STRING2ENUM = new HashMap<String, DependencyScopeRelations>();
+    private static final Map<String, ScopedRelation> STRING2ENUM = new HashMap<String, ScopedRelation>();
 
     static {
-        for (DependencyScopeRelations val : values()) {
+        for (ScopedRelation val : values()) {
             STRING2ENUM.put(val.toString(), val);
         }
     }
@@ -33,7 +33,7 @@ public enum DependencyScopeRelations implements RelationshipType {
      * @param pcode the code.
      * @return the corresponding enum.
      */
-    public static DependencyScopeRelations fromString(final String pcode) {
+    public static ScopedRelation fromString(final String pcode) {
         return STRING2ENUM.get(pcode);
     }
 

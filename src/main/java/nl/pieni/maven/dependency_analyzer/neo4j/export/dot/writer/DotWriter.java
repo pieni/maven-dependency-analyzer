@@ -47,7 +47,7 @@ public interface DotWriter {
 
     /**
      * Close the file (write the Dot ending)
-     * @throws IOException
+     * @throws IOException in case of error
      */
     void close() throws IOException;
 

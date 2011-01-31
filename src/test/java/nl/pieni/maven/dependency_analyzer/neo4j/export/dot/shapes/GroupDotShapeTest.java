@@ -36,34 +36,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 28-1-11
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
+ * Test classes for group shapes
  */
 public class GroupDotShapeTest {
 
-    private Node startNode;
-    private Node endNode;
-    private GroupAbstractDotShape shape;
+    private GroupDotShape shape;
     public static final String GROUP_NAME = "nl.pieni.maven.dependency_analyzer";
-    private Relationship relation;
 
     @Before
     public void before() {
-        startNode = mock(Node.class);
+        Node startNode= mock(Node.class);
         when(startNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
         when(startNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
         when(startNode.getId()).thenReturn(1L);
         when(startNode.getProperty(NodeProperties.GROUP_ID)).thenReturn(GROUP_NAME);
 
-        endNode = mock(Node.class);
+        Node endNode= mock(Node.class);
         when(endNode.getId()).thenReturn(2L);
         when(endNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
         when(endNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
 
-        relation = mock(Relationship.class);
+        Relationship relation= mock(Relationship.class);
         when(relation.getStartNode()).thenReturn(startNode);
 
 
@@ -72,7 +65,7 @@ public class GroupDotShapeTest {
 
         Set<Relationship> relationSet = new HashSet<Relationship>();
         relationSet.add(relation);
-        shape = new GroupAbstractDotShape(startNode, relationSet);
+        shape = new GroupDotShape(startNode, relationSet);
     }
 
     @Test

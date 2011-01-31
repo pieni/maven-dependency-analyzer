@@ -23,24 +23,27 @@ import org.neo4j.graphdb.Relationship;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 29-1-11
- * Time: 12:47
- * To change this template use File | Settings | File Templates.
+ * Base class for artifact shapes
  */
-public class VersionAbstractDotShape extends AbstractDotShape {
+public class ArtifactDotShape extends AbstractDotShape {
+    public ArtifactDotShape(Node node, Set<Relationship> relations) {
+        super(node, relations);
 
-    public VersionAbstractDotShape(Node node, Set<Relationship> relationships) {
-        super(node, relationships);
     }
 
+    /**
+     * @InheritDoc
+     */
     @Override
     public String getLabel() {
-        return getNode().getProperty(NodeProperties.VERSION).toString();
+        return getNode().getProperty(NodeProperties.ARTIFACT_ID).toString();
     }
 
+    /**
+     * @InheritDoc
+     */
+    @Override
     public String getId() {
-        return ShapeIdPrefix.Version.toString() + getNode().getId();
+        return ShapeIdPrefix.Artifact.toString() + getNode().getId();
     }
 }

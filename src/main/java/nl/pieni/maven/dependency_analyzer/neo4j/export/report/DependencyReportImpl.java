@@ -17,7 +17,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.report;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.export.report.DependencyReport;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
@@ -65,9 +65,9 @@ public class DependencyReportImpl implements DependencyReport {
             writer.write("\t" + version.getVersion() + lineSeperator);
         }
 
-        Map<DependencyScopeRelations, List<ArtifactNode>> scopedRelations = searcher.getDependingArtifacts(dependency);
+        Map<ScopedRelation, List<ArtifactNode>> scopedRelations = searcher.getDependingArtifacts(dependency);
         writer.write("Incoming relations" + lineSeperator);
-        for (DependencyScopeRelations dependencyScope : scopedRelations.keySet()) {
+        for (ScopedRelation dependencyScope : scopedRelations.keySet()) {
             writer.write("\tScope: " + dependencyScope + lineSeperator);
 
             List<ArtifactNode> artifacts = scopedRelations.get(dependencyScope);

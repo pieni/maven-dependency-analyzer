@@ -36,32 +36,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 28-1-11
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
+ * Root shape tests
  */
 public class RootDotShapeTest {
 
-    private Node startNode;
-    private Node endNode;
-    private RootShapeAbstract shape;
+    private RootShape shape;
     public static final String LABEL_NAME = "root";
-    private Relationship relation;
 
     @Before
     public void before() {
-        startNode = mock(Node.class);
+        Node startNode= mock(Node.class);
         when(startNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(false);
         when(startNode.getId()).thenReturn(1L);
 
-        endNode = mock(Node.class);
+        Node endNode= mock(Node.class);
         when(endNode.getId()).thenReturn(2L);
         when(endNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
         when(endNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
 
-        relation = mock(Relationship.class);
+        Relationship relation= mock(Relationship.class);
         when(relation.getStartNode()).thenReturn(startNode);
 
 
@@ -70,7 +63,7 @@ public class RootDotShapeTest {
 
         Set<Relationship> relationSet = new HashSet<Relationship>();
         relationSet.add(relation);
-        shape = new RootShapeAbstract(startNode, relationSet);
+        shape = new RootShape(startNode, relationSet);
     }
 
     @Test

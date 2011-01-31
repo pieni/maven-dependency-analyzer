@@ -280,11 +280,8 @@ public abstract class AbstractNodeDecorator implements Node, DependencyNode, Com
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Node)) {
-            return false;
+        return o instanceof Node && this.getId() == ((Node) o).getId();
         }
-        return this.getId() == ((Node) o).getId();
-    }
 
     @Override
     public int hashCode() {

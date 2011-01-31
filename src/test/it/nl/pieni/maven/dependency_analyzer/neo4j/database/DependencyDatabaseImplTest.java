@@ -51,7 +51,6 @@ public class DependencyDatabaseImplTest extends AbstractDatabaseImplTest {
         if (!dbClosed) {
             database.shutdownDatabase();
         }
-        afterBase();
     }
 
 

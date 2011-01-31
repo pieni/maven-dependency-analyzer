@@ -21,11 +21,7 @@ import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.neo4j.graphdb.Node;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 29-1-11
- * Time: 21:45
- * To change this template use File | Settings | File Templates.
+ * Prefixes used for shape identification
  */
 public enum ShapeIdPrefix {
 
@@ -35,12 +31,21 @@ public enum ShapeIdPrefix {
     Version("V"), //Version
     Root("R"); //Reference/root
 
-    private String shortPrefix;
+    private final String shortPrefix;
 
+    /**
+     * Default constructor
+     * @param shortPrefix the prefix
+     */
     ShapeIdPrefix(String shortPrefix) {
         this.shortPrefix = shortPrefix;
     }
 
+    /**
+     * Conversion
+     * @param node the Node
+     * @return the {@link ShapeIdPrefix} enum value
+     */
     public static String fromNode(Node node) {
         if (node.hasProperty(NodeProperties.NODE_TYPE)) {
             switch (NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE))) {
@@ -56,6 +61,10 @@ public enum ShapeIdPrefix {
         return Root.toString();
     }
 
+    /**
+     * @InheritDoc
+     */
+    @Override
     public String toString() {
         return shortPrefix;
     }

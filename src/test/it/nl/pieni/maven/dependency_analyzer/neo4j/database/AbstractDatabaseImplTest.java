@@ -33,10 +33,10 @@ public abstract class AbstractDatabaseImplTest {
 
     private final static String BASE_TEST_LOCATION = System.getProperty("java.io.tmpdir") + "/dependency_analyzer_test/";
     private static File testDirectory;
-    public static Log log;
+    protected static Log log;
     private static int dependencyCnt = 0;
 
-    private static boolean deleteDirectory(File path) {
+    private static void deleteDirectory(File path) {
         if (path.equals(testDirectory)) {
             System.out.println("Removing directory: " + path.getAbsolutePath());
         }
@@ -52,10 +52,11 @@ public abstract class AbstractDatabaseImplTest {
                 }
             }
         }
-        return (path.delete());
+        path.delete();
+        return;
     }
 
-    public static File createTempDirectory()
+    private static File createTempDirectory()
             throws IOException {
         final File temp;
 
@@ -81,15 +82,11 @@ public abstract class AbstractDatabaseImplTest {
         return (temp);
     }
 
-    static public void beforeBase() throws IOException {
+    protected static void beforeBase() throws IOException {
         testDirectory = createTempDirectory();
         log = mock(Log.class);
         when(log.isDebugEnabled()).thenReturn(true);
         when(log.isInfoEnabled()).thenReturn(true);
-    }
-
-    static public void afterBase() {
-        //deleteDirectory(testDirectory);
     }
 
     protected static String getDBDirectory() {

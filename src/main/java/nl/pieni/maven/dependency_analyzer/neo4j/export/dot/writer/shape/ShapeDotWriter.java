@@ -26,19 +26,27 @@ import java.io.Writer;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 30-1-11
- * Time: 21:22
- * To change this template use File | Settings | File Templates.
+ * Implementation of a Dot Writer
  */
 public class ShapeDotWriter extends AbstractDotWriter {
 
+    /**
+     * Default constructor
+     *
+     * @param writer the Writer
+     * @param LOG    the logger
+     */
     public ShapeDotWriter(Writer writer, Log LOG) {
         super(writer, LOG);
     }
 
-
+    /**
+     * Write the shapes and edges
+     *
+     * @param shapeAbstracts the shapes
+     * @param edges the edges
+     * @throws IOException in case of error
+     */
     public void write(Set<AbstractDotShape> shapeAbstracts, Set<DotEdge> edges) throws IOException {
 
         startGraph();

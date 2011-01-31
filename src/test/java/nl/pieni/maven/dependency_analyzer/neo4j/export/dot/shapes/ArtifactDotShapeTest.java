@@ -19,7 +19,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.junit.Before;
@@ -38,30 +38,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 28-1-11
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
+ * Test classes for the Artifact shapes
  */
 public class ArtifactDotShapeTest {
 
-    private Node startNode;
-    private Node endNode;
-    private ArtifactAbstractDotShape shape;
+    private ArtifactDotShape shape;
     public static final String ARTIFACT_NAME = "theArtifactId";
     private Relationship relation;
 
     @Before
     public void before() {
-        startNode = mock(Node.class);
+        Node startNode= mock(Node.class);
         when(startNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
         when(startNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
         when(startNode.getId()).thenReturn(1L);
         when(startNode.getProperty(NodeProperties.ARTIFACT_ID)).thenReturn(ARTIFACT_NAME);
         relation = mock(Relationship.class);
         when(relation.getStartNode()).thenReturn(startNode);
-        endNode = mock(Node.class);
+        Node endNode= mock(Node.class);
         when(endNode.getId()).thenReturn(2L);
         when(endNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
         when(endNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
@@ -69,7 +63,7 @@ public class ArtifactDotShapeTest {
         when(relation.getEndNode()).thenReturn(endNode);
         Set<Relationship> relationSet = new HashSet<Relationship>();
         relationSet.add(relation);
-        shape = new ArtifactAbstractDotShape(startNode, relationSet);
+        shape = new ArtifactDotShape(startNode, relationSet);
     }
 
     @Test
@@ -109,15 +103,15 @@ public class ArtifactDotShapeTest {
     @Test
     public void testGetEdgesScopedCompile() {
 
-        when(relation.getType()).thenReturn(DependencyScopeRelations.compile);
+        when(relation.getType()).thenReturn(ScopedRelation.compile);
         Set<DotEdge> dotEdges = shape.getEdges();
         for (DotEdge dotEdge : dotEdges) {
             assertEquals(EdgeStyle.dotted, dotEdge.getEdgeStyle());
             assertEquals("V2", dotEdge.getEndId());
             assertEquals("A1", dotEdge.getStartId());
-            assertEquals(DependencyScopeRelations.compile.toString(), dotEdge.getLabel());
+            assertEquals(ScopedRelation.compile.toString(), dotEdge.getLabel());
             assertThat(dotEdge.toString(), containsString("A1 -> V2"));
-            assertThat(dotEdge.toString(), containsString("label=\"" + DependencyScopeRelations.compile + "\""));
+            assertThat(dotEdge.toString(), containsString("label=\"" + ScopedRelation.compile + "\""));
             assertThat(dotEdge.toString(), containsString("style=\"" + EdgeStyle.dotted + "\""));
         }
     }

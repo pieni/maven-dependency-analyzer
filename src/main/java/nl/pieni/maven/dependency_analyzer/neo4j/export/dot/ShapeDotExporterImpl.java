@@ -26,18 +26,22 @@ import org.neo4j.graphdb.Node;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 30-1-11
- * Time: 21:29
- * To change this template use File | Settings | File Templates.
+ * Implementation of the shape exporter
  */
 public class ShapeDotExporterImpl extends AbstractDotExporter<ShapeDotWriter> {
 
+    /**
+     * Default constructor
+     * @param dependencyDatabase the DB
+     * @param log the Logger
+     */
     public ShapeDotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         super(dependencyDatabase, log);
     }
 
+    /**
+     * @InheritDoc
+     */
     @Override
     public void export(ShapeDotWriter writer) throws IOException {
         Neo4J2Dot neo4J2Dot = new Neo4J2Dot(getNodesAndRelations());

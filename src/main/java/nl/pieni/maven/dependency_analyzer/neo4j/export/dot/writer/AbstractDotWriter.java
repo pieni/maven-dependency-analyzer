@@ -29,10 +29,10 @@ import java.io.Writer;
 public class AbstractDotWriter implements DotWriter {
 
     private final Writer writer;
-    public final String LINE_SEPARATOR = System.getProperty("line.separator");
+    protected final String LINE_SEPARATOR = System.getProperty("line.separator");
     private final Log LOG;
 
-    public AbstractDotWriter(Writer writer, Log LOG) {
+    protected AbstractDotWriter(Writer writer, Log LOG) {
         this.writer = writer;
         this.LOG = LOG;
     }

@@ -19,11 +19,11 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.convert;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.AbstractDotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactAbstractDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactDotShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.GroupAbstractDotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.RootShapeAbstract;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionAbstractDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.GroupDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.RootShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionDotShape;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -32,11 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 29-1-11
- * Time: 18:11
- * To change this template use File | Settings | File Templates.
+ * Conversion of a Neo4J format to a Dot format
  */
 public class Neo4J2Dot {
 
@@ -44,20 +40,36 @@ public class Neo4J2Dot {
     Set<AbstractDotShape> shapeSetAbstract = new HashSet<AbstractDotShape>();
     Set<DotEdge> edgeSet = new HashSet<DotEdge>();
 
+    /**
+     * Default constructor
+     * Converst the Nodes to DotShapes and the Set of relations to Edges
+     * @param exportNodeMap
+     */
     public Neo4J2Dot(Map<Node, Set<Relationship>> exportNodeMap) {
         this.exportNodeMap = exportNodeMap;
         convertNodes();
         convertRelations();
     }
 
+    /**
+     * Return a Set of shapes
+     * @return the shapes
+     */
     public Set<AbstractDotShape> getShapes() {
         return shapeSetAbstract;
     }
 
+    /**
+     * Return a  set of edges
+     * @return the edges
+     */
     public Set<DotEdge> getEdges() {
         return edgeSet;
     }
 
+    /**
+     * The actual conversion of the nodes
+     */
     private void convertNodes() {
         for (Node node : exportNodeMap.keySet()) {
             Set<Relationship> relations = exportNodeMap.get(node);
@@ -65,21 +77,24 @@ public class Neo4J2Dot {
                 NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE));
                 switch (type) {
                     case ArtifactNode:
-                        shapeSetAbstract.add(new ArtifactAbstractDotShape(node, relations));
+                        shapeSetAbstract.add(new ArtifactDotShape(node, relations));
                         break;
                     case VersionNode:
-                        shapeSetAbstract.add(new VersionAbstractDotShape(node, relations));
+                        shapeSetAbstract.add(new VersionDotShape(node, relations));
                         break;
                     case GroupNode:
-                        shapeSetAbstract.add(new GroupAbstractDotShape(node, relations));
+                        shapeSetAbstract.add(new GroupDotShape(node, relations));
                         break;
                 }
             } else {
-                shapeSetAbstract.add(new RootShapeAbstract(node, relations));
+                shapeSetAbstract.add(new RootShape(node, relations));
             }
         }
     }
 
+    /**
+     * Conversion of the relations
+     */
     private void convertRelations() {
         for (AbstractDotShape shapeAbstract : shapeSetAbstract) {
             edgeSet.addAll(shapeAbstract.getEdges());

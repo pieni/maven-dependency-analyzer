@@ -16,17 +16,21 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.util;
 
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 30-1-11
- * Time: 20:06
- * To change this template use File | Settings | File Templates.
+ * Various utils used
  */
 public class NodeUtils {
+
+    /**
+     * Create a String representation of a {@link Node}
+     * @param node the node
+     * @return  String
+     */
     public static String nodeToString(Node node) {
         StringBuffer buff = new StringBuffer();
         buff.append("Node{ Id = ");
@@ -42,8 +46,23 @@ public class NodeUtils {
         return buff.toString();
     }
 
+    /**
+     * String representation of a relation
+     * @param relation the Relation
+     * @return String
+     */
     public static String relation2String(Relationship relation) {
         return "Relationship { Id = " + relation.getId() + " type = " + relation.getType() + "}";
+    }
+
+    /**
+     * Determine if the relation is a scope one.
+     *
+     * @param relationship the relation
+     * @return true when scope relation
+     */
+    public static boolean isScoperelation(RelationshipType relationship) {
+        return relationship instanceof ScopedRelation;
     }
 
 }

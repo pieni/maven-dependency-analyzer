@@ -30,6 +30,7 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -80,13 +81,9 @@ class IncludeFilterPatternMatcher {
     private boolean matchGroupNode(Node node) {
         GroupNodeDecorator groupNode = new GroupNodeDecorator(node);
         String gav = groupNode.getGroupId();
-        if (gavIncludeFilter.filter(gav)) {
-            return true;
+        return gavIncludeFilter.filter(gav) || hasMatchFurtherDown(groupNode);
+
         }
-
-        return hasMatchFurtherDown(groupNode);
-
-    }
 
     /**
      * Due to the structure of the DB "nl.pieni.maven" is stored as: nl -> nl.pieni -> nl.pieni.maven
@@ -97,8 +94,9 @@ class IncludeFilterPatternMatcher {
     private boolean hasMatchFurtherDown(GroupNodeDecorator groupNodeDecorator) {
 
         Iterable<Relationship> relationships = groupNodeDecorator.getRelationships(ArtifactRelations.has, Direction.OUTGOING);
-        for (Relationship relationship : relationships) {
-            Node otherNode = relationship.getOtherNode(groupNodeDecorator);
+        Iterator<Relationship> iter = relationships.iterator();
+        if (iter.hasNext()) {
+            Node otherNode = iter.next().getOtherNode(groupNodeDecorator);
             if (NodeType.ArtifactNode == NodeType.fromString((String)otherNode.getProperty(NodeProperties.NODE_TYPE))) {
                 return matchArtifactNode(otherNode);
             }

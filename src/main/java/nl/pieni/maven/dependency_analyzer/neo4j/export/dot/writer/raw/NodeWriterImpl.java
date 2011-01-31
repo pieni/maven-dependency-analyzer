@@ -18,11 +18,11 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.AbstractDotWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.util.NodeUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -118,7 +118,7 @@ public class NodeWriterImpl extends AbstractDotWriter implements NodeWriter {
         if (visitedRelations.add(relationship)) {
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
-            if (isScoperelation(relationship.getType())) {
+            if (NodeUtils.isScoperelation(relationship.getType())) {
                 getLog().debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
                 getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\" style=dotted]" + LINE_SEPARATOR);
             } else {
@@ -126,13 +126,6 @@ public class NodeWriterImpl extends AbstractDotWriter implements NodeWriter {
                 getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + LINE_SEPARATOR);
             }
         }
-    }
-
-    private boolean isScoperelation(RelationshipType relationship) {
-        if (relationship instanceof DependencyScopeRelations) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -161,7 +154,7 @@ public class NodeWriterImpl extends AbstractDotWriter implements NodeWriter {
 
         if (related.add(endNode)) {
             getLog().debug("Writing Node 2 Node Relation " + startNode + " -> " + endNode + " type = " + type);
-            if (isScoperelation(type)) {
+            if (NodeUtils.isScoperelation(type)) {
                 getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\" style=dotted]" + LINE_SEPARATOR);
             } else {
                 getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\"]" + LINE_SEPARATOR);

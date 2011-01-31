@@ -36,11 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 28-1-11
- * Time: 15:35
- * To change this template use File | Settings | File Templates.
+ * test classes for the pattern matcher
  */
 public class IncludeFilterPatternMatcherTest {
 
@@ -65,7 +61,6 @@ public class IncludeFilterPatternMatcherTest {
         Iterable<Relationship> relationshipIterable = mock(Iterable.class);
         Iterator<Relationship> relationshipIterator = mock(Iterator.class);
         when(relationshipIterable.iterator()).thenReturn(relationshipIterator);
-        Relationship relationship = mock(Relationship.class);
         when(relationshipIterator.hasNext()).thenReturn(true).thenReturn(false);
         List<String> pattern = new ArrayList<String>();
         pattern.add("nl.pieni.maven.*");

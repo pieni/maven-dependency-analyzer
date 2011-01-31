@@ -20,7 +20,7 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.factory.ArtifactNodeFactory;
@@ -140,7 +140,7 @@ public class DependencyNodeProcessorImpl implements DependencyNodeProcessor {
      * @return the {@link RelationshipType}
      */
     private RelationshipType determineRelationType(final Dependency dependency) {
-        RelationshipType result = DependencyScopeRelations.fromString(dependency.getScope());
+        RelationshipType result = ScopedRelation.fromString(dependency.getScope());
         if (result == null) {
             throw new IllegalArgumentException("Unable to determine scope for dependency: " + dependency);
         }

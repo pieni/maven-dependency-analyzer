@@ -16,7 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.database;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
 import nl.pieni.maven.dependency_analyzer.node.VersionNode;
@@ -74,7 +74,7 @@ public interface DependencyDatabaseSearcher<N> {
      * @param dependency the Artifact
      * @return A separate list for each ({@link Dependency}) scope
      */
-    Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(Dependency dependency);
+    Map<ScopedRelation, List<ArtifactNode>> getDependingArtifacts(Dependency dependency);
 
     /**
      * Retrieve the list of {@link VersionNode} elements that are dependent on the {@link ArtifactNode}.

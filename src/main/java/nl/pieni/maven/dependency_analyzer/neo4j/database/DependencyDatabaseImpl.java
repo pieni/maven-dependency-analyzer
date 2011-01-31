@@ -31,7 +31,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
  */
 public class DependencyDatabaseImpl implements DependencyDatabase<GraphDatabaseService, Node> {
     private final Log LOGGER;
-    private GraphDatabaseService graphDb;
+    private final GraphDatabaseService graphDb;
     private Transaction transaction;
     private int transactionCount = 0;
 

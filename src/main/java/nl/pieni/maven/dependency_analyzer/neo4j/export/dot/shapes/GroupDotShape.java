@@ -23,24 +23,27 @@ import org.neo4j.graphdb.Relationship;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 26-1-11
- * Time: 22:40
- * To change this template use File | Settings | File Templates.
+ * Dot shape for a Group
  */
-public class ArtifactAbstractDotShape extends AbstractDotShape {
-    public ArtifactAbstractDotShape(Node node, Set<Relationship> relations) {
-        super(node, relations);
+public class GroupDotShape extends AbstractDotShape {
 
+    public GroupDotShape(Node node, Set<Relationship> relations) {
+        super(node, relations);
     }
 
+    /**
+     * @InheritDoc
+     */
     @Override
     public String getLabel() {
-        return getNode().getProperty(NodeProperties.ARTIFACT_ID).toString();
+        return getNode().getProperty(NodeProperties.GROUP_ID).toString();
     }
 
+    /**
+     * @InheritDoc
+     */
+    @Override
     public String getId() {
-        return ShapeIdPrefix.Artifact.toString() + getNode().getId();
+        return ShapeIdPrefix.Group.toString() + getNode().getId();
     }
 }

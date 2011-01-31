@@ -17,16 +17,9 @@
 package nl.pieni.maven.dependency_analyzer.dot.NodeShapes;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 26-1-11
- * Time: 21:01
- * To change this template use File | Settings | File Templates.
+ * Style of edges used (i.e. the line)
  */
 public enum EdgeStyle {
-    dashed,
     dotted,
-    solid,
-    invis,
-    bold;
+    solid
 }

@@ -17,17 +17,12 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.util.NodeUtils;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 26-1-11
- * Time: 21:00
- * To change this template use File | Settings | File Templates.
+ * Edges of the Dot Graph
  */
 public class DotEdge {
     private final String endId;
@@ -36,13 +31,17 @@ public class DotEdge {
     private final String label;
 
 
+    /**
+     * Default constructor
+     * @param relationship the relation
+     */
     public DotEdge(Relationship relationship) {
         Node startNode = relationship.getStartNode();
         this.startId = ShapeIdPrefix.fromNode(startNode) + startNode.getId();
         Node endNode = relationship.getEndNode();
         this.endId = ShapeIdPrefix.fromNode(endNode) + endNode.getId();
 
-        if (isScoperelation(relationship.getType())) {
+        if (NodeUtils.isScoperelation(relationship.getType())) {
             this.edgeStyle = EdgeStyle.dotted;
         } else {
             this.edgeStyle = EdgeStyle.solid;
@@ -51,30 +50,44 @@ public class DotEdge {
         this.label = relationship.getType().toString();
     }
 
+    /**
+     * Starting ID of the edge
+     * @return the Id
+     */
     public String getStartId() {
         return this.startId;
     }
 
+    /**
+     * End ID of the edge
+     * @return the Id
+     */
     public String getEndId() {
         return this.endId;
     }
 
+    /**
+     * The style (line) of the edge see {@link EdgeStyle}
+     * @return the Style
+     */
     public EdgeStyle getEdgeStyle() {
         return this.edgeStyle;
     }
 
+    /**
+     * The label for the edge
+     * @return the label
+     */
     public String getLabel() {
         return this.label;
     }
 
+    /**
+     * Dot representation of the edge
+     * @return
+     */
     public String toString() {
         return this.getStartId() + " -> " + this.getEndId() + " [label=\"" + this.getLabel() + "\" style=\"" + this.getEdgeStyle() + "\" ]";
     }
 
-    private boolean isScoperelation(RelationshipType relationship) {
-        if (relationship instanceof DependencyScopeRelations) {
-            return true;
-        }
-        return false;
-    }
 }

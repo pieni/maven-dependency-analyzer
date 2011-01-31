@@ -112,8 +112,6 @@ public class CreateDatabaseMojo
 
         } catch (IOException e) {
             throw new MojoExecutionException("Error communicating", e);
-        } catch (SettingsBuildingException e) {
-            throw new MojoExecutionException("Error parsing settings", e);
         } catch (UnsupportedExistingLuceneIndexException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } finally {
@@ -137,7 +135,7 @@ public class CreateDatabaseMojo
      * @param source the found artifact
      * @throws SettingsBuildingException Unable to parse the settings file
      */
-    private void processArtifactInfo(final ArtifactInfo source) throws SettingsBuildingException {
+    private void processArtifactInfo(final ArtifactInfo source)  {
 
         try {
             MavenProject mavenProject = artifactInfo2MavenProject(source);

@@ -52,7 +52,6 @@ public class DependencyProcesserImplTest extends AbstractDatabaseImplTest {
     @AfterClass
     public static void afterClass() {
         database.shutdownDatabase();
-        afterBase();
     }
 
     @Test

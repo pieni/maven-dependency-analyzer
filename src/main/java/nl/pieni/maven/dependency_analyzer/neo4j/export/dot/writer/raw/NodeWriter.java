@@ -87,8 +87,8 @@ public interface NodeWriter extends DotWriter {
      *
      * @param refNode the refNode
      * @param childNode the relation.
-     * @param has
+     * @param type the relation type
      * @throws IOException in case of error
      */
-    void writeNode2NodeRelation(Node refNode, Node childNode, RelationshipType has) throws IOException;
+    void writeNode2NodeRelation(Node refNode, Node childNode, RelationshipType type) throws IOException;
 }

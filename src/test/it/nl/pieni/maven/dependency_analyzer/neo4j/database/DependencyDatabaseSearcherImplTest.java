@@ -57,7 +57,6 @@ public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest
         try {
         database.shutdownDatabase();
         searcher.shutdownSearcher();
-        afterBase();
         } catch (Exception e) {
             //Exception is ignored
         }

@@ -19,7 +19,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.database;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
@@ -160,16 +160,16 @@ public class DependencyDatabaseSearcherImpl implements DependencyDatabaseSearche
      * {@inheritDoc}
      */
     @Override
-    public Map<DependencyScopeRelations, List<ArtifactNode>> getDependingArtifacts(Dependency dependency) {
-        Map<DependencyScopeRelations, List<ArtifactNode>> artifactNodeMap = new HashMap<DependencyScopeRelations, List<ArtifactNode>>();
+    public Map<ScopedRelation, List<ArtifactNode>> getDependingArtifacts(Dependency dependency) {
+        Map<ScopedRelation, List<ArtifactNode>> artifactNodeMap = new HashMap<ScopedRelation, List<ArtifactNode>>();
 
         ArtifactNodeDecorator artifactNode = (ArtifactNodeDecorator) findArtifactNode(dependency);
         if (artifactNode == null) {
             return artifactNodeMap;
         }
 
-        DependencyScopeRelations[] relations = DependencyScopeRelations.values();
-        for (DependencyScopeRelations relation : relations) {
+        ScopedRelation[] relations = ScopedRelation.values();
+        for (ScopedRelation relation : relations) {
             List<ArtifactNode> artifactNodes = new ArrayList<ArtifactNode>();
             artifactNodeMap.put(relation, artifactNodes);
             Iterable<Relationship> scopeRelations = artifactNode.getRelationships(relation, Direction.INCOMING);

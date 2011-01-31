@@ -31,22 +31,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 30-1-11
- * Time: 21:30
- * To change this template use File | Settings | File Templates.
+ * Base class for Dot exports
  */
 public abstract class AbstractDotExporter<T> implements DotExporter<T> {
 
-    private final DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase;
-
-    private final Log LOG;
     private final NodeSelector nodeSelector;
 
-    public AbstractDotExporter(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
-        this.dependencyDatabase = dependencyDatabase;
-        this.LOG = log;
+    AbstractDotExporter(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
+        DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase1=dependencyDatabase;
+        Log LOG=log;
         this.nodeSelector = new NodeSelector(dependencyDatabase, log);
     }
 

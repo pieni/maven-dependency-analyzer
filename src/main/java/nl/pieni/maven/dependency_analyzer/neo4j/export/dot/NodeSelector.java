@@ -19,6 +19,7 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
+import nl.pieni.maven.dependency_analyzer.neo4j.util.NodeUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -33,19 +34,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 25-1-11
- * Time: 21:27
- * To change this template use File | Settings | File Templates.
+ * Select nodes from the graph stored om the database.
+ * Utilizes the {@link IncludeFilterPatternMatcher} to select the appropriate nodes
  */
-public class NodeSelector {
+class NodeSelector {
     private final Log LOG;
     private final DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase;
     private boolean includeVersions;
     private IncludeFilterPatternMatcher includeFilterPatternMatcher;
-    private Map<Node, Set<Relationship>> selectedNodeMap = new HashMap<Node, Set<Relationship>>();
+    private final Map<Node, Set<Relationship>> selectedNodeMap = new HashMap<Node, Set<Relationship>>();
 
+    /**
+     * Default constructor
+     * @param dependencyDatabase the Database
+     * @param log the Logger
+     */
     public NodeSelector(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
         this.LOG = log;
@@ -53,14 +56,30 @@ public class NodeSelector {
         setIncludeFilterPatterns(new ArrayList<String>() {});
     }
 
+    /**
+     * Set the include filter patters
+     * Default value is empty (nothing matches)
+     * @param includeFilterPatterns the pattern
+     */
     public void setIncludeFilterPatterns(List<String> includeFilterPatterns) {
         this.includeFilterPatternMatcher = new IncludeFilterPatternMatcher(includeFilterPatterns);
     }
 
+    /**
+     * Boolean the select versions
+     * Default value: false
+     * @param includeVersions false does not include versions.
+     */
     public void setIncludeVersions(boolean includeVersions) {
         this.includeVersions = includeVersions;
     }
 
+    /**
+     * Select all Nodes and relations with regards to the patterns specified.
+     * The Set contains all relavant relations see: {@link #setIncludeFilterPatterns(java.util.List)} and {@link #setIncludeVersions(boolean)}
+     *
+     * @return the map of nodes and relations
+     */
     public Map<Node, Set<Relationship>> selectNodesAndRelations() {
 
         Set<Node> nodeSet = selectNodes();
@@ -74,6 +93,7 @@ public class NodeSelector {
 
     /**
      * Parse through all nodes of the graph and select the nodes that must be written
+     * @return all selected nodes
      */
     private Set<Node> selectNodes() {
         Set<Node> nodeSet = new HashSet<Node>();
@@ -91,11 +111,41 @@ public class NodeSelector {
         return nodeSet;
     }
 
+    /**
+     * Select all valid relations from the nodes in the exportNodes_Refactor set
+     * @param selectedNodeSet the selected nodes.
+     */
+    private void selectRelationShips(Set<Node> selectedNodeSet) {
+        for (Node exportedNode : selectedNodeSet) {
+            if (exportedNode.hasRelationship(Direction.OUTGOING)) {
+                Iterable<Relationship> relations = exportedNode.getRelationships(Direction.OUTGOING);
+                for (Relationship relation : relations) {
+                    if (selectedNodeSet.contains(relation.getEndNode())) {
+                        processNodeAndRelation(exportedNode, relation);
+                    }
+                }
+            } else {
+                //Its a VersionNode
+                Set<Relationship> relationshipSet = new HashSet<Relationship>();
+                selectedNodeMap.put(exportedNode, relationshipSet);
+            }
+        }
+    }
+
+
+    //
+
+    /**
+     * Select all sub nodes (including startNode)
+     * This method is called recursively for the sub nodes (i.e. the end relations)
+     * @param startNode start point
+     * @return set of nodes selected
+     */
     private Set<Node> parseNode(Node startNode) {
         Set<Node> selectNodeSet = new HashSet<Node>();
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Parse: " + nodeToString(startNode));
+            LOG.debug("Parse: " + NodeUtils.nodeToString(startNode));
         }
 
         for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING)) {
@@ -115,6 +165,10 @@ public class NodeSelector {
         return selectNodeSet;
     }
 
+    /**
+     * Select all references that are coming from the root node.
+     * @param nodeSet the set of Node to process
+     */
     private void selectRefNodeRelationsShips(Set<Node> nodeSet) {
         for (Node exportNode : nodeSet) {
             Iterable<Relationship> refRelationships = exportNode.getRelationships(Direction.INCOMING);
@@ -126,26 +180,13 @@ public class NodeSelector {
         }
     }
 
-    /**
-     * Select all valid relations from the nodes in the exportNodes_Refactor set
-     */
-    private void selectRelationShips(Set<Node> selectedNodeSet) {
-        for (Node exportedNode : selectedNodeSet) {
-            if (exportedNode.hasRelationship(Direction.OUTGOING)) {
-                Iterable<Relationship> relations = exportedNode.getRelationships(Direction.OUTGOING);
-                for (Relationship relation : relations) {
-                    if (selectedNodeSet.contains(relation.getEndNode())) {
-                        processNodeAndRelation(exportedNode, relation);
-                    }
-                }
-            } else {
-                //Its a VersionNode
-                Set<Relationship> relationshipSet = new HashSet<Relationship>();
-                selectedNodeMap.put(exportedNode, relationshipSet);
-            }
-        }
-    }
 
+    /**
+     * Select and add the relations to the entry in the map that is identified by exportNode.
+     *
+     * @param exportedNode the relations from this node
+     * @param relation the relation to verify
+     */
     private void processNodeAndRelation(Node exportedNode, Relationship relation) {
         Set<Relationship> relationshipSet = selectedNodeMap.get(exportedNode);
         if (relationshipSet == null) {
@@ -153,14 +194,19 @@ public class NodeSelector {
             selectedNodeMap.put(exportedNode, relationshipSet);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Selected relation: " + relation2String(relation) + " for exportRaw");
+            LOG.debug("Selected relation: " + NodeUtils.relation2String(relation) + " for exportRaw");
         }
         relationshipSet.add(relation);
     }
 
+    /**
+     * Determine if this node must be included
+     * @param node the node
+     * @return true when included
+     */
     private boolean exportNode(Node node) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing node: " + nodeToString(node));
+            LOG.debug("Processing node: " + NodeUtils.nodeToString(node));
         }
         if (!includeFilterPatternMatcher.include(node)) {
             return false;
@@ -170,31 +216,8 @@ public class NodeSelector {
             return false;
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Node: " + nodeToString(node) + " selected for output");
+            LOG.debug("Node: " + NodeUtils.nodeToString(node) + " selected for output");
         }
         return true;
     }
-
-
-
-    String nodeToString(Node node) {
-        StringBuffer buff = new StringBuffer();
-        buff.append("Node{ Id = ");
-        buff.append(node.getId());
-        for (String key : node.getPropertyKeys()) {
-            buff.append(" key = ");
-            buff.append(key);
-            buff.append(" value = ");
-            buff.append(node.getProperty(key));
-        }
-        buff.append("}");
-
-        return buff.toString();
-    }
-
-    private String relation2String(Relationship relation) {
-        return "Relationship { Id = " + relation.getId() + " type = " + relation.getType() + "}";
-    }
-
-
 }

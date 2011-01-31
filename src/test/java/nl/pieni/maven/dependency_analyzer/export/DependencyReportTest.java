@@ -17,7 +17,7 @@ package nl.pieni.maven.dependency_analyzer.export;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.export.report.DependencyReport;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.report.DependencyReportImpl;
 import nl.pieni.maven.dependency_analyzer.node.ArtifactNode;
 import nl.pieni.maven.dependency_analyzer.node.GroupNode;
@@ -100,10 +100,10 @@ public class DependencyReportTest {
         //The group of the report
         when(searcher.findGroupNode(reportDependency1)).thenReturn(reportGroupNode);
 
-        Map<DependencyScopeRelations, List<ArtifactNode>> dependingArtifacts = new HashMap<DependencyScopeRelations, List<ArtifactNode>>();
+        Map<ScopedRelation, List<ArtifactNode>> dependingArtifacts = new HashMap<ScopedRelation, List<ArtifactNode>>();
         List<ArtifactNode> artifacts = new ArrayList<ArtifactNode>();
         artifacts.add(otherArtifactNode);
-        dependingArtifacts.put(DependencyScopeRelations.compile, artifacts);
+        dependingArtifacts.put(ScopedRelation.compile, artifacts);
         when(searcher.getDependingArtifacts(reportDependency1)).thenReturn(dependingArtifacts);
 
         Map<VersionNode, List<VersionNode>> versionDependencyMap = new HashMap<VersionNode, List<VersionNode>>();

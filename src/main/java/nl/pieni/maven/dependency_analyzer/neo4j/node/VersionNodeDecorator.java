@@ -26,6 +26,8 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import java.util.Iterator;
+
 /**
  * VersionNode decorator
  */
@@ -79,8 +81,9 @@ public class VersionNodeDecorator extends AbstractNodeDecorator implements Versi
     @Override
     public ArtifactNode getParent() {
         Iterable<Relationship> parentRelations = getRelationships(ArtifactRelations.version, Direction.INCOMING);
-        for (Relationship parentRelation : parentRelations) {
-            Node parent = parentRelation.getOtherNode(this);
+        Iterator<Relationship> iter = parentRelations.iterator();
+        if (iter.hasNext()) {
+            Node parent = iter.next().getOtherNode(this);
             return new ArtifactNodeDecorator(parent);
         }
 

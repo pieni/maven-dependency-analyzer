@@ -59,7 +59,7 @@ public class GroupNodeFactory extends AbstractNodeFactory<GroupNode> {
         GroupNodeDecorator startNode = (GroupNodeDecorator) getSearcher().findGroupNode(existingPath);
         String tmp = dependency.getGroupId().substring(existingPath.length(), dependency.getGroupId().length());
         StringTokenizer stringTokenizer = new StringTokenizer(tmp, ".");
-        String createPath = "";
+        String createPath  ;
         String startPath = existingPath;
         getDatabase().startTransaction();
         while (stringTokenizer.hasMoreTokens()) {

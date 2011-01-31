@@ -26,11 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pieter
- * Date: 26-1-11
- * Time: 20:58
- * To change this template use File | Settings | File Templates.
+ * Base class for all dot Shapes
  */
 public abstract class AbstractDotShape {
 

@@ -46,7 +46,6 @@ public class DependencyDatabaseImplNonBreakingTest extends AbstractDatabaseImplT
     @AfterClass
     public static void afterClass() {
         database.shutdownDatabase();
-        afterBase();
     }
 
     @Test

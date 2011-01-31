@@ -16,7 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.node;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.ScopedRelation;
 import org.apache.maven.model.Dependency;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,8 +118,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void getRelationshipsRelationshipTypeTest() {
-        decorator.getRelationships(DependencyScopeRelations.compile);
-        verify(node).getRelationships(DependencyScopeRelations.compile);
+        decorator.getRelationships(ScopedRelation.compile);
+        verify(node).getRelationships(ScopedRelation.compile);
     }
 
     /**
@@ -127,8 +127,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void hasRelationshipRelationshipTypeTest() {
-        decorator.hasRelationship(DependencyScopeRelations.compile);
-        verify(node).hasRelationship(DependencyScopeRelations.compile);
+        decorator.hasRelationship(ScopedRelation.compile);
+        verify(node).hasRelationship(ScopedRelation.compile);
     }
 
     /**
@@ -154,8 +154,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void getRelationshipsRelationshipTypeDirectionTest() {
-        decorator.getRelationships(DependencyScopeRelations.compile, Direction.INCOMING);
-        verify(node).getRelationships(DependencyScopeRelations.compile, Direction.INCOMING);
+        decorator.getRelationships(ScopedRelation.compile, Direction.INCOMING);
+        verify(node).getRelationships(ScopedRelation.compile, Direction.INCOMING);
     }
 
     /**
@@ -163,8 +163,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void hasRelationshipRelationshipTypeDirectionTest() {
-        decorator.hasRelationship(DependencyScopeRelations.compile, Direction.INCOMING);
-        verify(node).hasRelationship(DependencyScopeRelations.compile, Direction.INCOMING);
+        decorator.hasRelationship(ScopedRelation.compile, Direction.INCOMING);
+        verify(node).hasRelationship(ScopedRelation.compile, Direction.INCOMING);
     }
 
     /**
@@ -172,8 +172,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void getSingleRelationshipRelationshipTypeDirectionTest() {
-        decorator.getSingleRelationship(DependencyScopeRelations.compile, Direction.BOTH);
-        verify(node).getSingleRelationship(DependencyScopeRelations.compile, Direction.BOTH);
+        decorator.getSingleRelationship(ScopedRelation.compile, Direction.BOTH);
+        verify(node).getSingleRelationship(ScopedRelation.compile, Direction.BOTH);
     }
 
     /**
@@ -182,8 +182,8 @@ public class AbstractNodeDecoratorTest {
     @Test
     public void createRelationshipToNodeRelationshipTypeTest() {
         Node otherNode = mock(Node.class);
-        decorator.createRelationshipTo(otherNode, DependencyScopeRelations.compile);
-        verify(node).createRelationshipTo(otherNode, DependencyScopeRelations.compile);
+        decorator.createRelationshipTo(otherNode, ScopedRelation.compile);
+        verify(node).createRelationshipTo(otherNode, ScopedRelation.compile);
     }
 
     /**
@@ -191,8 +191,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void traverseType1Test() {
-        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, Direction.BOTH);
-        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, Direction.BOTH);
+        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, Direction.BOTH);
+        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, Direction.BOTH);
     }
 
     /**
@@ -200,8 +200,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void traverseType2Test() {
-        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, Direction.BOTH, DependencyScopeRelations.provided, Direction.BOTH);
-        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, Direction.BOTH, DependencyScopeRelations.provided, Direction.BOTH);
+        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, Direction.BOTH, ScopedRelation.provided, Direction.BOTH);
+        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, Direction.BOTH, ScopedRelation.provided, Direction.BOTH);
     }
 
     /**
@@ -209,8 +209,8 @@ public class AbstractNodeDecoratorTest {
      */
     @Test
     public void traverseType3Test() {
-        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, DependencyScopeRelations.runtime);
-        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, DependencyScopeRelations.compile, DependencyScopeRelations.runtime);
+        decorator.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, ScopedRelation.runtime);
+        verify(node).traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE, ReturnableEvaluator.ALL, ScopedRelation.compile, ScopedRelation.runtime);
     }
 
     /**
