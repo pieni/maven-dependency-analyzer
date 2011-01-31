@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.dot;
+package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw;
 
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.DotWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -29,7 +30,7 @@ import java.io.IOException;
 /**
  * Interface to the NodeWriter
  */
-public interface NodeWriter {
+public interface NodeWriter extends DotWriter {
     /**
      * Close the file
      * @throws IOException in case of error

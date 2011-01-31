@@ -17,9 +17,9 @@
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
-import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.NodeWriterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriterImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;

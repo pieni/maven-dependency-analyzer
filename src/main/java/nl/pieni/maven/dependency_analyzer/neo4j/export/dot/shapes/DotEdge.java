@@ -68,7 +68,7 @@ public class DotEdge {
     }
 
     public String toString() {
-        return this.getStartId() + " -> " + this.getEndId() + " [label=" + this.getLabel() + " style=" + this.getEdgeStyle() + "]";
+        return this.getStartId() + " -> " + this.getEndId() + " [label=\"" + this.getLabel() + "\" style=\"" + this.getEdgeStyle() + "\" ]";
     }
 
     private boolean isScoperelation(RelationshipType relationship) {

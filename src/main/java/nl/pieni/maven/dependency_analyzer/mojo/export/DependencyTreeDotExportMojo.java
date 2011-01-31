@@ -17,9 +17,9 @@
 package nl.pieni.maven.dependency_analyzer.mojo.export;
 
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.DotExporterImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.NodeWriterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.RawDotExporterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriterImpl;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -65,7 +65,7 @@ class DependencyTreeDotExportMojo extends AbstractReportMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.setup();
 
-        DotExporter exporter= new DotExporterImpl(getDatabase(), getLog());
+        DotExporter exporter= new RawDotExporterImpl(getDatabase(), getLog());
         exporter.setIncludeVersions(includeVersions);
         exporter.setIncludePatters(includeFilterPatterns);
 

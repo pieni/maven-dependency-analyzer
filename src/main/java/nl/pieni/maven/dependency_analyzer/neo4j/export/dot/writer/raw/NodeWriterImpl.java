@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer;
+package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw;
 
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
-import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.AbstractDotWriter;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
 import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
@@ -35,44 +35,15 @@ import java.util.*;
 /**
  * Implementation of a DOT (@see http://graphviz.org) format Node file.
  */
-public class NodeWriterImpl implements NodeWriter {
+public class NodeWriterImpl extends AbstractDotWriter implements NodeWriter {
 
-    private final Writer writer;
-    private final String lineSeparator = System.getProperty("line.separator");
-    private final Log LOG;
     private final Set<Node> visitedNodes = new HashSet<Node>();
     private final Set<Relationship> visitedRelations = new HashSet<Relationship>();
     private final Map<Node, Set<Node>> nodeNodeRelations = new HashMap<Node, Set<Node>>();
 
-    /**
-     * Default constructor
-     *
-     * @param writer the putput stream writer
-     * @param LOG    the Logger
-     * @throws IOException in case of error
-     */
-    public NodeWriterImpl(Writer writer, Log LOG) throws IOException {
-        this.LOG = LOG;
-        this.writer = writer;
-        startGraph();
-    }
 
-    /**
-     * Insert the standard start of a DOT graph
-     *
-     * @throws IOException in case of error
-     */
-    private void startGraph() throws IOException {
-        writer.write(" digraph G {" + lineSeparator);
-    }
-
-    /**
-     * End the graph correctly
-     *
-     * @throws IOException in case of error;
-     */
-    private void endGraph() throws IOException {
-        writer.write("}");
+    public NodeWriterImpl(Writer writer, Log LOG) {
+        super(writer, LOG);
     }
 
     /**
@@ -80,13 +51,12 @@ public class NodeWriterImpl implements NodeWriter {
      */
     @Override
     public void close() throws IOException {
-        LOG.debug("Closing file");
+        getLog().debug("Closing file");
         endGraph();
-        LOG.info("Exported " + visitedNodes.size() + " nodes");
-        LOG.info("Exported " + visitedRelations.size() + " edges");
-        LOG.info("Exported " + nodeNodeRelations.size() + " edges (node2node");
-        writer.flush();
-        writer.close();
+        getLog().info("Exported " + visitedNodes.size() + " nodes");
+        getLog().info("Exported " + visitedRelations.size() + " edges");
+        getLog().info("Exported " + nodeNodeRelations.size() + " edges (node2node");
+        super.close();
     }
 
     /**
@@ -95,7 +65,7 @@ public class NodeWriterImpl implements NodeWriter {
     @Override
     public void writeNode(VersionNodeDecorator node) throws IOException {
         if (visitedNodes.add(node)) {
-            LOG.debug("Writing VersionNode " + node);
+            getLog().debug("Writing VersionNode " + node);
             String version = node.getVersion();
             long nodeId = node.getId();
             writeNode(nodeId, version, NodeShape.component);
@@ -109,7 +79,7 @@ public class NodeWriterImpl implements NodeWriter {
     @Override
     public void writeRootNode(Node node) throws IOException {
         if (visitedNodes.add(node)) {
-            LOG.debug("Writing RootNode");
+            getLog().debug("Writing RootNode");
             writeNode(node.getId(), "root", NodeShape.box);
         }
     }
@@ -120,7 +90,7 @@ public class NodeWriterImpl implements NodeWriter {
     @Override
     public void writeNode(ArtifactNodeDecorator node) throws IOException {
         if (visitedNodes.add(node)) {
-            LOG.debug("Writing ArtifactNode " + node);
+            getLog().debug("Writing ArtifactNode " + node);
             String artifactId = node.getArtifactId();
             long nodeId = node.getId();
             writeNode(nodeId, artifactId, NodeShape.rect);
@@ -133,7 +103,7 @@ public class NodeWriterImpl implements NodeWriter {
     @Override
     public void writeNode(GroupNodeDecorator node) throws IOException {
         if (visitedNodes.add(node)) {
-            LOG.debug("Writing GroupNode " + node);
+            getLog().debug("Writing GroupNode " + node);
             String groupId = node.getGroupId();
             long nodeId = node.getId();
             writeNode(nodeId, groupId, NodeShape.folder);
@@ -149,11 +119,11 @@ public class NodeWriterImpl implements NodeWriter {
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
             if (isScoperelation(relationship.getType())) {
-                LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
-                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\" style=dotted]" + lineSeparator);
+                getLog().debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
+                getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\" style=dotted]" + LINE_SEPARATOR);
             } else {
-                LOG.debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
-                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + lineSeparator);
+                getLog().debug("Writing Relation " + startNode.getId() + "-> " + endNode.getId() + " (" + relationship + ")");
+                getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + relationship.getType() + "\"]" + LINE_SEPARATOR);
             }
         }
     }
@@ -171,7 +141,7 @@ public class NodeWriterImpl implements NodeWriter {
     @Override
     public void writeNode(GroupNodeDecorator currentNode, GroupNodeDecorator previous) throws IOException {
         if (visitedNodes.add(currentNode)) {
-            LOG.debug("Writing GroupNode " + previous);
+            getLog().debug("Writing GroupNode " + previous);
             writeNode(currentNode.getId(), getAddedGroupIdPart(currentNode.getGroupId(), previous.getGroupId()), NodeShape.folder);
             writeNode2NodeRelation(previous, currentNode, ArtifactRelations.has);
         }
@@ -190,11 +160,11 @@ public class NodeWriterImpl implements NodeWriter {
         }
 
         if (related.add(endNode)) {
-            LOG.debug("Writing Node 2 Node Relation " + startNode + " -> " + endNode + " type = " + type);
+            getLog().debug("Writing Node 2 Node Relation " + startNode + " -> " + endNode + " type = " + type);
             if (isScoperelation(type)) {
-                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\" style=dotted]" + lineSeparator);
+                getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\" style=dotted]" + LINE_SEPARATOR);
             } else {
-                writer.write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\"]" + lineSeparator);
+                getWriter().write("\tN" + startNode.getId() + " -> " + "N" + endNode.getId() + " [label=\"" + type + "\"]" + LINE_SEPARATOR);
             }
         }
     }
@@ -231,6 +201,6 @@ public class NodeWriterImpl implements NodeWriter {
      * @throws IOException in case of error
      */
     private void writeNode(long id, String labelText, NodeShape shape) throws IOException {
-        writer.write("\tN" + id + " [label=\"" + labelText + "\"" + " shape=" + shape + "]" + lineSeparator);
+        getWriter().write("\tN" + id + " [label=\"" + labelText + "\"" + " shape=" + shape + "]" + LINE_SEPARATOR);
     }
 }

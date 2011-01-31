@@ -20,7 +20,8 @@ import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabaseSearcher;
 import nl.pieni.maven.dependency_analyzer.database.DependencyNodeProcessor;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.RawDotExporterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
 import nl.pieni.maven.dependency_analyzer.matchers.ArtifactNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.GroupNodeDecoratorMatcher;
 import nl.pieni.maven.dependency_analyzer.matchers.RelationshipTypeMatcher;
@@ -31,7 +32,7 @@ import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyDatabaseSearc
 import nl.pieni.maven.dependency_analyzer.neo4j.database.DependencyNodeProcessorImpl;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.DotExporterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriterImpl;
 import nl.pieni.maven.dependency_analyzer.test_helpers.SimpleLogger;
 import org.apache.maven.model.Dependency;
 import org.junit.After;
@@ -41,7 +42,10 @@ import org.mockito.Matchers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,9 +57,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test cases for the export to a Dot file.
+ * Test cases for the exportRaw to a Dot file.
  */
-public class DotExporterImplTest extends AbstractDatabaseImplTest {
+public class RawDotExporterImplTest extends AbstractDatabaseImplTest {
 
     private static DependencyDatabase<GraphDatabaseService, Node> database;
     private static DependencyNodeProcessor processor;
@@ -64,7 +68,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
     private int dependencyCnt;
     private final List<String> starIncludeList;
 
-    public DotExporterImplTest() {
+    public RawDotExporterImplTest() {
         this.starIncludeList = new ArrayList<String>();
         this.starIncludeList.add("*");
     }
@@ -90,12 +94,12 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency = getDependency(BASE_GROUP_ID);
         processor.addArtifact(dependency);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
-        NodeWriter writer = mock(NodeWriter.class);
-//    FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
-//    Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
-//    NodeWriter writer = new NodeWriterImpl(osWriter, log);
+        //NodeWriter writer = mock(NodeWriter.class);
+    FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
+    Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
+    NodeWriter writer = new NodeWriterImpl(osWriter, log);
         exporter.setIncludePatters(starIncludeList);
         exporter.export(writer);
 
@@ -116,7 +120,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
         exporter.setIncludePatters(starIncludeList);
@@ -139,7 +143,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency("org.pieni.maven");
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
         exporter.setIncludePatters(starIncludeList);
@@ -165,7 +169,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
         exporter.setIncludePatters(starIncludeList);
@@ -192,7 +196,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         dependency_2.setScope("compile");
         processor.addRelation(dependency_1, dependency_2);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
         exporter.setIncludePatters(starIncludeList);
@@ -219,7 +223,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
         Dependency dependency_2 = getDependency(groupId_2);
         processor.addArtifact(dependency_2);
 
-        exporter = new DotExporterImpl(database, log);
+        exporter = new RawDotExporterImpl(database, log);
         exporter.setIncludeVersions(true);
         NodeWriter writer = mock(NodeWriter.class);
         List<String> includeList = new ArrayList<String>();
@@ -245,12 +249,12 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency_2 = getDependency(groupId_2);
 //        processor.addArtifact(dependency_2);
 //
-//        exporter = new DotExporterImpl(database, true, log);
+//        exporter = new RawDotExporterImpl(database, true, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.maven*");
 //        exporter.setIncludePatters(excludeList);
-//        exporter.export(writer);
+//        exporter.exportRaw(writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(groupId_1)));
 //        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
@@ -270,11 +274,11 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        dependency_2.setScope("compile");
 //        processor.addRelation(dependency_1, dependency_2);
 //
-//        exporter = new DotExporterImpl(database, true, log);
+//        exporter = new RawDotExporterImpl(database, true, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.maven");
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
@@ -295,11 +299,11 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        dependency_2.setScope("compile");
 //        processor.addRelation(dependency_1, dependency_2);
 //
-//        exporter = new DotExporterImpl(database, false, log);
+//        exporter = new RawDotExporterImpl(database, false, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.maven");
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
@@ -324,11 +328,11 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        dependency_3.setScope("compile");
 //        processor.addRelation(dependency_1, dependency_3);
 //
-//        exporter = new DotExporterImpl(database, true, log);
+//        exporter = new RawDotExporterImpl(database, true, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.maven");
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency_1.getArtifactId())));
@@ -349,11 +353,11 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        dependency_2.setScope("compile");
 //        processor.addRelation(dependency_1, dependency_2);
 //
-//        exporter = new DotExporterImpl(database, true, log);
+//        exporter = new RawDotExporterImpl(database, true, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.maven*");
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_2.getGroupId())), argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
@@ -372,12 +376,12 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency = getDependency(BASE_GROUP_ID);
 //        processor.addArtifact(dependency);
 //
-//        exporter = new DotExporterImpl(database, true, log);
+//        exporter = new RawDotExporterImpl(database, true, log);
 //
 //        NodeWriter writer = mock(NodeWriter.class);
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add("nl.pieni.*");
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency.getGroupId())));
 //        verify(writer, atLeast(1)).writeNode(argThat(new ArtifactNodeDecoratorMatcher(dependency.getArtifactId())));
@@ -396,13 +400,13 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency_2 = getDependency(groupId_2);
 //        processor.addArtifact(dependency_2);
 //
-//        exporter = new DotExporterImpl(database, false, log);
+//        exporter = new RawDotExporterImpl(database, false, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 ////        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
 ////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
 ////        NodeWriter writer = new NodeWriterImpl(osWriter, log);
 //
-//        exporter.export(starIncludeList, writer);
+//        exporter.exportRaw(starIncludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
 //        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
@@ -436,13 +440,13 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency_4 = getDependency(groupId_4);
 //        processor.addArtifact(dependency_4);
 //
-//        exporter = new DotExporterImpl(database, false, log);
+//        exporter = new RawDotExporterImpl(database, false, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 ////        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
 ////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
 ////        NodeWriter writer = new NodeWriterImpl(osWriter, log);
 //
-//        exporter.export(starIncludeList, writer);
+//        exporter.exportRaw(starIncludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
 //        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
@@ -505,14 +509,14 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency_4 = getDependency(groupId_4);
 //        processor.addArtifact(dependency_4);
 //
-//        exporter = new DotExporterImpl(database, false, log);
+//        exporter = new RawDotExporterImpl(database, false, log);
 ////        NodeWriter writer = mock(NodeWriter.class);
 //        FileOutputStream fos = new FileOutputStream("c:/temp/compile_dependency.dot");
 //        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
 //        NodeWriter writer = new NodeWriterImpl(osWriter, log);
 //        List<String> includeList = new ArrayList<String>();
 //        includeList.add(BASE_GROUP_ID + "*");
-//        exporter.export(includeList, writer);
+//        exporter.exportRaw(includeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
 //        verify(writer, atLeast(1)).writeNode(argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)), argThat(new GroupNodeDecoratorMatcher(BASE_GROUP_ID)));
@@ -569,7 +573,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //        Dependency dependency_2 = getDependency(groupId_2);
 //        processor.addArtifact(dependency_2);
 //
-//        exporter = new DotExporterImpl(database, false, log);
+//        exporter = new RawDotExporterImpl(database, false, log);
 //        NodeWriter writer = mock(NodeWriter.class);
 ////        FileOutputStream fos = new FileOutputStream("target/compile_dependency.dot");
 ////        Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
@@ -577,7 +581,7 @@ public class DotExporterImplTest extends AbstractDatabaseImplTest {
 //
 //        List<String> excludeList = new ArrayList<String>();
 //        excludeList.add(groupId_1);
-//        exporter.export(excludeList, writer);
+//        exporter.exportRaw(excludeList, writer);
 //
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));
 //        verify(writer).writeNode(argThat(new GroupNodeDecoratorMatcher(dependency_1.getGroupId())));

@@ -16,17 +16,19 @@
 
 package nl.pieni.maven.dependency_analyzer.dot;
 
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
+
 import java.io.IOException;
 import java.util.List;
 
 /**
  * Interface for Exporting the Graph to a Dot file.
  */
-public interface DotExporter {
+public interface DotExporter<T> {
 
     void setIncludePatters(List<String> includeFilterPatterns);
 
     void setIncludeVersions(boolean includeVersions);
 
-    void export(NodeWriter writer) throws IOException;
+    void export(T writer) throws IOException;
 }

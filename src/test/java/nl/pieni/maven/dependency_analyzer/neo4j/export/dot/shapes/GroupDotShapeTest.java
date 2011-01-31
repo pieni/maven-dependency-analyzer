@@ -19,7 +19,6 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
 import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.DependencyScopeRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
 import org.junit.Before;
@@ -32,7 +31,6 @@ import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,52 +42,60 @@ import static org.mockito.Mockito.when;
  * Time: 15:21
  * To change this template use File | Settings | File Templates.
  */
-public class ArtifactDotShapeTest {
+public class GroupDotShapeTest {
 
     private Node startNode;
     private Node endNode;
-    private ArtifactAbstractDotShape shape;
-    public static final String ARTIFACT_NAME = "theArtifactId";
+    private GroupAbstractDotShape shape;
+    public static final String GROUP_NAME = "nl.pieni.maven.dependency_analyzer";
     private Relationship relation;
 
     @Before
     public void before() {
         startNode = mock(Node.class);
         when(startNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
-        when(startNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
+        when(startNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.GroupNode);
         when(startNode.getId()).thenReturn(1L);
-        when(startNode.getProperty(NodeProperties.ARTIFACT_ID)).thenReturn(ARTIFACT_NAME);
-        relation = mock(Relationship.class);
-        when(relation.getStartNode()).thenReturn(startNode);
+        when(startNode.getProperty(NodeProperties.GROUP_ID)).thenReturn(GROUP_NAME);
+
         endNode = mock(Node.class);
         when(endNode.getId()).thenReturn(2L);
         when(endNode.hasProperty(NodeProperties.NODE_TYPE)).thenReturn(true);
-        when(endNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.VersionNode);
+        when(endNode.getProperty(NodeProperties.NODE_TYPE)).thenReturn(NodeType.ArtifactNode);
+
+        relation = mock(Relationship.class);
+        when(relation.getStartNode()).thenReturn(startNode);
+
+
         when(relation.getType()).thenReturn(ArtifactRelations.has);
         when(relation.getEndNode()).thenReturn(endNode);
+
         Set<Relationship> relationSet = new HashSet<Relationship>();
         relationSet.add(relation);
-        shape = new ArtifactAbstractDotShape(startNode, relationSet);
+        shape = new GroupAbstractDotShape(startNode, relationSet);
     }
 
     @Test
     public void testGetId() throws Exception {
-        assertEquals("A1", shape.getId());
+        assertEquals("G1", shape.getId());
     }
 
     @Test
     public void testGetShape() throws Exception {
-        assertEquals(NodeShape.rect, shape.getShape());
+        assertEquals(NodeShape.folder, shape.getShape());
     }
 
     @Test
     public void testGetLabel() throws Exception {
-        assertEquals(ARTIFACT_NAME, shape.getLabel());
+        assertEquals(GROUP_NAME, shape.getLabel());
     }
 
     @Test
     public void testToString() throws Exception {
-        assertEquals("A1 [ label=\"" + ARTIFACT_NAME + "\" shape=\"" + NodeShape.rect + "\" ]", shape.toString());
+        assertThat(shape.toString(), containsString("G1"));
+        assertThat(shape.toString(), containsString(GROUP_NAME));
+        assertThat(shape.toString(), containsString(NodeShape.folder.toString()));
+        assertEquals("G1 [ label=\"" + GROUP_NAME + "\" shape=\"" + NodeShape.folder+ "\" ]", shape.toString());
     }
 
     @Test
@@ -97,34 +103,13 @@ public class ArtifactDotShapeTest {
         Set<DotEdge> dotEdges = shape.getEdges();
         for (DotEdge dotEdge : dotEdges) {
             assertEquals(EdgeStyle.solid, dotEdge.getEdgeStyle());
-            assertEquals("V2", dotEdge.getEndId());
-            assertEquals("A1", dotEdge.getStartId());
+            assertEquals("A2", dotEdge.getEndId());
+            assertEquals("G1", dotEdge.getStartId());
             assertEquals(ArtifactRelations.has.toString(), dotEdge.getLabel());
-            assertThat(dotEdge.toString(), containsString("A1 -> V2"));
+            assertThat(dotEdge.toString(), containsString("G1 -> A2"));
             assertThat(dotEdge.toString(), containsString("label=\"" + ArtifactRelations.has + "\""));
             assertThat(dotEdge.toString(), containsString("style=\"" + EdgeStyle.solid + "\""));
         }
-    }
-
-    @Test
-    public void testGetEdgesScopedCompile() {
-
-        when(relation.getType()).thenReturn(DependencyScopeRelations.compile);
-        Set<DotEdge> dotEdges = shape.getEdges();
-        for (DotEdge dotEdge : dotEdges) {
-            assertEquals(EdgeStyle.dotted, dotEdge.getEdgeStyle());
-            assertEquals("V2", dotEdge.getEndId());
-            assertEquals("A1", dotEdge.getStartId());
-            assertEquals(DependencyScopeRelations.compile.toString(), dotEdge.getLabel());
-            assertThat(dotEdge.toString(), containsString("A1 -> V2"));
-            assertThat(dotEdge.toString(), containsString("label=\"" + DependencyScopeRelations.compile + "\""));
-            assertThat(dotEdge.toString(), containsString("style=\"" + EdgeStyle.dotted + "\""));
-        }
-    }
-
-    @Test
-    public void testHashCode() {
-        assertTrue(shape.hashCode() != 0);
     }
 
 }

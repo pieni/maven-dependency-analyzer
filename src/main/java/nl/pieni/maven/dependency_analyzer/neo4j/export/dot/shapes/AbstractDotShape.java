@@ -32,22 +32,17 @@ import java.util.Set;
  * Time: 20:58
  * To change this template use File | Settings | File Templates.
  */
-public abstract class DotShape {
-    private String id;
-    private NodeShape nodeShape;
-    private String label;
+public abstract class AbstractDotShape {
 
     private final Node node;
     private final Set<Relationship> relations;
 
-    public DotShape(Node node, Set<Relationship> relations) {
+    public AbstractDotShape(Node node, Set<Relationship> relations) {
         this.node = node;
         this.relations = relations;
     }
 
-    public String getId() {
-        return ShapeIdPrefix.Artifact.toString() + node.getId();
-    }
+    abstract public String getId();
 
     public NodeShape getShape() {
          if (node.hasProperty(NodeProperties.NODE_TYPE)) {
@@ -80,7 +75,7 @@ public abstract class DotShape {
 
     @Override
     public String toString() {
-        return getId() + " [ label=\"" + getLabel() + "\" style=\"" + getShape() + "\" ]";
+        return getId() + " [ label=\"" + getLabel() + "\" shape=\"" + getShape() + "\" ]";
     }
 
     @Override

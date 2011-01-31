@@ -18,43 +18,33 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.dot.NodeWriter;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.convert.RawExport;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.ArtifactNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.GroupNodeDecorator;
-import nl.pieni.maven.dependency_analyzer.neo4j.node.VersionNodeDecorator;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
 import org.apache.maven.plugin.logging.Log;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Export of the graph (partial) to a file in the dot language. see http://graphviz.org
+ * Created by IntelliJ IDEA.
+ * User: pieter
+ * Date: 30-1-11
+ * Time: 21:30
+ * To change this template use File | Settings | File Templates.
  */
-public class DotExporterImpl implements DotExporter {
+public abstract class AbstractDotExporter<T> implements DotExporter<T> {
 
     private final DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase;
 
     private final Log LOG;
-    private NodeWriter nodeWriter;
-    private Map<Node, Set<Relationship>> exportNodeMap = new HashMap<Node, Set<Relationship>>();
     private final NodeSelector nodeSelector;
 
-    public DotExporterImpl(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
+    public AbstractDotExporter(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
         this.LOG = log;
         this.nodeSelector = new NodeSelector(dependencyDatabase, log);
@@ -70,19 +60,11 @@ public class DotExporterImpl implements DotExporter {
         this.nodeSelector.setIncludeVersions(includeVersions);
     }
 
+    Map<Node, Set<Relationship>> getNodesAndRelations() {
+        return nodeSelector.selectNodesAndRelations();
+    }
+
     @Override
-    public void export(NodeWriter nodeWriter) throws IOException {
-        exportNodeMap = nodeSelector.selectNodesAndRelations();
+    public abstract void export(T writer) throws IOException;
 
-        exportRaw(nodeWriter);
-    }
-
-    private void exportRaw(NodeWriter writer) throws IOException {
-
-        exportNodeMap = nodeSelector.selectNodesAndRelations();
-
-        RawExport exporter = new RawExport(writer, exportNodeMap);
-
-        exporter.writeDotFile();
-    }
 }

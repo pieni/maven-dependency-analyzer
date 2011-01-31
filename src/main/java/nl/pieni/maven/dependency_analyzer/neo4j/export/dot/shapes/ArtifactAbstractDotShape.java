@@ -16,7 +16,6 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 
-import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -26,18 +25,22 @@ import java.util.Set;
 /**
  * Created by IntelliJ IDEA.
  * User: pieter
- * Date: 29-1-11
- * Time: 12:47
+ * Date: 26-1-11
+ * Time: 22:40
  * To change this template use File | Settings | File Templates.
  */
-public class VersionDotShape extends DotShape {
+public class ArtifactAbstractDotShape extends AbstractDotShape {
+    public ArtifactAbstractDotShape(Node node, Set<Relationship> relations) {
+        super(node, relations);
 
-    public VersionDotShape(Node node, Set<Relationship> relationships) {
-        super(node, relationships);
     }
 
     @Override
     public String getLabel() {
-        return getNode().getProperty(NodeProperties.VERSION).toString();
+        return getNode().getProperty(NodeProperties.ARTIFACT_ID).toString();
+    }
+
+    public String getId() {
+        return ShapeIdPrefix.Artifact.toString() + getNode().getId();
     }
 }

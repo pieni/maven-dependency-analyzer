@@ -18,12 +18,12 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.convert;
 
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.AbstractDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactAbstractDotShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.GroupDotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.RootShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.GroupAbstractDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.RootShapeAbstract;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionAbstractDotShape;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -41,7 +41,7 @@ import java.util.Set;
 public class Neo4J2Dot {
 
     private Map<Node, Set<Relationship>> exportNodeMap;
-    Set<DotShape> shapeSet = new HashSet<DotShape>();
+    Set<AbstractDotShape> shapeSetAbstract = new HashSet<AbstractDotShape>();
     Set<DotEdge> edgeSet = new HashSet<DotEdge>();
 
     public Neo4J2Dot(Map<Node, Set<Relationship>> exportNodeMap) {
@@ -50,8 +50,8 @@ public class Neo4J2Dot {
         convertRelations();
     }
 
-    public Set<DotShape> getShapes() {
-        return shapeSet;
+    public Set<AbstractDotShape> getShapes() {
+        return shapeSetAbstract;
     }
 
     public Set<DotEdge> getEdges() {
@@ -60,30 +60,29 @@ public class Neo4J2Dot {
 
     private void convertNodes() {
         for (Node node : exportNodeMap.keySet()) {
-            DotShape shape;
             Set<Relationship> relations = exportNodeMap.get(node);
             if (node.hasProperty(NodeProperties.NODE_TYPE)) {
                 NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE));
                 switch (type) {
                     case ArtifactNode:
-                        shapeSet.add(new ArtifactDotShape(node, relations));
+                        shapeSetAbstract.add(new ArtifactAbstractDotShape(node, relations));
                         break;
                     case VersionNode:
-                        shapeSet.add(new VersionDotShape(node, relations));
+                        shapeSetAbstract.add(new VersionAbstractDotShape(node, relations));
                         break;
                     case GroupNode:
-                        shapeSet.add(new GroupDotShape(node, relations));
+                        shapeSetAbstract.add(new GroupAbstractDotShape(node, relations));
                         break;
                 }
             } else {
-                shapeSet.add(new RootShape(node, relations));
+                shapeSetAbstract.add(new RootShapeAbstract(node, relations));
             }
         }
     }
 
-    public void convertRelations() {
-        for (DotShape shape : shapeSet) {
-            edgeSet.addAll(shape.getEdges());
+    private void convertRelations() {
+        for (AbstractDotShape shapeAbstract : shapeSetAbstract) {
+            edgeSet.addAll(shapeAbstract.getEdges());
         }
     }
 }

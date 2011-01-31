@@ -16,24 +16,20 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.optimize;
 
-import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
-import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.NodeShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
-import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.AbstractDotShape;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  */
-public class OptimizedGroupDotShape extends DotShape {
+public class OptimizedGroupAbstractDotShape extends AbstractDotShape {
 
     private Node startNode;
 
-    public OptimizedGroupDotShape(Node node, Set<Relationship> relations) {
+    public OptimizedGroupAbstractDotShape(Node node, Set<Relationship> relations) {
         super(node, relations);
     }
 

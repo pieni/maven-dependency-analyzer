@@ -16,6 +16,7 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes;
 
+import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -25,16 +26,21 @@ import java.util.Set;
  * Created by IntelliJ IDEA.
  * User: pieter
  * Date: 29-1-11
- * Time: 19:05
+ * Time: 18:06
  * To change this template use File | Settings | File Templates.
  */
-public class RootShape extends DotShape {
+public class GroupAbstractDotShape extends AbstractDotShape {
 
-    public RootShape(Node node, Set<Relationship> relations) {
+    public GroupAbstractDotShape(Node node, Set<Relationship> relations) {
         super(node, relations);
     }
 
+    @Override
     public String getLabel() {
-        return "root";
+        return getNode().getProperty(NodeProperties.GROUP_ID).toString();
+    }
+
+    public String getId() {
+        return ShapeIdPrefix.Group.toString() + getNode().getId();
     }
 }

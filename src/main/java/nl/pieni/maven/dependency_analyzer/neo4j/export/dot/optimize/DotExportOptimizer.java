@@ -16,14 +16,13 @@
 
 package nl.pieni.maven.dependency_analyzer.neo4j.export.dot.optimize;
 
-import nl.pieni.maven.dependency_analyzer.dot.NodeShapes.EdgeStyle;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.ArtifactRelations;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeProperties;
 import nl.pieni.maven.dependency_analyzer.neo4j.enums.NodeType;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.ArtifactAbstractDotShape;
 import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotEdge;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.DotShape;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.AbstractDotShape;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.shapes.VersionAbstractDotShape;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -44,16 +43,16 @@ import java.util.Set;
 public class DotExportOptimizer {
 
     private Map<Node, Set<Relationship>> exportNodeMap = new HashMap<Node, Set<Relationship>>();
-    private Set<OptimizedGroupDotShape> optimizedGroupDotShapes = new HashSet<OptimizedGroupDotShape>();
-    private Set<ArtifactDotShape> artifactDotShapes = new HashSet<ArtifactDotShape>();
+    private Set<OptimizedGroupAbstractDotShape> optimizedGroupDotShapes = new HashSet<OptimizedGroupAbstractDotShape>();
+    private Set<ArtifactAbstractDotShape> artifactDotShapes = new HashSet<ArtifactAbstractDotShape>();
     private Set<DotEdge> edges = new HashSet<DotEdge>();
-    private Set<VersionDotShape> versionDotShapes = new HashSet<VersionDotShape>();
+    private Set<VersionAbstractDotShape> versionDotShapes = new HashSet<VersionAbstractDotShape>();
 
 
     public DotExportOptimizer() {
     }
 
-    public Map<DotShape, Set<DotEdge>> optimize(final Map<Node, Set<Relationship>> nodeSetMap) {
+    public Map<AbstractDotShape, Set<DotEdge>> optimize(final Map<Node, Set<Relationship>> nodeSetMap) {
         //Copy the original
         exportNodeMap.putAll(nodeSetMap);
 
@@ -85,7 +84,7 @@ public class DotExportOptimizer {
         for (Node node : exportNodeMap.keySet()) {
             NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE));
             if (type == NodeType.VersionNode) {
-                //VersionDotShape shape = new VersionDotShape(node);
+                //VersionAbstractDotShape shape = new VersionAbstractDotShape(node);
                 //versionDotShapes.add(shape);
                 exportNodeMap.remove(node);
             }
@@ -96,7 +95,7 @@ public class DotExportOptimizer {
         for (Node node : exportNodeMap.keySet()) {
             NodeType type = NodeType.fromString(node.getProperty(NodeProperties.NODE_TYPE));
             if (type == NodeType.ArtifactNode) {
-                //ArtifactDotShape shape = new ArtifactDotShape(node);
+                //ArtifactAbstractDotShape shape = new ArtifactAbstractDotShape(node);
                 //artifactDotShapes.add(shape);
                 exportNodeMap.remove(node);
             }
@@ -105,7 +104,7 @@ public class DotExportOptimizer {
 
 
     private void createGroupEdges() {
-        for (OptimizedGroupDotShape optimizedGroupDotShape : optimizedGroupDotShapes) {
+        for (OptimizedGroupAbstractDotShape optimizedGroupDotShape : optimizedGroupDotShapes) {
             if (optimizedGroupDotShape.getStartNode() == null) {
                 edges.addAll(createRootEdges(optimizedGroupDotShape));
             }
@@ -113,7 +112,7 @@ public class DotExportOptimizer {
         }
     }
 
-    private Set<DotEdge> getGroupShapeEdges(OptimizedGroupDotShape shapeOptimized) {
+    private Set<DotEdge> getGroupShapeEdges(OptimizedGroupAbstractDotShape shapeOptimized) {
         Set<DotEdge> edges = new HashSet<DotEdge>();
 //        for (Relationship endRelationship : shapeOptimized.getEndRelationships()) {
 //            Node relationEnd = endRelationship.getEndNode();
@@ -123,7 +122,7 @@ public class DotExportOptimizer {
 //                    edges.add(new DotEdge(shapeOptimized.getId(), "N" + relationEnd.getId(), EdgeStyle.solid, endRelationship.getType()));
 //                    break;
 //                case GroupNode:
-//                    OptimizedGroupDotShape endOptimizedGroup = findGroupShapeStartingWith(relationEnd);
+//                    OptimizedGroupAbstractDotShape endOptimizedGroup = findGroupShapeStartingWith(relationEnd);
 //                    edges.add(new DotEdge(shapeOptimized.getId(), endOptimizedGroup.getId(), EdgeStyle.solid, endRelationship.getType()));
 //                    break;
 //                default:
@@ -134,12 +133,12 @@ public class DotExportOptimizer {
         return edges;
     }
 
-    private Collection<? extends DotEdge> createRootEdges(OptimizedGroupDotShape rootShapeOptimized) {
+    private Collection<? extends DotEdge> createRootEdges(OptimizedGroupAbstractDotShape rootShapeOptimized) {
         Set<DotEdge> result = new HashSet<DotEdge>();
 //        Set<Relationship> relations = rootShapeOptimized.getEndRelationships();
 //        for (Relationship relation : relations) {
 //            Node endNode = relation.getEndNode();
-//            OptimizedGroupDotShape endOptimizedGroupShape = findGroupShapeStartingWith(endNode);
+//            OptimizedGroupAbstractDotShape endOptimizedGroupShape = findGroupShapeStartingWith(endNode);
 //            DotEdge edge = new DotEdge(rootShapeOptimized.getId(), endOptimizedGroupShape.getId(), EdgeStyle.solid, ArtifactRelations.has);
 //            result.add(edge);
 //        }
@@ -147,8 +146,8 @@ public class DotExportOptimizer {
         return result;
     }
 
-    private OptimizedGroupDotShape findGroupShapeStartingWith(Node shape) {
-        for (OptimizedGroupDotShape optimizedGroupDotShape : optimizedGroupDotShapes) {
+    private OptimizedGroupAbstractDotShape findGroupShapeStartingWith(Node shape) {
+        for (OptimizedGroupAbstractDotShape optimizedGroupDotShape : optimizedGroupDotShapes) {
             if (optimizedGroupDotShape.startsWith(shape)) {
                 return optimizedGroupDotShape;
             }
@@ -158,7 +157,7 @@ public class DotExportOptimizer {
 
     private void mergeGroups() {
 
-//        for (OptimizedGroupDotShape optimizedGroupShape : optimizedGroupDotShapes) {
+//        for (OptimizedGroupAbstractDotShape optimizedGroupShape : optimizedGroupDotShapes) {
 //            Node node = optimizedGroupShape.getEndNode();
 //            Iterable<Relationship> inboundRelationships = node.getRelationships(ArtifactRelations.has, Direction.INCOMING);
 //            int relationCount = 0;
@@ -181,7 +180,7 @@ public class DotExportOptimizer {
     private void convertGroupNodes(final Set<Node> endNodes) {
 
 //        for (Node groupNode : endNodes) {
-//            OptimizedGroupDotShape shapeOptimized = new OptimizedGroupDotShape(groupNode);
+//            OptimizedGroupAbstractDotShape shapeOptimized = new OptimizedGroupAbstractDotShape(groupNode);
 //            shapeOptimized.setEndRelationships(exportNodeMap.get(groupNode));
 //            exportNodeMap.remove(groupNode);
 //            optimizedGroupDotShapes.add(shapeOptimized);

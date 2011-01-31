@@ -153,7 +153,7 @@ public class NodeSelector {
             selectedNodeMap.put(exportedNode, relationshipSet);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Selected relation: " + relation2String(relation) + " for export");
+            LOG.debug("Selected relation: " + relation2String(relation) + " for exportRaw");
         }
         relationshipSet.add(relation);
     }
