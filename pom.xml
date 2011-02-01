@@ -25,7 +25,7 @@
 
     <groupId>nl.pieni.maven.dependency-analyzer</groupId>
     <artifactId>maven-dependency-analyzer</artifactId>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>dependency-analyzer Maven Mojo</name>
