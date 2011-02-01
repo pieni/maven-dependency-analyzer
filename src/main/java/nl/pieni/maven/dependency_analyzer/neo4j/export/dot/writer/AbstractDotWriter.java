@@ -41,7 +41,7 @@ public class AbstractDotWriter implements DotWriter {
      * @inheritDoc
      */
     public void startGraph() throws IOException {
-        writer.write(" digraph G {" + LINE_SEPARATOR);
+        writer.write("digraph G {" + LINE_SEPARATOR);
     }
 
     /**

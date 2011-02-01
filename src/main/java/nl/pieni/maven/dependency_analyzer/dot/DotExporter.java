@@ -16,8 +16,6 @@
 
 package nl.pieni.maven.dependency_analyzer.dot;
 
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
-
 import java.io.IOException;
 import java.util.List;
 

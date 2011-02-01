@@ -18,14 +18,12 @@ package nl.pieni.maven.dependency_analyzer.neo4j.export.dot;
 
 import nl.pieni.maven.dependency_analyzer.database.DependencyDatabase;
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
 import org.apache.maven.plugin.logging.Log;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +36,8 @@ public abstract class AbstractDotExporter<T> implements DotExporter<T> {
     private final NodeSelector nodeSelector;
 
     AbstractDotExporter(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
-        DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase1=dependencyDatabase;
-        Log LOG=log;
+        DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase1= dependencyDatabase;
+        Log LOG= log;
         this.nodeSelector = new NodeSelector(dependencyDatabase, log);
     }
 

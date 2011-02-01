@@ -46,19 +46,22 @@ class NodeSelector {
 
     /**
      * Default constructor
+     *
      * @param dependencyDatabase the Database
-     * @param log the Logger
+     * @param log
      */
     public NodeSelector(DependencyDatabase<GraphDatabaseService, Node> dependencyDatabase, Log log) {
         this.dependencyDatabase = dependencyDatabase;
         this.LOG = log;
         setIncludeVersions(false);
-        setIncludeFilterPatterns(new ArrayList<String>() {});
+        setIncludeFilterPatterns(new ArrayList<String>() {
+        });
     }
 
     /**
      * Set the include filter patters
      * Default value is empty (nothing matches)
+     *
      * @param includeFilterPatterns the pattern
      */
     public void setIncludeFilterPatterns(List<String> includeFilterPatterns) {
@@ -68,6 +71,7 @@ class NodeSelector {
     /**
      * Boolean the select versions
      * Default value: false
+     *
      * @param includeVersions false does not include versions.
      */
     public void setIncludeVersions(boolean includeVersions) {
@@ -93,6 +97,7 @@ class NodeSelector {
 
     /**
      * Parse through all nodes of the graph and select the nodes that must be written
+     *
      * @return all selected nodes
      */
     private Set<Node> selectNodes() {
@@ -113,31 +118,34 @@ class NodeSelector {
 
     /**
      * Select all valid relations from the nodes in the exportNodes_Refactor set
+     *
      * @param selectedNodeSet the selected nodes.
      */
     private void selectRelationShips(Set<Node> selectedNodeSet) {
+
+
         for (Node exportedNode : selectedNodeSet) {
+            Set<Relationship> relationshipSet = new HashSet<Relationship>();
             if (exportedNode.hasRelationship(Direction.OUTGOING)) {
                 Iterable<Relationship> relations = exportedNode.getRelationships(Direction.OUTGOING);
                 for (Relationship relation : relations) {
                     if (selectedNodeSet.contains(relation.getEndNode())) {
-                        processNodeAndRelation(exportedNode, relation);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Selected relation: " + NodeUtils.relation2String(relation) + " for export");
+                        }
+                        relationshipSet.add(relation);
                     }
                 }
-            } else {
-                //Its a VersionNode
-                Set<Relationship> relationshipSet = new HashSet<Relationship>();
-                selectedNodeMap.put(exportedNode, relationshipSet);
             }
+
+            selectedNodeMap.put(exportedNode, relationshipSet);
         }
     }
-
-
-    //
 
     /**
      * Select all sub nodes (including startNode)
      * This method is called recursively for the sub nodes (i.e. the end relations)
+     *
      * @param startNode start point
      * @return set of nodes selected
      */
@@ -167,6 +175,7 @@ class NodeSelector {
 
     /**
      * Select all references that are coming from the root node.
+     *
      * @param nodeSet the set of Node to process
      */
     private void selectRefNodeRelationsShips(Set<Node> nodeSet) {
@@ -185,22 +194,21 @@ class NodeSelector {
      * Select and add the relations to the entry in the map that is identified by exportNode.
      *
      * @param exportedNode the relations from this node
-     * @param relation the relation to verify
+     * @param relation     the relation to verify
      */
-    private void processNodeAndRelation(Node exportedNode, Relationship relation) {
-        Set<Relationship> relationshipSet = selectedNodeMap.get(exportedNode);
-        if (relationshipSet == null) {
-            relationshipSet = new HashSet<Relationship>();
-            selectedNodeMap.put(exportedNode, relationshipSet);
-        }
+    private Set<Relationship> processNodeAndRelation(Node exportedNode, Relationship relation) {
+        Set<Relationship> relationshipSet = new HashSet<Relationship>();
+
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Selected relation: " + NodeUtils.relation2String(relation) + " for exportRaw");
+            LOG.debug("Selected relation: " + NodeUtils.relation2String(relation) + " for export");
         }
         relationshipSet.add(relation);
+        return relationshipSet;
     }
 
     /**
      * Determine if this node must be included
+     *
      * @param node the node
      * @return true when included
      */

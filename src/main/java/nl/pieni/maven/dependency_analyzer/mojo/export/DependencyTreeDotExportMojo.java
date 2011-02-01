@@ -17,9 +17,8 @@
 package nl.pieni.maven.dependency_analyzer.mojo.export;
 
 import nl.pieni.maven.dependency_analyzer.dot.DotExporter;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.RawDotExporterImpl;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriter;
-import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.raw.NodeWriterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.ShapeDotExporterImpl;
+import nl.pieni.maven.dependency_analyzer.neo4j.export.dot.writer.shape.ShapeDotWriter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -65,14 +64,14 @@ class DependencyTreeDotExportMojo extends AbstractReportMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.setup();
 
-        DotExporter exporter= new RawDotExporterImpl(getDatabase(), getLog());
+        DotExporter exporter= new ShapeDotExporterImpl(getDatabase(), getLog());
         exporter.setIncludeVersions(includeVersions);
         exporter.setIncludePatters(includeFilterPatterns);
 
         try {
             FileOutputStream fos = new FileOutputStream(dotFile);
             Writer osWriter = new OutputStreamWriter(fos, "UTF-8");
-            NodeWriter writer = new NodeWriterImpl(osWriter, getLog());
+            ShapeDotWriter writer = new ShapeDotWriter(osWriter, getLog());
             exporter.export(writer);
         } catch (IOException e) {
             getLog().error("Error creating output for reporting");

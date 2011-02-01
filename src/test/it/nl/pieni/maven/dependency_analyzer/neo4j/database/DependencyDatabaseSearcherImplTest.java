@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * TODO Split is descructive and non descructive tests (speeeed).
+ * Test class for searcher
  */
 public class DependencyDatabaseSearcherImplTest extends AbstractDatabaseImplTest {
 

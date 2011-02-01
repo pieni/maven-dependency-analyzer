@@ -47,7 +47,7 @@ public class ShapeDotWriter extends AbstractDotWriter {
      * @param edges the edges
      * @throws IOException in case of error
      */
-    public void write(Set<AbstractDotShape> shapeAbstracts, Set<DotEdge> edges) throws IOException {
+    public void write(Set<? extends AbstractDotShape> shapeAbstracts, Set<DotEdge> edges) throws IOException {
 
         startGraph();
 

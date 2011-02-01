@@ -142,7 +142,7 @@ public class ArtifactNodeDecoratorTest {
         when(parentRelations.iterator()).thenReturn(iter);
         when(iter.hasNext()).thenReturn(true);
         when(iter.next()).thenReturn(relation);
-        //TODO Figure out why this only works with the any(...) as argument, it should be versionNode;
+        //Figure out why this only works with the any(...) as argument, it should be versionNode;
         when(relation.getOtherNode(any(Node.class))).thenReturn(parentNode);
 
         GroupNodeDecorator groupNode = (GroupNodeDecorator) decorator.getParent();
